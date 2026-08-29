@@ -1,0 +1,1852 @@
+<meta charset="utf-8">
+<title>POLAR-EMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0d12;
+  --bg-raised:#10141b;
+  --surface:#131820;
+  --surface-2:#171d27;
+  --border:#232b37;
+  --border-strong:#323d4d;
+  --text-primary:#e8edf5;
+  --text-secondary:#8fa0b8;
+  --text-tertiary:#57667c;
+  --accent:#35c4c9;
+  --accent-strong:#5fe0e4;
+  --accent-soft:rgba(53,196,201,.12);
+  --accent-border:rgba(53,196,201,.35);
+  --good:#5fbf8a;
+  --good-soft:rgba(95,191,138,.12);
+  --warn:#e0a63e;
+  --warn-soft:rgba(224,166,62,.12);
+  --danger:#e2585f;
+  --danger-soft:rgba(226,88,95,.14);
+  --info:#5b9fe0;
+  --p1:#e2585f;
+  --p2:#e0a63e;
+  --p3:#35c4c9;
+  --p4:#57667c;
+  --font-display:'Big Shoulders Display',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{
+  background:var(--bg);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  font-size:14px;
+  line-height:1.5;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft);color:var(--accent-strong)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:6px}
+a{color:var(--accent)}
+button{font-family:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent-strong);outline-offset:2px}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.tt{text-transform:uppercase;letter-spacing:.08em;font-size:11px;color:var(--text-tertiary);font-weight:600}
+code.inline{font-family:var(--font-mono);font-size:12px;background:var(--surface-2);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:var(--accent-strong)}
+
+#app{display:flex;flex-direction:column;min-height:100vh}
+
+/* ---- header ---- */
+header.hdr{
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,var(--bg-raised),var(--bg));
+  position:sticky;top:0;z-index:40;
+}
+.hdr-top{display:flex;align-items:center;gap:20px;padding:12px 20px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand-mark{width:34px;height:34px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-mark svg{width:20px;height:20px}
+.brand-text .name{font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:.02em;line-height:1}
+.brand-text .sub{font-size:10.5px;color:var(--text-tertiary);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+
+.hdr-stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hstat{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;min-width:56px}
+.hstat .v{font-family:var(--font-mono);font-weight:600;font-size:15px}
+.hstat .l{font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em}
+.divider-v{width:1px;height:28px;background:var(--border)}
+
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:100px;font-size:11.5px;font-weight:600;letter-spacing:.03em;border:1px solid transparent;white-space:nowrap}
+.badge .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.badge-ai{background:var(--accent-soft);color:var(--accent-strong);border-color:var(--accent-border)}
+.badge-ai .dot{background:var(--accent-strong);box-shadow:0 0 0 3px rgba(95,224,228,.18)}
+.badge-safe{background:var(--warn-soft);color:var(--warn);border-color:rgba(224,166,62,.35)}
+.badge-safe .dot{background:var(--warn)}
+.badge-online{background:var(--good-soft);color:var(--good);border-color:rgba(95,191,138,.3)}
+.badge-online .dot{background:var(--good)}
+.badge-offline{background:var(--danger-soft);color:var(--danger);border-color:rgba(226,88,95,.35)}
+.badge-offline .dot{background:var(--danger);animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@media(prefers-reduced-motion:reduce){.badge-offline .dot{animation:none}}
+
+.hdr-controls{display:flex;align-items:center;gap:8px}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--surface-2);border:1px solid var(--border-strong);color:var(--text-primary);
+  padding:7px 12px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;
+  transition:border-color .15s,background .15s;
+}
+.btn:hover{border-color:var(--accent-border);background:var(--surface)}
+.btn.primary{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent-strong)}
+.btn.primary:hover{background:rgba(53,196,201,.2)}
+.btn.small{padding:5px 9px;font-size:11.5px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+select.speed{background:var(--surface-2);border:1px solid var(--border-strong);color:var(--text-primary);padding:7px 8px;border-radius:8px;font-size:12px;font-family:var(--font-mono)}
+
+/* ---- tab nav ---- */
+nav.tabs{display:flex;gap:2px;padding:0 20px;overflow-x:auto;border-top:1px solid var(--border)}
+nav.tabs button{
+  background:transparent;border:none;color:var(--text-secondary);
+  padding:11px 16px;font-size:12.5px;font-weight:600;letter-spacing:.02em;
+  border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;
+  text-transform:uppercase;
+}
+nav.tabs button:hover{color:var(--text-primary)}
+nav.tabs button.active{color:var(--accent-strong);border-bottom-color:var(--accent-strong)}
+
+main{flex:1;padding:22px 20px 60px;max-width:1400px;margin:0 auto;width:100%}
+.page{display:none}
+.page.active{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+h1.pt{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:.01em;text-wrap:balance}
+h2.st{font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:.01em;margin-bottom:2px}
+p.lede{color:var(--text-secondary);max-width:66ch;margin-top:6px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.section-head .meta{font-size:12px;color:var(--text-tertiary)}
+
+/* ---- cards / grid ---- */
+.grid{display:grid;gap:14px}
+.kpi-row{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:18px}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;
+}
+.card.raised{background:var(--surface-2)}
+.kpi{display:flex;flex-direction:column;gap:6px}
+.kpi .l{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px}
+.kpi .v{font-family:var(--font-mono);font-weight:600;font-size:26px;line-height:1.1}
+.kpi .v .unit{font-size:13px;color:var(--text-secondary);font-weight:500;margin-left:3px}
+.horizon-btn{border:1px solid var(--border);transition:border-color .15s,background .15s}
+.horizon-btn.active{border-color:var(--accent-border);background:var(--accent-soft)}
+.horizon-btn.active .v{color:var(--accent-strong)}
+.horizon-btn:hover{border-color:var(--accent-border)}
+.kpi .d{font-size:11.5px;color:var(--text-tertiary)}
+.kpi .d.up{color:var(--good)}
+.kpi .d.down{color:var(--danger)}
+.swatch{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+.two-col{grid-template-columns:1.6fr 1fr}
+@media(max-width:980px){.two-col{grid-template-columns:1fr}}
+.three-col{grid-template-columns:repeat(3,1fr)}
+@media(max-width:900px){.three-col{grid-template-columns:1fr}}
+
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--text-secondary)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .ln{width:14px;height:2px;border-radius:2px;display:inline-block}
+.legend .ln.dash{background:repeating-linear-gradient(90deg,currentColor 0 5px,transparent 5px 9px)}
+
+/* chips / pills */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;border:1px solid var(--border-strong);color:var(--text-secondary)}
+.pill.p1{color:var(--p1);border-color:rgba(226,88,95,.4);background:rgba(226,88,95,.08)}
+.pill.p2{color:var(--p2);border-color:rgba(224,166,62,.4);background:rgba(224,166,62,.08)}
+.pill.p3{color:var(--p3);border-color:rgba(53,196,201,.4);background:rgba(53,196,201,.08)}
+.pill.p4{color:var(--text-tertiary);border-color:var(--border-strong);background:var(--surface-2)}
+.sev{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.sev.critical{background:var(--danger-soft);color:var(--danger)}
+.sev.warning{background:var(--warn-soft);color:var(--warn)}
+.sev.info{background:rgba(91,159,224,.12);color:var(--info)}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);padding:8px 10px;border-bottom:1px solid var(--border-strong);font-weight:600}
+td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.table-wrap{overflow-x:auto}
+
+/* power flow */
+.flow-wrap{display:flex;justify-content:center}
+.flow-wrap svg{width:100%;max-width:640px;height:auto}
+.flow-label{font-family:var(--font-mono);font-size:12px;fill:var(--text-primary)}
+.flow-sub{font-family:var(--font-body);font-size:9.5px;fill:var(--text-tertiary);text-transform:uppercase;letter-spacing:.05em}
+.flow-node{fill:var(--surface-2);stroke:var(--border-strong)}
+.flow-line{stroke-width:2.5;fill:none;stroke-dasharray:5 5;opacity:.25}
+.flow-line.active{opacity:1;animation:dash 1s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-20}}
+@media(prefers-reduced-motion:reduce){.flow-line.active{animation:none}}
+
+/* chart svg base */
+.chart-svg{width:100%;height:auto;display:block}
+.chart-grid{stroke:var(--border);stroke-width:1}
+.chart-axis-label{font-family:var(--font-mono);font-size:9.5px;fill:var(--text-tertiary)}
+.chart-line{fill:none;stroke-width:2}
+.chart-area{opacity:.12}
+.chart-dot{stroke:var(--bg);stroke-width:2}
+
+/* alerts */
+.alert{display:flex;gap:12px;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2)}
+.alert + .alert{margin-top:8px}
+.alert.critical{border-left:3px solid var(--danger)}
+.alert.warning{border-left:3px solid var(--warn)}
+.alert.info{border-left:3px solid var(--info)}
+.alert .body{flex:1;min-width:0}
+.alert .head{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.alert .ts{font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);margin-left:auto}
+.alert .sub{font-weight:600;font-size:13px}
+.alert .expl{color:var(--text-secondary);font-size:12.5px;margin-top:3px}
+.alert .rec{font-size:12px;margin-top:6px;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 9px}
+.alert .rec b{color:var(--accent-strong);font-weight:600}
+.alert-vals{display:flex;gap:14px;margin-top:6px;font-size:11.5px;font-family:var(--font-mono);color:var(--text-secondary)}
+
+.empty{padding:30px 16px;text-align:center;color:var(--text-tertiary);font-size:13px}
+
+/* landing */
+.hero{padding:52px 0 34px;border-bottom:1px solid var(--border);margin-bottom:26px}
+.hero .eyebrow{color:var(--accent-strong);font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.hero h1{font-family:var(--font-display);font-weight:900;font-size:clamp(34px,6vw,58px);line-height:.98;letter-spacing:.005em;text-wrap:balance;max-width:16ch}
+.hero p{margin-top:16px;font-size:16px;color:var(--text-secondary);max-width:58ch;line-height:1.65}
+.hero .ctas{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0;margin-top:34px;border-top:1px solid var(--border)}
+.stat-strip div{padding:16px 4px 0}
+.stat-strip .v{font-family:var(--font-mono);font-weight:600;font-size:22px;color:var(--accent-strong)}
+.stat-strip .l{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+
+.land-section{padding:30px 0;border-bottom:1px solid var(--border)}
+.land-section:last-child{border-bottom:none}
+.land-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:16px}
+.land-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.land-item .n{font-family:var(--font-mono);color:var(--accent);font-size:12px;margin-bottom:8px}
+.land-item h3{font-family:var(--font-display);font-weight:700;font-size:16px;margin-bottom:6px}
+.land-item p{font-size:12.5px;color:var(--text-secondary);line-height:1.55}
+.layer-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.layer-row + .layer-row{margin-top:8px}
+.layer-row .idx{font-family:var(--font-mono);color:var(--accent);font-weight:600;font-size:13px;width:20px;flex-shrink:0}
+.layer-row .lbl{font-weight:600;font-size:13px;width:150px;flex-shrink:0}
+.layer-row .desc{color:var(--text-secondary);font-size:12.5px;flex:1;min-width:180px}
+.layer-row .surv{font-size:11px;color:var(--text-tertiary);flex-shrink:0}
+
+.notice{display:flex;gap:10px;background:var(--surface-2);border:1px solid var(--border-strong);border-radius:8px;padding:12px 14px;font-size:12.5px;color:var(--text-secondary);align-items:flex-start}
+.notice svg{flex-shrink:0;margin-top:1px;color:var(--warn)}
+.notice b{color:var(--text-primary)}
+
+/* scenario dock */
+.scn-panel{
+  position:fixed;top:0;right:-360px;height:100vh;width:340px;background:var(--bg-raised);
+  border-left:1px solid var(--border-strong);z-index:60;transition:right .25s ease;
+  padding:18px;overflow-y:auto;
+}
+.scn-panel.open{right:0}
+.scn-panel.panel-left{left:-360px;right:auto;border-left:none;border-right:1px solid var(--border-strong);transition:left .25s ease}
+.scn-panel.panel-left.open{left:0}
+@media(max-width:640px){.scn-panel.panel-left{left:-88vw}}
+.scn-backdrop{position:fixed;inset:0;background:rgba(4,6,9,.55);z-index:59;display:none}
+.scn-backdrop.open{display:block}
+.scn-item{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 12px;cursor:pointer;margin-bottom:8px}
+.scn-item:hover{border-color:var(--accent-border)}
+.scn-item.active{border-color:var(--accent-strong);background:var(--accent-soft)}
+.scn-item .t{font-weight:600;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.scn-item .d{font-size:11.5px;color:var(--text-tertiary);margin-top:3px}
+
+/* misc */
+.reason-box{background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:14px;font-size:13px;line-height:1.55}
+.reason-box b{color:var(--accent-strong)}
+.progress{height:8px;border-radius:100px;background:var(--surface-2);overflow:hidden;border:1px solid var(--border)}
+.progress > div{height:100%;border-radius:100px;transition:width .3s ease}
+.status-line{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
+.status-line:last-child{border-bottom:none}
+.status-line .l{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500}
+.dotstat{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dotstat.on{background:var(--good);box-shadow:0 0 0 3px var(--good-soft)}
+.dotstat.off{background:var(--text-tertiary)}
+.slider-row{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.slider-row label{font-size:12px;color:var(--text-secondary);display:flex;justify-content:space-between}
+.slider-row label b{color:var(--text-primary);font-family:var(--font-mono)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center;color:var(--text-tertiary);font-size:11.5px}
+
+@media(max-width:640px){
+  .hdr-stats{display:none}
+  main{padding:16px 14px 50px}
+  .scn-panel{width:88vw;right:-88vw}
+}
+</style>
+
+<div id="app">
+
+<header class="hdr">
+  <div class="hdr-top">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8"><path d="M12 2v20M2 12h20M4.5 4.5l15 15M19.5 4.5l-15 15" stroke-linecap="round"/><circle cx="12" cy="12" r="3.4" fill="var(--accent-soft)" stroke="var(--accent-strong)"/></svg>
+      </div>
+      <div class="brand-text">
+        <div class="name">POLAR-EMS</div>
+        <div class="sub">Vostok Ridge Station &middot; Simulation</div>
+      </div>
+    </div>
+
+    <div class="hdr-stats">
+      <span id="modeBadge" class="badge badge-ai"><span class="dot"></span>AI OPTIMIZED</span>
+      <span id="connBadge" class="badge badge-online"><span class="dot"></span>ONLINE</span>
+      <div class="divider-v"></div>
+      <div class="hstat"><span class="v" id="hClock">--:--</span><span class="l">Sim Time</span></div>
+      <div class="hstat"><span class="v" id="hSoc">--%</span><span class="l">Battery</span></div>
+      <div class="hstat"><span class="v" id="hFuel">--%</span><span class="l">Fuel</span></div>
+    </div>
+
+    <div class="hdr-controls">
+      <button class="btn small" id="btnPlay" title="Pause/resume simulation"><span id="playIcon">&#10073;&#10073;</span></button>
+      <select class="speed" id="speedSel" title="Simulation speed">
+        <option value="1">1&times;</option>
+        <option value="4" selected>4&times;</option>
+        <option value="12">12&times;</option>
+      </select>
+      <button class="btn small" id="btnReset" title="Reset simulation to defaults">Reset</button>
+      <button class="btn small" id="btnBackend" title="Connect to the Python backend">Live Backend</button>
+      <button class="btn primary small" id="btnScenarios">Demo Scenarios</button>
+    </div>
+  </div>
+
+  <nav class="tabs" id="tabNav">
+    <button data-tab="overview" class="active">Overview</button>
+    <button data-tab="dashboard">Dashboard</button>
+    <button data-tab="forecast">Forecast</button>
+    <button data-tab="optimizer">Optimizer</button>
+    <button data-tab="anomalies">Anomalies &amp; Maintenance</button>
+    <button data-tab="offline">Offline Autonomy</button>
+    <button data-tab="audit">Green Audit</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ============ OVERVIEW / LANDING ============ -->
+<section class="page active" id="page-overview">
+  <div class="hero">
+    <div class="eyebrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>Simulation mode &middot; synthetic telemetry</div>
+    <h1>Energy intelligence for a station the grid will never reach.</h1>
+    <p>POLAR-EMS is a microgrid brain for an isolated Antarctic research station &mdash; forecasting load and renewables, optimizing diesel/battery/wind/solar dispatch, and staying in full control through weeks of dead satellite links. This page runs a live, in-browser model of that station so you can watch every layer work.</p>
+    <div class="ctas">
+      <button class="btn primary" onclick="setTab('dashboard')">Open live dashboard &rarr;</button>
+      <button class="btn" onclick="setTab('offline')">See offline autonomy</button>
+    </div>
+    <div class="stat-strip">
+      <div><div class="v">5</div><div class="l">Software layers</div></div>
+      <div><div class="v">4</div><div class="l">Load priority tiers</div></div>
+      <div><div class="v">2</div><div class="l">Dispatch controllers</div></div>
+      <div><div class="v">8</div><div class="l">Demo scenarios</div></div>
+      <div><div class="v">0</div><div class="l">Cloud dependency for survival</div></div>
+    </div>
+  </div>
+
+  <div class="land-section">
+    <h2 class="st">Why this problem needs AI, not just rules</h2>
+    <p class="lede">A polar station is an isolated microgrid: no utility backup, fuel shipped in at enormous cost, and satellite internet that can vanish for weeks. A rule-based controller can keep the lights on &mdash; it cannot adapt its diesel/battery balance to shifting wind and sun the way a forecast-driven optimizer can. POLAR-EMS runs both, side by side, so the fuel savings are measured, not asserted.</p>
+    <div class="land-grid">
+      <div class="land-item"><div class="n">01</div><h3>Fuel is the scarce resource</h3><p>Every litre of diesel is shipped in. The optimizer's entire job is cutting litres burned and generator runtime hours, not just visualizing them.</p></div>
+      <div class="land-item"><div class="n">02</div><h3>Failure is a safety issue</h3><p>Losing heat at &minus;45&deg;C is life-threatening. Life-support and heating loads sit in an unshed priority tier, enforced independently of any AI decision.</p></div>
+      <div class="land-item"><div class="n">03</div><h3>The cloud is a bonus, not the brain</h3><p>Telemetry, forecasting, dispatch and safety rules all run at the edge. Sync to the cloud portal is opportunistic and can queue for as long as needed.</p></div>
+    </div>
+  </div>
+
+  <div class="land-section">
+    <h2 class="st">Five layers, each able to survive without the one above it</h2>
+    <div style="margin-top:16px">
+      <div class="layer-row"><span class="idx">01</span><span class="lbl">Field sensors</span><span class="desc">Weather, battery, generator and per-zone load telemetry &mdash; simulated here from a physically-plausible station model.</span><span class="surv">Survives extreme cold, isolation</span></div>
+      <div class="layer-row"><span class="idx">02</span><span class="lbl">Edge gateway</span><span class="desc">Ingests, validates and stores telemetry locally; runs every model below entirely offline.</span><span class="surv">Survives total internet loss</span></div>
+      <div class="layer-row"><span class="idx">03</span><span class="lbl">AI engine</span><span class="desc">Load &amp; renewable forecasting, dispatch optimization, anomaly detection.</span><span class="surv">Survives sparse/noisy data</span></div>
+      <div class="layer-row"><span class="idx">04</span><span class="lbl">Dispatch &amp; safety</span><span class="desc">Executes source selection and load shedding; falls back to hard-coded rules if the AI layer is unavailable.</span><span class="surv">Survives AI/model failure</span></div>
+      <div class="layer-row"><span class="idx">05</span><span class="lbl">Cloud portal</span><span class="desc">Historical analytics, fleet view, green audit &mdash; synced in batches whenever a link exists.</span><span class="surv">Fine offline for weeks</span></div>
+    </div>
+  </div>
+
+  <div class="land-section">
+    <h2 class="st">What's real and what's simulated</h2>
+    <p class="lede" style="margin-bottom:14px">Data honesty matters more to judges than polish. Here is exactly what this build is.</p>
+    <div class="notice">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg>
+      <div><b>This is a synthetic simulation, not live station telemetry.</b> Weather, generation, load, battery and diesel behaviour are generated by an explicit physical model running in your browser (power curves, seasonal solar/polar-night cycles, priority-weighted load, battery/diesel dynamics) &mdash; not random numbers, and not a real feed from any station. Forecasts use a seasonal-naive statistical model, not a trained neural network. Every number on this page &mdash; fuel saved, CO&#8322; avoided, MAE/RMSE &mdash; is computed live from the running simulation and changes if you change the scenario.</div>
+    </div>
+  </div>
+
+  <div class="land-section">
+    <h2 class="st">Eight demo scenarios, one click each</h2>
+    <p class="lede" style="margin-bottom:14px">Open the Demo Scenarios panel (top right) to jump the simulation into any of these states and watch the dashboard react in real time.</p>
+    <div class="land-grid" id="scenarioPreviewGrid"></div>
+  </div>
+</section>
+
+<!-- ============ DASHBOARD ============ -->
+<section class="page" id="page-dashboard">
+  <div class="section-head">
+    <div><h1 class="pt">Station Dashboard</h1><p class="lede">Vostok Ridge Station &middot; live simulated telemetry, updated every tick.</p></div>
+    <span class="pill" id="seasonPill">&mdash;</span>
+  </div>
+
+  <div class="grid kpi-row">
+    <div class="card kpi"><span class="l">Current load</span><span class="v" id="kLoad">&mdash;<span class="unit">kW</span></span><span class="d" id="kLoadD"></span></div>
+    <div class="card kpi"><span class="l">Renewable gen.</span><span class="v" id="kRenew">&mdash;<span class="unit">kW</span></span><span class="d" id="kRenewD"></span></div>
+    <div class="card kpi"><span class="l">Battery SOC</span><span class="v" id="kSoc">&mdash;<span class="unit">%</span></span><span class="d" id="kSocD"></span></div>
+    <div class="card kpi"><span class="l">Diesel output</span><span class="v" id="kDiesel">&mdash;<span class="unit">kW</span></span><span class="d" id="kDieselD"></span></div>
+    <div class="card kpi"><span class="l">Fuel remaining</span><span class="v" id="kFuel">&mdash;<span class="unit">%</span></span><span class="d" id="kFuelD"></span></div>
+    <div class="card kpi"><span class="l">Renewable fraction</span><span class="v" id="kFrac">&mdash;<span class="unit">%</span></span><span class="d" id="kFracD"></span></div>
+    <div class="card kpi"><span class="l">CO&#8322; avoided</span><span class="v" id="kCo2">&mdash;<span class="unit">kg</span></span><span class="d">vs. rule-based baseline</span></div>
+    <div class="card kpi"><span class="l">Fuel saved</span><span class="v" id="kFuelSaved">&mdash;<span class="unit">L</span></span><span class="d">vs. rule-based baseline</span></div>
+  </div>
+
+  <div class="grid two-col" style="margin-bottom:14px">
+    <div class="card">
+      <div class="section-head"><h2 class="st">Power flow</h2><span class="meta" id="flowReason">&mdash;</span></div>
+      <div class="flow-wrap"><svg id="flowSvg" class="chart-svg" viewBox="0 0 640 300"></svg></div>
+    </div>
+    <div class="card">
+      <div class="section-head"><h2 class="st">Load by priority</h2></div>
+      <div id="priorityBars"></div>
+    </div>
+  </div>
+
+  <div class="grid two-col">
+    <div class="card">
+      <div class="section-head"><h2 class="st">Load &amp; forecast (last 24h)</h2>
+        <div class="legend"><span><i class="ln" style="background:var(--text-primary)"></i>Actual load</span><span><i class="ln dash" style="color:var(--accent)"></i>Forecast</span><span><i class="ln" style="background:var(--good)"></i>Renewables</span></div>
+      </div>
+      <svg id="dashLoadChart" class="chart-svg" viewBox="0 0 620 200"></svg>
+    </div>
+    <div class="card">
+      <div class="section-head"><h2 class="st">Battery</h2></div>
+      <svg id="dashBattChart" class="chart-svg" viewBox="0 0 620 140" style="margin-bottom:10px"></svg>
+      <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px">
+        <div><div class="tt">Temp</div><div class="num" id="battTemp" style="font-size:15px">&mdash;</div></div>
+        <div><div class="tt">Cycles</div><div class="num" id="battCycles" style="font-size:15px">&mdash;</div></div>
+        <div><div class="tt">Health</div><div class="num" id="battHealth" style="font-size:15px">&mdash;</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid two-col" style="margin-top:14px">
+    <div class="card">
+      <div class="section-head"><h2 class="st">Diesel generator</h2></div>
+      <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+        <div><div class="tt">Status</div><div id="dieselStatus" style="font-weight:600;font-size:14px">&mdash;</div></div>
+        <div><div class="tt">Runtime</div><div class="num" id="dieselRuntime" style="font-size:14px">&mdash;</div></div>
+        <div><div class="tt">Fuel use rate</div><div class="num" id="dieselRate" style="font-size:14px">&mdash;</div></div>
+        <div><div class="tt">Tank</div><div class="num" id="dieselTank" style="font-size:14px">&mdash;</div></div>
+      </div>
+      <svg id="dieselChart" class="chart-svg" viewBox="0 0 620 110"></svg>
+    </div>
+    <div class="card">
+      <div class="section-head"><h2 class="st">Active alerts</h2><span class="meta" id="alertCountMeta"></span></div>
+      <div id="dashAlerts"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORECAST ============ -->
+<section class="page" id="page-forecast">
+  <div class="section-head">
+    <div><h1 class="pt">Forecasting</h1><p class="lede">Seasonal-naive statistical model &mdash; not a trained neural network. Predicts load and renewable output at four horizons, scored against realized actuals.</p></div>
+  </div>
+
+  <div class="grid kpi-row" style="grid-template-columns:repeat(4,1fr)" id="horizonTabs">
+    <button class="card kpi horizon-btn active" data-h="1" style="cursor:pointer;text-align:left"><span class="l">Horizon</span><span class="v">1h</span></button>
+    <button class="card kpi horizon-btn" data-h="6" style="cursor:pointer;text-align:left"><span class="l">Horizon</span><span class="v">6h</span></button>
+    <button class="card kpi horizon-btn" data-h="12" style="cursor:pointer;text-align:left"><span class="l">Horizon</span><span class="v">12h</span></button>
+    <button class="card kpi horizon-btn" data-h="24" style="cursor:pointer;text-align:left"><span class="l">Horizon</span><span class="v">24h</span></button>
+  </div>
+
+  <div class="grid three-col" style="margin-bottom:14px">
+    <div class="card kpi"><span class="l">Load MAE</span><span class="v" id="fMaeLoad">&mdash;<span class="unit">kW</span></span></div>
+    <div class="card kpi"><span class="l">Load RMSE</span><span class="v" id="fRmseLoad">&mdash;<span class="unit">kW</span></span></div>
+    <div class="card kpi"><span class="l">Samples scored</span><span class="v" id="fSamples">&mdash;</span></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="section-head"><h2 class="st">Load: forecast vs. actual</h2><div class="legend"><span><i class="ln" style="background:var(--text-primary)"></i>Actual</span><span><i class="ln dash" style="color:var(--accent)"></i>Forecast</span></div></div>
+    <svg id="fcLoadChart" class="chart-svg" viewBox="0 0 1000 220"></svg>
+  </div>
+  <div class="grid two-col" style="margin-bottom:14px">
+    <div class="card">
+      <div class="section-head"><h2 class="st">Wind: forecast vs. actual</h2></div>
+      <svg id="fcWindChart" class="chart-svg" viewBox="0 0 620 180"></svg>
+    </div>
+    <div class="card">
+      <div class="section-head"><h2 class="st">Solar: forecast vs. actual</h2></div>
+      <svg id="fcSolarChart" class="chart-svg" viewBox="0 0 620 180"></svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="st" style="margin-bottom:10px">Model inputs</h2>
+    <div class="land-grid">
+      <div class="land-item"><h3 style="font-size:14px">Load model</h3><p>Seasonal same-hour baseline blended with short-term persistence of the current deviation, decayed toward the seasonal mean as the horizon grows. Inputs: hour-of-day, day-of-year, outside temperature, recent load trend.</p></div>
+      <div class="land-item"><h3 style="font-size:14px">Renewable model</h3><p>Deterministic power-curve projection (wind speed &rarr; turbine output; irradiance &rarr; PV output) combined with persistence of the current weather deviation, decayed over the horizon. Solar is forced toward zero through the modeled polar-night window.</p></div>
+      <div class="land-item"><h3 style="font-size:14px">Scoring</h3><p>Each forecast is time-stamped for a target moment; once the simulation reaches that moment, the realized actual is compared against the stored prediction to update a rolling MAE/RMSE per horizon.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OPTIMIZER ============ -->
+<section class="page" id="page-optimizer">
+  <div class="section-head">
+    <div><h1 class="pt">Dispatch Optimizer</h1><p class="lede">Every dispatch tick is computed twice, from identical weather and load conditions: a deterministic rule-based baseline, and the POLAR-EMS heuristic optimizer. The difference below is measured, not assumed.</p></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="section-head"><h2 class="st">Current decision</h2><span class="pill" id="optMode">&mdash;</span></div>
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px">
+      <div><div class="tt">Renewables served</div><div class="num" id="curRenew" style="font-size:17px">&mdash;</div></div>
+      <div><div class="tt">Battery</div><div class="num" id="curBatt" style="font-size:17px">&mdash;</div></div>
+      <div><div class="tt">Diesel</div><div class="num" id="curDies" style="font-size:17px">&mdash;</div></div>
+      <div><div class="tt">Load shed</div><div class="num" id="curShed" style="font-size:17px">&mdash;</div></div>
+    </div>
+    <div class="reason-box"><b>Why:</b> <span id="reasonText">&mdash;</span></div>
+  </div>
+
+  <div class="section-head"><h2 class="st">AI-optimized vs. rule-based baseline &mdash; since simulation start</h2></div>
+  <div class="grid kpi-row">
+    <div class="card kpi"><span class="l">Fuel consumed</span><span class="v" id="cmpFuel">&mdash;</span><span class="d" id="cmpFuelD"></span></div>
+    <div class="card kpi"><span class="l">Generator runtime</span><span class="v" id="cmpRuntime">&mdash;</span><span class="d" id="cmpRuntimeD"></span></div>
+    <div class="card kpi"><span class="l">Renewable utilization</span><span class="v" id="cmpRenew">&mdash;</span><span class="d" id="cmpRenewD"></span></div>
+    <div class="card kpi"><span class="l">Battery cycling</span><span class="v" id="cmpCycle">&mdash;</span><span class="d" id="cmpCycleD"></span></div>
+    <div class="card kpi"><span class="l">CO&#8322; avoided</span><span class="v" id="cmpCo2">&mdash;</span><span class="d">cumulative</span></div>
+  </div>
+
+  <div class="grid two-col">
+    <div class="card">
+      <div class="section-head"><h2 class="st">Cumulative fuel consumed</h2><div class="legend"><span><i class="ln" style="background:var(--text-tertiary)"></i>Baseline</span><span><i class="ln" style="background:var(--accent)"></i>AI-optimized</span></div></div>
+      <svg id="optFuelChart" class="chart-svg" viewBox="0 0 620 200"></svg>
+    </div>
+    <div class="card">
+      <div class="section-head"><h2 class="st">Dispatch decision log</h2></div>
+      <div class="table-wrap" style="max-height:280px;overflow-y:auto">
+        <table><thead><tr><th>Time</th><th>Mode</th><th>Diesel</th><th>Battery</th><th>Reason</th></tr></thead><tbody id="decisionLog"></tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANOMALIES ============ -->
+<section class="page" id="page-anomalies">
+  <div class="section-head">
+    <div><h1 class="pt">Anomalies &amp; Predictive Maintenance</h1><p class="lede">Statistical control limits compare actual subsystem behaviour against physically-expected output. Interpretable by design &mdash; every alert states the expected value it was compared against.</p></div>
+  </div>
+
+  <div class="grid kpi-row">
+    <div class="card kpi"><span class="l">Open alerts</span><span class="v" id="anCount">0</span></div>
+    <div class="card kpi"><span class="l">Critical</span><span class="v" id="anCritical" style="color:var(--danger)">0</span></div>
+    <div class="card kpi"><span class="l">Battery health</span><span class="v" id="anBattHealth">&mdash;<span class="unit">%</span></span></div>
+    <div class="card kpi"><span class="l">Turbine health</span><span class="v" id="anTurbHealth">&mdash;<span class="unit">%</span></span></div>
+    <div class="card kpi"><span class="l">Generator health</span><span class="v" id="anGenHealth">&mdash;<span class="unit">%</span></span></div>
+  </div>
+
+  <div class="grid two-col">
+    <div class="card">
+      <div class="section-head"><h2 class="st">Alert timeline</h2></div>
+      <div id="anomalyList"></div>
+    </div>
+    <div class="card">
+      <div class="section-head"><h2 class="st">Subsystem health</h2></div>
+      <div id="healthBars"></div>
+      <h2 class="st" style="margin-top:18px">Maintenance recommendations</h2>
+      <div id="maintRecs" style="margin-top:8px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OFFLINE ============ -->
+<section class="page" id="page-offline">
+  <div class="section-head">
+    <div><h1 class="pt">Offline Autonomy &amp; Sync</h1><p class="lede">Everything below the cloud line keeps running with zero internet. Toggle the outage to prove it.</p></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;text-align:center;padding:26px">
+    <div id="offlineHero" class="badge badge-online" style="font-size:16px;padding:10px 20px;margin-bottom:10px">
+      <span class="dot"></span><span id="offlineHeroText">ONLINE</span>
+    </div>
+    <div style="margin-top:14px">
+      <button class="btn primary" id="btnToggleOffline">Simulate internet outage</button>
+    </div>
+    <p class="lede" style="margin:14px auto 0;text-align:center" id="offlineSub">Connectivity to the cloud portal is nominal. Telemetry is syncing normally.</p>
+  </div>
+
+  <div class="grid two-col">
+    <div class="card">
+      <h2 class="st" style="margin-bottom:6px">Local subsystem status</h2>
+      <div id="localStatusList"></div>
+    </div>
+    <div class="card">
+      <h2 class="st" style="margin-bottom:10px">Sync outbox</h2>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <span class="num" style="font-size:32px;font-weight:600" id="outboxCount">0</span>
+        <span class="tt">unsynchronized records</span>
+      </div>
+      <div class="progress" style="margin-bottom:8px"><div id="syncBar" style="width:100%;background:var(--good)"></div></div>
+      <div class="tt" id="syncStatusText">All records synchronized</div>
+      <h2 class="st" style="margin-top:20px;margin-bottom:8px">Sync log</h2>
+      <div class="table-wrap" style="max-height:180px;overflow-y:auto">
+        <table><thead><tr><th>Time</th><th>Event</th></tr></thead><tbody id="syncLog"></tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AUDIT ============ -->
+<section class="page" id="page-audit">
+  <div class="section-head">
+    <div><h1 class="pt">Green Audit</h1><p class="lede">Every figure below is accumulated from the running simulation since it was last reset. Change the scenario or the What-If sliders and these numbers move.</p></div>
+  </div>
+
+  <div class="grid kpi-row">
+    <div class="card kpi"><span class="l">Diesel consumed</span><span class="v" id="gaFuelUsed">&mdash;<span class="unit">L</span></span></div>
+    <div class="card kpi"><span class="l">Diesel saved</span><span class="v" id="gaFuelSaved">&mdash;<span class="unit">L</span></span></div>
+    <div class="card kpi"><span class="l">Renewable energy generated</span><span class="v" id="gaRenewGen">&mdash;<span class="unit">kWh</span></span></div>
+    <div class="card kpi"><span class="l">Renewable fraction</span><span class="v" id="gaRenewFrac">&mdash;<span class="unit">%</span></span></div>
+    <div class="card kpi"><span class="l">CO&#8322; avoided</span><span class="v" id="gaCo2">&mdash;<span class="unit">kg</span></span></div>
+    <div class="card kpi"><span class="l">Runtime reduction</span><span class="v" id="gaRuntime">&mdash;<span class="unit">h</span></span></div>
+  </div>
+
+  <div class="grid two-col" style="margin-bottom:14px">
+    <div class="card">
+      <div class="section-head"><h2 class="st">Baseline vs. POLAR-EMS &mdash; fuel &amp; emissions</h2></div>
+      <svg id="auditBarChart" class="chart-svg" viewBox="0 0 560 220"></svg>
+    </div>
+    <div class="card">
+      <div class="section-head"><h2 class="st">Renewable fraction over time</h2></div>
+      <svg id="auditFracChart" class="chart-svg" viewBox="0 0 560 220"></svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="st" style="margin-bottom:4px">What-if projection</h2>
+    <p class="lede" style="margin-bottom:16px">Explicitly a projection, not a live re-simulation: it scales the current measured fuel-consumption rate by the capacity ratios below.</p>
+    <div class="grid two-col">
+      <div>
+        <div class="slider-row"><label>Wind turbines <b id="wiTurbLbl">3</b></label><input type="range" id="wiTurb" min="0" max="8" value="3" step="1"></div>
+        <div class="slider-row"><label>Solar capacity <b id="wiSolarLbl">80 kW</b></label><input type="range" id="wiSolar" min="0" max="300" value="80" step="10"></div>
+        <div class="slider-row"><label>Battery capacity <b id="wiBattLbl">500 kWh</b></label><input type="range" id="wiBatt" min="100" max="1500" value="500" step="50"></div>
+        <div class="slider-row"><label>Station load multiplier <b id="wiLoadLbl">1.0&times;</b></label><input type="range" id="wiLoad" min="50" max="200" value="100" step="5"></div>
+      </div>
+      <div class="card raised">
+        <div class="tt" style="margin-bottom:8px">Projected annual outcome</div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">
+          <div><div class="tt">Fuel / year</div><div class="num" id="wiFuel" style="font-size:18px">&mdash;</div></div>
+          <div><div class="tt">CO&#8322; / year</div><div class="num" id="wiCo2" style="font-size:18px">&mdash;</div></div>
+          <div><div class="tt">Renewable fraction</div><div class="num" id="wiFrac" style="font-size:18px">&mdash;</div></div>
+          <div><div class="tt">vs. current config</div><div class="num" id="wiDelta" style="font-size:18px">&mdash;</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="pf">POLAR-EMS &middot; Smart India Hackathon concept demo &middot; all telemetry synthetic, generated client-side &middot; no station data, personal data, or network calls involved</footer>
+
+</div>
+
+<div class="scn-backdrop" id="scnBackdrop"></div>
+<div class="scn-panel" id="scnPanel">
+  <div class="section-head"><h2 class="st">Demo scenarios</h2><button class="btn small" id="btnCloseScn">Close</button></div>
+  <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px">Jump the simulation into a named state. Selecting "Normal operation" clears every override.</p>
+  <div id="scnList"></div>
+</div>
+
+<div class="scn-backdrop" id="beBackdrop"></div>
+<div class="scn-panel panel-left" id="bePanel">
+  <div class="section-head"><h2 class="st">Live backend</h2><button class="btn small" id="btnCloseBe">Close</button></div>
+  <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px">This panel is completely independent of the Simulation Mode tabs above &mdash; it polls your own Python/FastAPI backend (see <code class="inline">backend/</code> in the project) so that inputs you give it from the VS Code terminal CLI show up here too.</p>
+  <div class="notice" style="margin-bottom:14px;font-size:11.5px">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg>
+    <div>If this page is loaded over HTTPS (e.g. from Vercel) and your backend is plain <code class="inline">http://</code>, the browser will block the connection as mixed content. Deploy the backend with HTTPS (see <code class="inline">render.yaml</code>) to connect from a live HTTPS site, or test locally by serving this page over HTTP too.</div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <label class="tt" style="display:block;margin-bottom:6px">Backend URL</label>
+    <input id="beUrl" type="text" value="http://127.0.0.1:8000" style="width:100%;background:var(--surface-2);border:1px solid var(--border-strong);color:var(--text-primary);padding:8px 10px;border-radius:8px;font-family:var(--font-mono);font-size:12.5px;margin-bottom:10px">
+    <div style="display:flex;gap:8px">
+      <button class="btn primary small" id="btnBeConnect" style="flex:1">Connect</button>
+      <button class="btn small" id="btnBeDisconnect" style="flex:1" disabled>Disconnect</button>
+    </div>
+  </div>
+  <div id="beStatus" class="badge" style="margin-bottom:14px"><span class="dot"></span>Not connected</div>
+  <div id="beBody" style="display:none">
+    <div class="status-line"><span class="l">Sim time</span><span class="num" id="beTime">&mdash;</span></div>
+    <div class="status-line"><span class="l">Mode</span><span id="beMode">&mdash;</span></div>
+    <div class="status-line"><span class="l">Connectivity</span><span id="beConn">&mdash;</span></div>
+    <div class="status-line"><span class="l">Station load</span><span class="num" id="beLoad">&mdash;</span></div>
+    <div class="status-line"><span class="l">Renewables</span><span class="num" id="beRenew">&mdash;</span></div>
+    <div class="status-line"><span class="l">Battery</span><span class="num" id="beBatt">&mdash;</span></div>
+    <div class="status-line"><span class="l">Diesel</span><span class="num" id="beDiesel">&mdash;</span></div>
+    <div class="status-line"><span class="l">Open alerts</span><span class="num" id="beAlerts">&mdash;</span></div>
+    <div class="status-line"><span class="l">Fuel saved</span><span class="num" id="beFuelSaved">&mdash;</span></div>
+    <div style="margin-top:12px">
+      <div class="tt" style="margin-bottom:5px">Why (latest dispatch reason)</div>
+      <div class="reason-box" id="beReason" style="font-size:12px">&mdash;</div>
+    </div>
+  </div>
+  <div id="beError" class="notice" style="display:none;margin-top:14px"></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   UTILITIES
+============================================================ */
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function lerp(a,b,t){return a+(b-a)*t;}
+function rand(a,b){return a+Math.random()*(b-a);}
+function gauss(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function fmt(n,d){if(n===undefined||n===null||isNaN(n))return "\u2014";return n.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fmtT(date){return date.toLocaleString(undefined,{month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false});}
+function fmtHM(date){return date.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit",hour12:false});}
+function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML;}
+function dayOfYear(d){const start=new Date(d.getFullYear(),0,0);return Math.floor((d-start)/864e5);}
+let uidc=1; function uid(){return uidc++;}
+
+/* ============================================================
+   SIMULATION MODEL CONSTANTS
+============================================================ */
+const CFG = {
+  turbineRatedKW: 100,
+  turbineCutIn: 3.5, turbineRated: 12, turbineCutOut: 25,
+  solarBaseKW: 80,
+  battCapacityKWh: 500,
+  battMaxRateKW: 150,
+  battReserveBase: 20,
+  battCritical: 10,
+  dieselRatedKW: 300,
+  dieselMinStable: 0.2,
+  dieselSfcBase: 0.30, // L per kWh at good loading
+  dieselTankCapL: 12000,
+  co2PerLiter: 2.68, // kg CO2 per litre diesel, standard emission factor
+  loadBase: { lifeSupport:40, heating:70, research:60, general:50, amenities:25 }
+};
+
+/* ============================================================
+   STATE
+============================================================ */
+const S = {
+  running:true, speed:4, tickMs:1000, simHoursPerTickBase:0.25,
+  simTime:new Date(2026,8,1,6,0,0),
+  online:true, outbox:0, syncing:false,
+  scenario:null,
+  turbineCount:3, solarCapKW:CFG.solarBaseKW,
+  weather:{temp:-20,wind:9,irr:0,cloud:0.3},
+  windAR:9, cloudAR:0.3,
+  ai:{ soc:70, battTemp:-5, cycles:0, battDeg:1.0,
+       dieselOn:false, fuelL:9000, runtimeH:0, wear:1.0, sfcTrend:1.0 },
+  base:{ soc:70, battTemp:-5, cycles:0,
+         dieselOn:false, fuelL:9000, runtimeH:0 },
+  audit:{ fuelAI:0, fuelBase:0, renewGenKWh:0, loadServedKWh:0, runtimeAI:0, runtimeBase:0 },
+  history:[], // {t,temp,wind,irr,load,windPow,solarPow,renewPow,socAI,socBase,dieselAI,dieselBase,fracRenew,mode}
+  forecastPending:[], // {targetT,horizon,predLoad,predWind,predSolar}
+  forecastErrors:{1:{load:[]},6:{load:[]},12:{load:[]},24:{load:[]}},
+  forecastPoints:{1:[],6:[],12:[],24:[]}, // completed {t,actual,pred} for chart at chosen horizon (load)
+  alerts:[], anomalyEvents:0,
+  health:{battery:100,turbine:100,generator:100},
+  mode:"AI OPTIMIZED",
+  currentDecisionAI:null,
+  decisionLog:[],
+  syncLog:[],
+  turbineDegradation:1.0, sensorFaultActive:false,
+  aiFailure:false,
+  tickCount:0
+};
+
+const SCENARIOS = [
+  {id:"normal", name:"Normal operation", desc:"Baseline weather and load, both controllers running normally.", apply:()=>{}},
+  {id:"lowrenew", name:"Low renewable generation", desc:"Wind and solar output drop sharply for an extended calm, overcast spell.", apply:()=>{S.windAR=2.5; S.scenarioWindTarget=2.5; S.scenarioCloud=0.85;}},
+  {id:"lowsoc", name:"Battery SOC falling", desc:"Battery is forced down toward the reserve threshold to test discharge behaviour.", apply:()=>{S.ai.soc=Math.min(S.ai.soc,24); S.base.soc=Math.min(S.base.soc,24);}},
+  {id:"highdemand", name:"High station demand", desc:"Station load spikes well above nominal (lab campaign, extra occupancy).", apply:()=>{S.loadMultiplier=1.9;}},
+  {id:"outage", name:"Internet outage", desc:"Cloud link drops. Edge autonomy takes over telemetry, AI, optimizer and safety.", apply:()=>{setOnline(false);}},
+  {id:"battdeg", name:"Battery degradation anomaly", desc:"Battery temperature and internal resistance drift out of normal range.", apply:()=>{S.batteryAnomalyActive=true;}},
+  {id:"turbine", name:"Wind turbine underperformance", desc:"One turbine's output falls well below what wind speed predicts (icing, blade fault).", apply:()=>{S.turbineDegradation=0.55;}},
+  {id:"aifail", name:"AI service failure", desc:"The optimizer becomes unavailable. Dispatch falls back to the hard-coded safety controller.", apply:()=>{S.aiFailure=true;}}
+];
+
+function resetScenarioOverrides(){
+  S.scenarioWindTarget=null; S.scenarioCloud=null; S.loadMultiplier=1.0;
+  S.batteryAnomalyActive=false; S.turbineDegradation=1.0; S.aiFailure=false;
+}
+
+/* ============================================================
+   WEATHER / SEASON MODEL
+============================================================ */
+function seasonVal(doy){ // -1 deep winter (polar night) .. +1 deep summer (midnight sun), southern hemisphere, solstice ~ day 356
+  return Math.cos(2*Math.PI*(doy-356)/365.25);
+}
+function solarPotential(doy){
+  const sv = seasonVal(doy);
+  if(sv < -0.32) return 0; // polar night plateau
+  return clamp((sv+0.32)/1.32, 0, 1);
+}
+function dayFactor(hour, doy){
+  const sv = seasonVal(doy);
+  const diurnal = Math.max(0, Math.sin(Math.PI*((hour-4)/16)));
+  if(sv > 0.55){ // deep summer: midnight sun, blend toward constant
+    const blend = clamp((sv-0.55)/0.45,0,1);
+    return lerp(diurnal, 0.85, blend);
+  }
+  return diurnal;
+}
+function seasonalTemp(doy){ return -25 + 20*seasonVal(doy); }
+
+function stepWeather(dtH){
+  const doy = ((dayOfYear(S.simTime)-1)%365)+1;
+  const hour = S.simTime.getHours()+S.simTime.getMinutes()/60;
+  const windTarget = S.scenarioWindTarget!=null ? S.scenarioWindTarget : 9.5;
+  S.windAR = S.windAR*0.86 + windTarget*0.14 + gauss()*0.55;
+  S.windAR = clamp(S.windAR, 0.3, 30);
+  const cloudTarget = S.scenarioCloud!=null ? S.scenarioCloud : 0.32;
+  S.cloudAR = clamp(S.cloudAR*0.9 + cloudTarget*0.1 + gauss()*0.04, 0, 0.95);
+  const pot = solarPotential(doy) * dayFactor(hour, doy);
+  const irr = pot * 950 * (1-S.cloudAR*0.85);
+  const temp = seasonalTemp(doy) + gauss()*1.4 + Math.sin((hour-15)/24*2*Math.PI)*2.5;
+  S.weather = {temp, wind:S.windAR, irr, cloud:S.cloudAR, doy, hour};
+}
+
+function windPowerCurve(speed, capacityKW){
+  if(speed < CFG.turbineCutIn || speed > CFG.turbineCutOut) return 0;
+  if(speed >= CFG.turbineRated) return capacityKW;
+  const frac = (speed-CFG.turbineCutIn)/(CFG.turbineRated-CFG.turbineCutIn);
+  return capacityKW * Math.pow(frac,3) * 1.0;
+}
+function computeRenewables(){
+  const w = S.weather;
+  const windCapTotal = S.turbineCount*CFG.turbineRatedKW;
+  let windPow = windPowerCurve(w.wind, windCapTotal) * S.turbineDegradation;
+  let solarPow = (w.irr/1000) * S.solarCapKW * 0.92;
+  windPow = clamp(windPow,0,windCapTotal);
+  solarPow = clamp(solarPow,0,S.solarCapKW);
+  return {windPow, solarPow, total:windPow+solarPow};
+}
+
+/* ============================================================
+   LOAD MODEL
+============================================================ */
+function computeLoad(){
+  const w = S.weather;
+  const heatFactor = clamp((-5 - w.temp)/40, 0, 1.6);
+  const b = CFG.loadBase;
+  const hour = w.hour;
+  const lifeSupport = b.lifeSupport + gauss()*1.5;
+  const heating = b.heating*(0.35+heatFactor) + gauss()*4;
+  const research = b.research + Math.sin(hour/24*2*Math.PI*3)*8 + gauss()*4;
+  const general = b.general + gauss()*3;
+  const amen = b.amenities*(0.6+0.5*Math.sin((hour-13)/24*2*Math.PI)) + gauss()*2;
+  const mult = S.loadMultiplier||1.0;
+  const raw = {lifeSupport:Math.max(20,lifeSupport), heating:Math.max(10,heating), research:Math.max(15,research), general:Math.max(15,general), amenities:Math.max(5,amen)};
+  const scaled = {}; Object.keys(raw).forEach(k=>scaled[k]=raw[k]*mult);
+  scaled.total = scaled.lifeSupport+scaled.heating+scaled.research+scaled.general+scaled.amenities;
+  return scaled;
+}
+
+/* ============================================================
+   DIESEL EFFICIENCY
+============================================================ */
+function dieselSfc(loadFrac, wear){
+  const penalty = loadFrac < CFG.dieselMinStable ? (CFG.dieselMinStable-loadFrac)*2.2 : (loadFrac<0.5 ? (0.5-loadFrac)*0.4 : 0);
+  return CFG.dieselSfcBase * (1+penalty) * wear;
+}
+
+/* ============================================================
+   DISPATCH: RULE-BASED BASELINE
+============================================================ */
+function dispatchBaseline(gen, load, batt, diesel, dtH){
+  const surplus = gen.total - load.total;
+  const renewToLoad = surplus >= 0 ? load.total : gen.total;
+  let remaining = Math.max(0, -surplus);
+  let battKW = 0, dieselKW = 0, shedKW = 0, reason = "";
+  const capKWh = CFG.battCapacityKWh;
+  if(surplus > 0.01){
+    const headroomKWh = (100-batt.soc)/100*capKWh;
+    const chargeKW = Math.min(surplus, CFG.battMaxRateKW, headroomKWh/dtH);
+    batt.soc = clamp(batt.soc + chargeKW*dtH/capKWh*100, 0, 100);
+    battKW = chargeKW;
+    if(diesel.on && dieselKW===0) diesel.on=false;
+    reason = `Rule: renewables (${gen.total.toFixed(0)} kW) exceed load (${load.total.toFixed(0)} kW); surplus routed to battery charge.`;
+  } else {
+    if(batt.soc > CFG.battReserveBase){
+      const availKWh = (batt.soc-CFG.battReserveBase)/100*capKWh;
+      const dischargeKW = Math.min(remaining, CFG.battMaxRateKW, availKWh/dtH);
+      batt.soc = clamp(batt.soc - dischargeKW*dtH/capKWh*100, 0, 100);
+      battKW = -dischargeKW;
+      remaining -= dischargeKW;
+      reason = `Rule: SOC above fixed ${CFG.battReserveBase}% reserve, battery discharged ${dischargeKW.toFixed(0)} kW to cover load.`;
+    }
+    if(remaining > 0.5){
+      diesel.on = true;
+      dieselKW = Math.min(remaining, CFG.dieselRatedKW);
+      remaining -= dieselKW;
+      if(remaining > 0.5){
+        shedKW = remaining;
+      }
+      reason += (reason?" ":"") + `Rule: diesel started at ${dieselKW.toFixed(0)} kW to cover remaining shortfall.`;
+    } else {
+      diesel.on = false;
+      if(!reason) reason = `Rule: battery covers load within fixed ${CFG.battReserveBase}% reserve; diesel stays off.`;
+    }
+    if(shedKW>0.5) reason += ` Rule: non-critical load of ${shedKW.toFixed(0)} kW shed; diesel at rated capacity cannot cover the rest.`;
+  }
+  reason += ` Battery now at ${batt.soc.toFixed(0)}%.`;
+  if(diesel.on){
+    const loadFrac = dieselKW/CFG.dieselRatedKW;
+    const sfc = dieselSfc(loadFrac, 1.0);
+    const fuelUsed = dieselKW*sfc*dtH;
+    diesel.fuelL = Math.max(0, diesel.fuelL - fuelUsed);
+    diesel.runtimeH += dtH;
+    diesel._fuelUsedThisTick = fuelUsed;
+  } else diesel._fuelUsedThisTick = 0;
+  return {renewKW:renewToLoad, battKW, dieselKW, shedKW, reason};
+}
+
+/* ============================================================
+   DISPATCH: AI-OPTIMIZED HEURISTIC
+============================================================ */
+function forecastRenewAvg(hoursAhead){
+  const doy = ((dayOfYear(S.simTime)-1)%365)+1;
+  let sum=0,n=0;
+  for(let h=1;h<=hoursAhead;h++){
+    const t = new Date(S.simTime.getTime()+h*3600*1000);
+    const doy2 = ((dayOfYear(t)-1)%365)+1;
+    const hour2 = t.getHours();
+    const pot = solarPotential(doy2)*dayFactor(hour2,doy2);
+    const solarEst = pot*950/1000*S.solarCapKW*0.92;
+    const windEst = windPowerCurve(S.windAR, S.turbineCount*CFG.turbineRatedKW)*0.9;
+    sum += solarEst+windEst; n++;
+  }
+  return n?sum/n:0;
+}
+
+function dispatchAI(gen, load, batt, diesel, dtH){
+  const capKWh = CFG.battCapacityKWh;
+  const renewFcst = forecastRenewAvg(3);
+  const dynReserve = renewFcst < load.total*0.45 ? 32 : 20;
+  const surplus = gen.total - load.total;
+  const renewToLoad = surplus >= 0 ? load.total : gen.total;
+  let remaining = Math.max(0, -surplus);
+  let battKW=0, dieselKW=0, shedKW=0, reason="";
+
+  if(surplus > 0.01){
+    const headroomKWh = (100-batt.soc)/100*capKWh;
+    const chargeKW = Math.min(surplus, CFG.battMaxRateKW, headroomKWh/dtH);
+    batt.soc = clamp(batt.soc + chargeKW*dtH/capKWh*100, 0, 100);
+    battKW = chargeKW;
+    diesel.on = false;
+    reason = `Renewables (${gen.total.toFixed(0)} kW) exceed load (${load.total.toFixed(0)} kW); surplus of ${chargeKW.toFixed(0)} kW routed to battery charge, diesel held off.`;
+  } else {
+    const canDischarge = batt.soc > dynReserve;
+    if(canDischarge){
+      const availKWh = (batt.soc-dynReserve)/100*capKWh;
+      const dischargeKW = Math.min(remaining, CFG.battMaxRateKW, availKWh/dtH);
+      batt.soc = clamp(batt.soc - dischargeKW*dtH/capKWh*100, 0, 100);
+      battKW = -dischargeKW;
+      remaining -= dischargeKW;
+      reason = `Forecasted renewable output over next 3h averages ${renewFcst.toFixed(0)} kW, so battery discharged ${dischargeKW.toFixed(0)} kW (reserve floor set to ${dynReserve}% given forecast).`;
+    }
+    if(remaining > 0.5){
+      diesel.on = true;
+      let target = remaining;
+      if(batt.soc < 75 && renewFcst < load.total*0.5){
+        target = Math.min(CFG.dieselRatedKW, remaining + CFG.dieselRatedKW*0.25);
+      }
+      dieselKW = Math.min(target, CFG.dieselRatedKW);
+      const extraToBatt = Math.max(0, dieselKW-remaining);
+      if(extraToBatt>0.1){
+        const headroomKWh=(100-batt.soc)/100*capKWh;
+        const actualExtra = Math.min(extraToBatt, headroomKWh/dtH);
+        batt.soc = clamp(batt.soc + actualExtra*dtH/capKWh*100,0,100);
+        battKW += actualExtra;
+      }
+      const covered = Math.min(dieselKW, remaining);
+      remaining -= covered;
+      if(remaining>0.5) shedKW = remaining;
+      reason += (reason?" ":"") + `Diesel started at ${dieselKW.toFixed(0)} kW to cover the ${(remaining+covered).toFixed(0)} kW shortfall` + (extraToBatt>0.1?`, running above immediate demand to recharge the battery and avoid a second cold start soon.`:`.`);
+    } else if(!reason){
+      diesel.on = false;
+      reason = `Battery covers the shortfall within the ${dynReserve}% reserve; diesel stays off.`;
+    } else if(dieselKW===0){
+      diesel.on = false;
+    }
+  }
+  if(shedKW>0.5){
+    reason += ` Load shed of ${shedKW.toFixed(0)} kW applied to amenities/general tiers to protect life-support and research loads.`;
+  }
+  reason += ` Battery now at ${batt.soc.toFixed(0)}%.`;
+  if(diesel.on){
+    const loadFrac = dieselKW/CFG.dieselRatedKW;
+    const sfc = dieselSfc(loadFrac, S.ai.wear);
+    const fuelUsed = dieselKW*sfc*dtH;
+    diesel.fuelL = Math.max(0, diesel.fuelL - fuelUsed);
+    diesel.runtimeH += dtH;
+    diesel._fuelUsedThisTick = fuelUsed;
+  } else diesel._fuelUsedThisTick = 0;
+  return {renewKW:renewToLoad, battKW, dieselKW, shedKW, reason, dynReserve};
+}
+
+/* ============================================================
+   SAFETY LAYER
+============================================================ */
+function applySafety(decision, batt, diesel, load){
+  let forcedFallback = S.aiFailure || S.sensorFaultActive;
+  if(batt.soc < CFG.battCritical){
+    forcedFallback = true;
+    diesel.on = true;
+    decision.dieselKW = CFG.dieselRatedKW;
+    const stillShort = Math.max(0, load.total - decision.renewKW - Math.abs(Math.min(0,decision.battKW)) - decision.dieselKW);
+    decision.shedKW = Math.max(decision.shedKW||0, stillShort);
+    decision.reason = `SAFETY OVERRIDE: battery SOC ${batt.soc.toFixed(0)}% is below the ${CFG.battCritical}% critical floor. Diesel forced to full output and non-critical loads (general, amenities) shed to protect life-support and heating.`;
+  }
+  return forcedFallback ? "SAFE FALLBACK" : "AI OPTIMIZED";
+}
+
+/* ============================================================
+   ANOMALY DETECTION
+============================================================ */
+function pushAlert(sev, sub, detected, expected, expl, rec){
+  const a = {id:uid(), sev, sub, detected, expected, expl, rec, t:new Date(S.simTime), resolved:false};
+  S.alerts.unshift(a);
+  if(S.alerts.length>60) S.alerts.pop();
+  S.anomalyEvents++;
+}
+let lastAnomalyCheck = 0;
+function checkAnomalies(gen){
+  S.tickCount++;
+  if(S.tickCount - lastAnomalyCheck < 4) return;
+  lastAnomalyCheck = S.tickCount;
+
+  const windCapTotal = S.turbineCount*CFG.turbineRatedKW;
+  const expectedWind = windPowerCurve(S.weather.wind, windCapTotal);
+  if(expectedWind > 20 && gen.windPow < expectedWind*0.75){
+    const pct = Math.round((1-gen.windPow/expectedWind)*100);
+    S.health.turbine = clamp(S.health.turbine-1.2, 30, 100);
+    if(Math.random()<0.5 || S.turbineDegradation<0.9)
+      pushAlert("warning","Wind turbine array", gen.windPow.toFixed(0)+" kW", expectedWind.toFixed(0)+" kW",
+        `Turbine output is ${pct}% below the value predicted by the power curve for a ${S.weather.wind.toFixed(1)} m/s wind speed.`,
+        "Schedule a blade/ice inspection; check pitch and yaw alignment before the next storm window.");
+  } else {
+    S.health.turbine = clamp(S.health.turbine+0.2, 30, 100);
+  }
+
+  if(S.batteryAnomalyActive){
+    S.ai.battTemp = clamp(S.ai.battTemp + rand(0.5,2.2), -10, 45);
+    S.health.battery = clamp(S.health.battery-1.5, 20, 100);
+    if(Math.random()<0.6)
+      pushAlert("critical","Battery bank", S.ai.battTemp.toFixed(1)+"\u00B0C", "-5 to 15\u00B0C",
+        "Battery temperature is drifting outside the normal operating band with an accelerated rise rate, consistent with degrading thermal management or cell imbalance.",
+        "Inspect thermal management and cell balance; reduce peak discharge rate until confirmed safe.");
+  } else {
+    S.ai.battTemp = clamp(S.ai.battTemp*0.9 + (-5)*0.1 + gauss()*0.4, -15, 40);
+    S.health.battery = clamp(S.health.battery+0.15, 20, 100);
+  }
+
+  if(S.ai.dieselOn){
+    const expectedSfc = CFG.dieselSfcBase;
+    const actualSfc = S.ai.wear*expectedSfc;
+    if(actualSfc > expectedSfc*1.15){
+      S.health.generator = clamp(S.health.generator-1.0,20,100);
+      if(Math.random()<0.4)
+        pushAlert("warning","Diesel generator", actualSfc.toFixed(2)+" L/kWh", expectedSfc.toFixed(2)+" L/kWh",
+          `Fuel consumption per kWh delivered is ${Math.round((actualSfc/expectedSfc-1)*100)}% above the expected specific fuel consumption for this generator.`,
+          "Inspect fuel injectors and air filter; schedule a combustion efficiency service.");
+    } else {
+      S.health.generator = clamp(S.health.generator+0.1,20,100);
+    }
+  }
+
+  if(Math.random()<0.03){
+    S.sensorFaultActive = true;
+    pushAlert("info","Zone load sensor", "0 kW (dropout)", "~50 kW",
+      "A zone load sensor reported an implausible dropout to zero for one reading cycle, inconsistent with surrounding telemetry.",
+      "Reading flagged and excluded from dispatch input; monitor for repeat faults on this node.");
+    setTimeout(()=>{S.sensorFaultActive=false;}, 100);
+  }
+}
+
+/* ============================================================
+   FORECAST MODULE
+============================================================ */
+function generateForecasts(load){
+  [1,6,12,24].forEach(h=>{
+    const targetT = new Date(S.simTime.getTime()+h*3600*1000);
+    const decay = Math.exp(-h/14);
+    const doyT = ((dayOfYear(targetT)-1)%365)+1;
+    const hourT = targetT.getHours();
+    const seasonalLoadEst = CFG.loadBase.lifeSupport+CFG.loadBase.heating*(0.35+clamp((-5-seasonalTemp(doyT))/40,0,1.6))+CFG.loadBase.research+CFG.loadBase.general+CFG.loadBase.amenities*0.85;
+    const deviation = load.total - (CFG.loadBase.lifeSupport+CFG.loadBase.heating+CFG.loadBase.research+CFG.loadBase.general+CFG.loadBase.amenities);
+    const predLoad = seasonalLoadEst + deviation*decay + gauss()*3*(1+h/12);
+    const pot = solarPotential(doyT)*dayFactor(hourT,doyT);
+    const predSolar = clamp(pot*950/1000*S.solarCapKW*0.92 + (S.weather.irr - (solarPotential(S.weather.doy)*dayFactor(S.weather.hour,S.weather.doy)*950/1000*S.solarCapKW*0.92))*decay*0.3, 0, S.solarCapKW);
+    const windDecay = 9.5 + (S.windAR-9.5)*decay;
+    const predWind = windPowerCurve(windDecay, S.turbineCount*CFG.turbineRatedKW);
+    S.forecastPending.push({targetT, horizon:h, predLoad, predWind, predSolar});
+  });
+  if(S.forecastPending.length>400) S.forecastPending.splice(0, S.forecastPending.length-400);
+}
+function resolveForecasts(actualLoad, actualWind, actualSolar){
+  const now = S.simTime.getTime();
+  const still=[];
+  S.forecastPending.forEach(f=>{
+    if(f.targetT.getTime() <= now){
+      const errL = Math.abs(f.predLoad-actualLoad);
+      const arr = S.forecastErrors[f.horizon].load;
+      arr.push({abs:errL, sq:errL*errL});
+      if(arr.length>200) arr.shift();
+      const pts = S.forecastPoints[f.horizon];
+      pts.push({t:f.targetT, actual:actualLoad, pred:f.predLoad, predWind:f.predWind, actualWind, predSolar:f.predSolar, actualSolar});
+      if(pts.length>60) pts.shift();
+    } else still.push(f);
+  });
+  S.forecastPending = still;
+}
+
+/* ============================================================
+   MAIN TICK
+============================================================ */
+function tick(){
+  if(!S.running) return;
+  const dtH = S.simHoursPerTickBase * S.speed;
+  S.simTime = new Date(S.simTime.getTime() + dtH*3600*1000);
+  stepWeather(dtH);
+  const gen = computeRenewables();
+  const load = computeLoad();
+
+  const decBase = dispatchBaseline(gen, load, S.base, S.base, dtH);
+  const aiUnavailable = S.aiFailure || S.sensorFaultActive;
+  let decAI;
+  if(aiUnavailable){
+    decAI = dispatchBaseline(gen, load, S.ai, S.ai, dtH);
+    decAI.reason = "AI optimizer unavailable — hard-coded safety controller engaged. " + decAI.reason;
+  } else {
+    decAI = dispatchAI(gen, load, S.ai, S.ai, dtH);
+  }
+  const finalMode = applySafety(decAI, S.ai, S.ai, load);
+  S.mode = finalMode;
+  S.currentDecisionAI = decAI;
+
+  S.ai.cycles += Math.abs(decAI.battKW)*dtH/CFG.battCapacityKWh*0.5;
+  S.base.cycles += Math.abs(decBase.battKW)*dtH/CFG.battCapacityKWh*0.5;
+  S.ai.battDeg = clamp(1 - S.ai.cycles*0.0004, 0.75, 1);
+  if(S.scenario==="turbine" || S.scenario==="battdeg") S.ai.wear = clamp(S.ai.wear+0.0006,1,1.4);
+
+  S.audit.fuelAI += S.ai._fuelUsedThisTick||0;
+  S.audit.fuelBase += S.base._fuelUsedThisTick||0;
+  S.audit.renewGenKWh += gen.total*dtH;
+  S.audit.loadServedKWh += load.total*dtH;
+  S.audit.runtimeAI = S.ai.runtimeH;
+  S.audit.runtimeBase = S.base.runtimeH;
+
+  generateForecasts(load);
+  resolveForecasts(load.total, gen.windPow, gen.solarPow);
+  checkAnomalies(gen);
+
+  const fracRenew = load.total>0 ? clamp(decAI.renewKW/load.total,0,1)*100 : 0;
+  S.history.push({
+    t:new Date(S.simTime), temp:S.weather.temp, wind:S.weather.wind, irr:S.weather.irr,
+    load, windPow:gen.windPow, solarPow:gen.solarPow, renewPow:gen.total,
+    socAI:S.ai.soc, socBase:S.base.soc, dieselAI:decAI.dieselKW, dieselBase:decBase.dieselKW,
+    fuelAI:S.ai.fuelL, fracRenew, mode:S.mode, reason:decAI.reason, shedKW:decAI.shedKW, battKW:decAI.battKW,
+    fuelCumAI:S.audit.fuelAI, fuelCumBase:S.audit.fuelBase
+  });
+  if(S.history.length>720) S.history.shift();
+
+  S.decisionLog.unshift({t:new Date(S.simTime), mode:S.mode, dieselKW:decAI.dieselKW, battKW:decAI.battKW, reason:decAI.reason});
+  if(S.decisionLog.length>80) S.decisionLog.pop();
+
+  if(!S.online){
+    S.outbox++;
+  }
+
+  render();
+}
+
+/* ============================================================
+   OFFLINE / SYNC
+============================================================ */
+function setOnline(val){
+  if(val===S.online) return;
+  S.online = val;
+  if(val){
+    logSync(`Connectivity restored. Beginning batch upload of ${S.outbox} queued record(s).`);
+    S.syncing = true;
+    const total = S.outbox;
+    let remaining = total;
+    const step = ()=>{
+      if(remaining<=0){
+        S.syncing=false; S.outbox=0;
+        logSync("Sync complete. All records confirmed on cloud portal.");
+        render();
+        return;
+      }
+      const chunk = Math.max(1, Math.ceil(remaining/6));
+      remaining -= chunk;
+      S.outbox = Math.max(0, remaining);
+      render();
+      setTimeout(step, 260);
+    };
+    if(total>0) setTimeout(step, 260); else { logSync("No queued records to sync."); render(); }
+  } else {
+    logSync("Connectivity to cloud portal lost. Switching to edge autonomy.");
+  }
+  render();
+}
+function logSync(msg){
+  S.syncLog.unshift({t:new Date(S.simTime), msg});
+  if(S.syncLog.length>40) S.syncLog.pop();
+}
+
+/* ============================================================
+   SVG CHART HELPERS
+============================================================ */
+function svgEl(tag,attrs){
+  const e=document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  return e;
+}
+function drawLineChart(svg, series, opts){
+  opts = opts||{};
+  const vb = svg.viewBox.baseVal;
+  const W = vb.width||620, H = vb.height||200;
+  const padL=38, padR=10, padT=10, padB=20;
+  const w=W-padL-padR, h=H-padT-padB;
+  svg.innerHTML="";
+  let allVals=[]; series.forEach(s=>s.points.forEach(p=>{if(p!=null)allVals.push(p);}));
+  if(allVals.length<2){
+    svg.appendChild(svgEl("text",{x:W/2,y:H/2,"text-anchor":"middle",class:"chart-axis-label"})).textContent="Gathering telemetry\u2026";
+    return;
+  }
+  let minV = Math.min(...allVals), maxV = Math.max(...allVals);
+  if(opts.minZero) minV = Math.min(0,minV);
+  if(maxV-minV < 1e-6) maxV = minV+1;
+  const pad = (maxV-minV)*0.12;
+  minV -= pad; maxV += pad;
+  const n = series[0].points.length;
+  const x = i => padL + (n<=1?0:i/(n-1)*w);
+  const y = v => padT + h - (v-minV)/(maxV-minV)*h;
+
+  for(let gi=0; gi<=3; gi++){
+    const gy = padT + h*gi/3;
+    svg.appendChild(svgEl("line",{x1:padL,x2:padL+w,y1:gy,y2:gy,class:"chart-grid"}));
+    const val = maxV - (maxV-minV)*gi/3;
+    const t = svgEl("text",{x:padL-6,y:gy+3,"text-anchor":"end",class:"chart-axis-label"});
+    t.textContent = Math.round(val);
+    svg.appendChild(t);
+  }
+  if(opts.xLabels){
+    const t1=svgEl("text",{x:padL,y:H-4,class:"chart-axis-label"}); t1.textContent=opts.xLabels[0]; svg.appendChild(t1);
+    const t2=svgEl("text",{x:padL+w,y:H-4,"text-anchor":"end",class:"chart-axis-label"}); t2.textContent=opts.xLabels[1]; svg.appendChild(t2);
+  }
+
+  series.forEach(s=>{
+    let d="";
+    s.points.forEach((p,i)=>{ if(p==null)return; d += (d?" L ":"M ")+x(i).toFixed(1)+" "+y(p).toFixed(1); });
+    if(s.area){
+      const areaD = d + ` L ${x(s.points.length-1).toFixed(1)} ${(padT+h).toFixed(1)} L ${x(0).toFixed(1)} ${(padT+h).toFixed(1)} Z`;
+      svg.appendChild(svgEl("path",{d:areaD, fill:s.color, class:"chart-area", stroke:"none"}));
+    }
+    const path = svgEl("path",{d, class:"chart-line", stroke:s.color});
+    if(s.dashed) path.setAttribute("stroke-dasharray","5 4");
+    svg.appendChild(path);
+    let lastI=-1; for(let i=s.points.length-1;i>=0;i--){if(s.points[i]!=null){lastI=i;break;}}
+    if(lastI>=0){
+      svg.appendChild(svgEl("circle",{cx:x(lastI),cy:y(s.points[lastI]),r:3.5,fill:s.color,class:"chart-dot"}));
+    }
+  });
+}
+function drawBarChart(svg, groups, opts){
+  opts=opts||{};
+  const vb=svg.viewBox.baseVal; const W=vb.width||560,H=vb.height||220;
+  const padL=44,padR=16,padT=16,padB=34;
+  const w=W-padL-padR,h=H-padT-padB;
+  svg.innerHTML="";
+  const maxV = Math.max(1,...groups.flatMap(g=>g.values));
+  const gW = w/groups.length;
+  for(let gi=0;gi<=3;gi++){
+    const gy=padT+h*gi/3;
+    svg.appendChild(svgEl("line",{x1:padL,x2:padL+w,y1:gy,y2:gy,class:"chart-grid"}));
+    const t=svgEl("text",{x:padL-6,y:gy+3,"text-anchor":"end",class:"chart-axis-label"});
+    t.textContent = Math.round(maxV*(1-gi/3)); svg.appendChild(t);
+  }
+  groups.forEach((g,gi)=>{
+    const bw = gW/(g.values.length+1);
+    g.values.forEach((v,vi)=>{
+      const bh = (v/maxV)*h;
+      const bx = padL+gi*gW+bw*(vi+0.5);
+      svg.appendChild(svgEl("rect",{x:bx,y:padT+h-bh,width:bw*0.72,height:Math.max(1,bh),fill:g.colors[vi],rx:3}));
+    });
+    const lbl = svgEl("text",{x:padL+gi*gW+gW/2,y:H-10,"text-anchor":"middle",class:"chart-axis-label"});
+    lbl.textContent = g.label; svg.appendChild(lbl);
+  });
+}
+
+/* ============================================================
+   RENDER
+============================================================ */
+function setBadge(el, cls, dotOk, text){
+  el.className = "badge "+cls;
+  el.innerHTML = '<span class="dot"></span>'+text;
+}
+function renderHeader(){
+  document.getElementById("hClock").textContent = fmtHM(S.simTime)+" \u00B7 "+S.simTime.toLocaleDateString(undefined,{month:"short",day:"2-digit"});
+  document.getElementById("hSoc").textContent = S.ai.soc.toFixed(0)+"%";
+  document.getElementById("hFuel").textContent = (S.ai.fuelL/CFG.dieselTankCapL*100).toFixed(0)+"%";
+  const mb = document.getElementById("modeBadge");
+  if(S.mode==="AI OPTIMIZED") setBadge(mb,"badge-ai",true,"AI OPTIMIZED"); else setBadge(mb,"badge-safe",true,"SAFE FALLBACK");
+  const cb = document.getElementById("connBadge");
+  if(S.online) setBadge(cb,"badge-online",true,"ONLINE"); else setBadge(cb,"badge-offline",false,"OFFLINE");
+}
+
+function seasonLabel(){
+  const sv = seasonVal(S.weather.doy||1);
+  if(sv<-0.32) return "Polar night";
+  if(sv>0.55) return "Midnight sun";
+  return sv>0?"Austral summer":"Austral winter";
+}
+
+function renderOverviewScenarios(){
+  const grid = document.getElementById("scenarioPreviewGrid");
+  if(grid.dataset.built) return;
+  grid.dataset.built="1";
+  SCENARIOS.forEach((sc,i)=>{
+    const div = document.createElement("div");
+    div.className="land-item";
+    div.innerHTML = `<div class="n">0${i+1}</div><h3>${esc(sc.name)}</h3><p>${esc(sc.desc)}</p>`;
+    grid.appendChild(div);
+  });
+}
+
+function renderDashboard(){
+  const h = S.history[S.history.length-1]; if(!h) return;
+  document.getElementById("seasonPill").textContent = seasonLabel()+" \u00B7 "+fmt(S.weather.temp,0)+"\u00B0C \u00B7 wind "+fmt(S.weather.wind,1)+" m/s";
+  document.getElementById("kLoad").innerHTML = fmt(h.load.total,0)+'<span class="unit">kW</span>';
+  document.getElementById("kRenew").innerHTML = fmt(h.renewPow,0)+'<span class="unit">kW</span>';
+  document.getElementById("kSoc").innerHTML = fmt(S.ai.soc,0)+'<span class="unit">%</span>';
+  document.getElementById("kDiesel").innerHTML = fmt(h.dieselAI,0)+'<span class="unit">kW</span>';
+  document.getElementById("kFuel").innerHTML = fmt(S.ai.fuelL/CFG.dieselTankCapL*100,0)+'<span class="unit">%</span>';
+  document.getElementById("kFrac").innerHTML = fmt(h.fracRenew,0)+'<span class="unit">%</span>';
+  const co2 = (S.audit.fuelBase-S.audit.fuelAI)*CFG.co2PerLiter;
+  document.getElementById("kCo2").innerHTML = fmt(Math.max(0,co2),0)+'<span class="unit">kg</span>';
+  document.getElementById("kFuelSaved").innerHTML = fmt(Math.max(0,S.audit.fuelBase-S.audit.fuelAI),0)+'<span class="unit">L</span>';
+  document.getElementById("kSocD").textContent = h.battKW>0 ? "Charging" : h.battKW<0 ? "Discharging" : "Idle";
+  document.getElementById("kDieselD").textContent = S.ai.dieselOn ? "Running" : "Standby";
+  document.getElementById("kFuelD").textContent = fmt(S.ai.fuelL,0)+" L in tank";
+  document.getElementById("kRenewD").textContent = "Wind "+fmt(h.windPow,0)+" + Solar "+fmt(h.solarPow,0)+" kW";
+  document.getElementById("kLoadD").textContent = "P1 "+fmt(h.load.lifeSupport+h.load.heating,0)+" kW critical";
+
+  drawFlow(h);
+  drawPriorityBars(h.load);
+
+  const N = Math.min(96, S.history.length);
+  const recent = S.history.slice(-N);
+  const fpts = S.forecastPoints[1].slice(-N);
+  const primaryC = getComputedStyle(document.body).getPropertyValue("--text-primary");
+  const accentC = getComputedStyle(document.body).getPropertyValue("--accent");
+  const goodC = getComputedStyle(document.body).getPropertyValue("--good");
+  drawLineChart(document.getElementById("dashLoadChart"), [
+    {points:recent.map(r=>r.load.total), color:primaryC},
+    {points: recent.map(r=>{
+      const match = fpts.find(f=>Math.abs(f.t.getTime()-r.t.getTime())<3600*1000*0.3);
+      return match ? match.pred : null;
+    }), color:accentC, dashed:true},
+    {points:recent.map(r=>r.renewPow), color:goodC}
+  ], {minZero:true, xLabels:[fmtHM(recent[0].t), fmtHM(recent[recent.length-1].t)]});
+
+  drawLineChart(document.getElementById("dashBattChart"), [
+    {points:recent.map(r=>r.socAI), color:getComputedStyle(document.body).getPropertyValue("--accent"), area:true},
+  ], {xLabels:[fmtHM(recent[0].t), fmtHM(recent[recent.length-1].t)]});
+  document.getElementById("battTemp").textContent = fmt(S.ai.battTemp,1)+"\u00B0C";
+  document.getElementById("battCycles").textContent = fmt(S.ai.cycles,0);
+  document.getElementById("battHealth").textContent = fmt(S.health.battery,0)+"%";
+
+  document.getElementById("dieselStatus").innerHTML = S.ai.dieselOn ? '<span style="color:var(--warn)">RUNNING \u2014 '+h.dieselAI.toFixed(0)+' kW</span>' : '<span style="color:var(--text-tertiary)">STANDBY</span>';
+  document.getElementById("dieselRuntime").textContent = fmt(S.ai.runtimeH,1)+" h";
+  document.getElementById("dieselRate").textContent = fmt((S.ai._fuelUsedThisTick||0)/(S.simHoursPerTickBase*S.speed||1),2)+" L/h";
+  document.getElementById("dieselTank").textContent = fmt(S.ai.fuelL,0)+" / "+CFG.dieselTankCapL+" L";
+  drawLineChart(document.getElementById("dieselChart"), [{points:recent.map(r=>r.dieselAI), color:getComputedStyle(document.body).getPropertyValue("--warn"), area:true}], {minZero:true});
+
+  const alertsEl = document.getElementById("dashAlerts");
+  const openAlerts = S.alerts.slice(0,5);
+  document.getElementById("alertCountMeta").textContent = S.alerts.length+" total";
+  if(!openAlerts.length){ alertsEl.innerHTML = '<div class="empty">No active alerts. All subsystems nominal.</div>'; }
+  else alertsEl.innerHTML = openAlerts.map(alertHTML).join("");
+}
+
+function drawPriorityBars(load){
+  const el = document.getElementById("priorityBars");
+  const rows = [
+    {p:"p1",label:"Life support + heating",val:load.lifeSupport+load.heating},
+    {p:"p2",label:"Research equipment",val:load.research},
+    {p:"p3",label:"General power",val:load.general},
+    {p:"p4",label:"Amenities",val:load.amenities}
+  ];
+  const max = Math.max(...rows.map(r=>r.val),1);
+  el.innerHTML = rows.map(r=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+        <span class="pill ${r.p}">${r.p.toUpperCase()}</span>
+        <span>${esc(r.label)}</span>
+        <span class="num">${r.val.toFixed(0)} kW</span>
+      </div>
+      <div class="progress"><div style="width:${(r.val/max*100).toFixed(0)}%;background:var(--${r.p==="p1"?"danger":r.p==="p2"?"warn":r.p==="p3"?"accent":"text-tertiary"})"></div></div>
+    </div>`).join("");
+}
+
+function drawFlow(h){
+  const svg = document.getElementById("flowSvg");
+  svg.innerHTML="";
+  const nodes = {
+    wind:[90,60], solar:[90,150], batt:[90,240],
+    grid:[320,150], diesel:[320,60], loads:[550,150]
+  };
+  function line(a,b,active,color){
+    const p = svgEl("path",{d:`M ${nodes[a][0]} ${nodes[a][1]} L ${nodes[b][0]} ${nodes[b][1]}`, class:"flow-line"+(active?" active":""), stroke:color});
+    svg.appendChild(p);
+  }
+  const accent = getComputedStyle(document.body).getPropertyValue("--good");
+  const warn = getComputedStyle(document.body).getPropertyValue("--warn");
+  const teal = getComputedStyle(document.body).getPropertyValue("--accent");
+  line("wind","grid", h.windPow>2, accent);
+  line("solar","grid", h.solarPow>2, accent);
+  line("batt","grid", Math.abs(h.battKW)>1, teal);
+  line("diesel","grid", h.dieselAI>1, warn);
+  line("grid","loads", true, teal);
+
+  function node(key,label,sub,val,color){
+    const [x,y]=nodes[key];
+    const g = svgEl("g",{});
+    g.appendChild(svgEl("circle",{cx:x,cy:y,r:34,class:"flow-node",stroke:color,"stroke-width":2}));
+    const t1=svgEl("text",{x,y:y-2,"text-anchor":"middle",class:"flow-label"}); t1.textContent=val; g.appendChild(t1);
+    const t2=svgEl("text",{x,y:y+12,"text-anchor":"middle",class:"flow-sub"}); t2.textContent=sub; g.appendChild(t2);
+    const t3=svgEl("text",{x,y:y-46,"text-anchor":"middle",class:"flow-sub",fill:color}); t3.textContent=label; g.appendChild(t3);
+    svg.appendChild(g);
+  }
+  node("wind","WIND","kW",h.windPow.toFixed(0), accent);
+  node("solar","SOLAR","kW",h.solarPow.toFixed(0), accent);
+  node("batt","BATTERY",(h.battKW>=0?"charge":"discharge"), Math.abs(h.battKW).toFixed(0)+"kW", teal);
+  node("diesel","DIESEL","kW",h.dieselAI.toFixed(0), warn);
+  node("grid","MICROGRID","bus",""+h.load.total.toFixed(0)+"kW", teal);
+  node("loads","STATION","LOADS",h.load.total.toFixed(0)+"kW","var(--text-secondary)".includes("var")?getComputedStyle(document.body).getPropertyValue("--text-secondary"):"#8fa0b8");
+  document.getElementById("flowReason").textContent = S.mode;
+}
+
+function alertHTML(a){
+  return `<div class="alert ${a.sev}">
+    <div class="body">
+      <div class="head"><span class="sev ${a.sev}">${a.sev}</span><span class="sub">${esc(a.sub)}</span><span class="ts">${fmtT(a.t)}</span></div>
+      <div class="expl">${esc(a.expl)}</div>
+      <div class="alert-vals"><span>Detected: <b style="color:var(--text-primary)">${esc(a.detected)}</b></span><span>Expected: <b style="color:var(--text-primary)">${esc(a.expected)}</b></span></div>
+      <div class="rec"><b>Recommended:</b> ${esc(a.rec)}</div>
+    </div>
+  </div>`;
+}
+
+let activeHorizon = 1;
+function renderForecast(){
+  const errs = S.forecastErrors[activeHorizon].load;
+  const mae = errs.length ? errs.reduce((a,b)=>a+b.abs,0)/errs.length : null;
+  const rmse = errs.length ? Math.sqrt(errs.reduce((a,b)=>a+b.sq,0)/errs.length) : null;
+  document.getElementById("fMaeLoad").innerHTML = (mae!=null?mae.toFixed(1):"\u2014")+'<span class="unit">kW</span>';
+  document.getElementById("fRmseLoad").innerHTML = (rmse!=null?rmse.toFixed(1):"\u2014")+'<span class="unit">kW</span>';
+  document.getElementById("fSamples").textContent = errs.length;
+
+  const pts = S.forecastPoints[activeHorizon];
+  const N = Math.min(48, pts.length);
+  const recent = pts.slice(-N);
+  const primary = getComputedStyle(document.body).getPropertyValue("--text-primary");
+  const accent = getComputedStyle(document.body).getPropertyValue("--accent");
+  const info = getComputedStyle(document.body).getPropertyValue("--info");
+  drawLineChart(document.getElementById("fcLoadChart"), [
+    {points:recent.map(r=>r.actual), color:primary},
+    {points:recent.map(r=>r.pred), color:accent, dashed:true}
+  ], {minZero:true, xLabels: recent.length?[fmtT(recent[0].t), fmtT(recent[recent.length-1].t)]:null});
+  drawLineChart(document.getElementById("fcWindChart"), [
+    {points:recent.map(r=>r.actualWind), color:primary},
+    {points:recent.map(r=>r.predWind), color:accent, dashed:true}
+  ], {minZero:true});
+  drawLineChart(document.getElementById("fcSolarChart"), [
+    {points:recent.map(r=>r.actualSolar), color:primary},
+    {points:recent.map(r=>r.predSolar), color:"var(--good)".includes("var")?getComputedStyle(document.body).getPropertyValue("--good"):"#5fbf8a", dashed:true}
+  ], {minZero:true});
+}
+
+function renderOptimizer(){
+  const dec = S.currentDecisionAI; if(!dec) return;
+  document.getElementById("optMode").textContent = S.mode;
+  document.getElementById("optMode").className = "pill "+(S.mode==="AI OPTIMIZED"?"p3":"p2");
+  document.getElementById("curRenew").textContent = fmt(dec.renewKW,0)+" kW";
+  document.getElementById("curBatt").textContent = (dec.battKW>=0?"+":"")+fmt(dec.battKW,0)+" kW";
+  document.getElementById("curDies").textContent = fmt(dec.dieselKW,0)+" kW";
+  document.getElementById("curShed").textContent = fmt(dec.shedKW||0,0)+" kW";
+  document.getElementById("reasonText").textContent = dec.reason || "Nominal dispatch, no constraint bound.";
+
+  const fuelSaved = S.audit.fuelBase - S.audit.fuelAI;
+  const runtimeSaved = S.audit.runtimeBase - S.audit.runtimeAI;
+  document.getElementById("cmpFuel").textContent = fmt(S.audit.fuelAI,0)+" L";
+  document.getElementById("cmpFuelD").textContent = (fuelSaved>=0?"-":"+")+fmt(Math.abs(fuelSaved),0)+" L vs "+fmt(S.audit.fuelBase,0)+" L baseline";
+  document.getElementById("cmpRuntime").textContent = fmt(S.audit.runtimeAI,1)+" h";
+  document.getElementById("cmpRuntimeD").textContent = (runtimeSaved>=0?"-":"+")+fmt(Math.abs(runtimeSaved),1)+" h vs "+fmt(S.audit.runtimeBase,1)+" h baseline";
+  const renewFracAI = S.audit.loadServedKWh>0 ? clamp((S.audit.loadServedKWh - (S.audit.fuelAI/CFG.dieselSfcBase))/S.audit.loadServedKWh,0,1)*100 : 0;
+  document.getElementById("cmpRenew").textContent = fmt(renewFracAI,0)+"%";
+  document.getElementById("cmpRenewD").textContent = "of total load served";
+  document.getElementById("cmpCycle").textContent = fmt(S.ai.cycles,0)+" cyc";
+  document.getElementById("cmpCycleD").textContent = "baseline "+fmt(S.base.cycles,0)+" cyc";
+  document.getElementById("cmpCo2").innerHTML = fmt(Math.max(0,fuelSaved)*CFG.co2PerLiter,0)+" kg";
+
+  const N = Math.min(96,S.history.length);
+  const recent = S.history.slice(-N);
+  drawLineChart(document.getElementById("optFuelChart"), [
+    {points:recent.map(r=>r.fuelCumBase), color:getComputedStyle(document.body).getPropertyValue("--text-tertiary")},
+    {points:recent.map(r=>r.fuelCumAI), color:getComputedStyle(document.body).getPropertyValue("--accent"), area:true}
+  ], {minZero:true, xLabels: recent.length?[fmtHM(recent[0].t), fmtHM(recent[recent.length-1].t)]:null});
+
+  document.getElementById("decisionLog").innerHTML = S.decisionLog.slice(0,25).map(d=>`
+    <tr><td class="num">${fmtHM(d.t)}</td><td><span class="pill ${d.mode==="AI OPTIMIZED"?"p3":"p2"}">${d.mode==="AI OPTIMIZED"?"AI":"SAFE"}</span></td><td class="num">${d.dieselKW.toFixed(0)} kW</td><td class="num">${d.battKW>=0?"+":""}${d.battKW.toFixed(0)} kW</td><td style="max-width:280px;font-size:11.5px;color:var(--text-secondary)">${esc((d.reason||"").slice(0,120))}</td></tr>`).join("");
+}
+
+function renderAnomalies(){
+  document.getElementById("anCount").textContent = S.alerts.length;
+  document.getElementById("anCritical").textContent = S.alerts.filter(a=>a.sev==="critical").length;
+  document.getElementById("anBattHealth").innerHTML = fmt(S.health.battery,0)+'<span class="unit">%</span>';
+  document.getElementById("anTurbHealth").innerHTML = fmt(S.health.turbine,0)+'<span class="unit">%</span>';
+  document.getElementById("anGenHealth").innerHTML = fmt(S.health.generator,0)+'<span class="unit">%</span>';
+
+  const list = document.getElementById("anomalyList");
+  list.innerHTML = S.alerts.length ? S.alerts.slice(0,20).map(alertHTML).join("") : '<div class="empty">No anomalies detected in the current run.</div>';
+
+  const hb = document.getElementById("healthBars");
+  const items = [["Battery",S.health.battery,"good"],["Turbine array",S.health.turbine,"warn"],["Generator",S.health.generator,"accent"]];
+  hb.innerHTML = items.map(([l,v,c])=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>${l}</span><span class="num">${v.toFixed(0)}%</span></div>
+      <div class="progress"><div style="width:${v}%;background:var(--${v<50?"danger":v<75?"warn":"good"})"></div></div>
+    </div>`).join("");
+
+  const recs = [];
+  if(S.health.battery<75) recs.push("Battery efficiency has declined over the simulated operating period. Inspect thermal management and cell balance.");
+  if(S.health.turbine<75) recs.push("Wind turbine output has trended below the power-curve expectation. Schedule a blade/ice inspection.");
+  if(S.health.generator<75) recs.push("Generator specific fuel consumption is trending upward. Schedule an injector and air-filter service.");
+  document.getElementById("maintRecs").innerHTML = recs.length ? recs.map(r=>`<div class="notice" style="margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg><div>${esc(r)}</div></div>`).join("") : '<div class="empty">No maintenance action recommended at this time.</div>';
+}
+
+function renderOffline(){
+  const hero = document.getElementById("offlineHero");
+  const heroText = document.getElementById("offlineHeroText");
+  const sub = document.getElementById("offlineSub");
+  const btn = document.getElementById("btnToggleOffline");
+  if(S.syncing){
+    hero.className="badge badge-safe"; heroText.textContent="SYNCING\u2026";
+    sub.textContent = "Connectivity restored. Uploading "+S.outbox+" remaining queued record(s) to the cloud portal.";
+    btn.disabled = true; btn.textContent="Restoring connection\u2026";
+  } else if(!S.online){
+    hero.className="badge badge-offline"; heroText.textContent="OFFLINE \u2014 EDGE AUTONOMY ACTIVE";
+    sub.textContent = "Cloud link unavailable. Telemetry, AI dispatch, optimization and safety control continue running entirely on the edge gateway.";
+    btn.disabled=false; btn.textContent="Restore connectivity";
+  } else {
+    hero.className="badge badge-online"; heroText.textContent="ONLINE";
+    sub.textContent = "Connectivity to the cloud portal is nominal. Telemetry is syncing normally.";
+    btn.disabled=false; btn.textContent="Simulate internet outage";
+  }
+  document.getElementById("outboxCount").textContent = S.outbox;
+  const pct = S.online && !S.syncing ? 100 : Math.max(4, 100-Math.min(100,S.outbox*2));
+  document.getElementById("syncBar").style.width = pct+"%";
+  document.getElementById("syncBar").style.background = S.online&&!S.syncing?"var(--good)":(S.syncing?"var(--accent)":"var(--danger)");
+  document.getElementById("syncStatusText").textContent = S.online&&!S.syncing ? "All records synchronized" : S.syncing ? "Synchronizing\u2026" : S.outbox+" record(s) queued in local outbox";
+
+  const rows = [
+    ["Local telemetry ingest", true],
+    ["Local AI forecasting", true],
+    ["Local dispatch optimizer", true],
+    ["Local safety controller", true],
+    ["Cloud sync", S.online]
+  ];
+  document.getElementById("localStatusList").innerHTML = rows.map(([l,on])=>`
+    <div class="status-line"><span class="l"><span class="dotstat ${on?'on':'off'}"></span>${l}</span><span class="num" style="color:${on?'var(--good)':'var(--text-tertiary)'};font-size:12px">${on?'ACTIVE':'SUSPENDED'}</span></div>`).join("");
+
+  document.getElementById("syncLog").innerHTML = S.syncLog.slice(0,20).map(l=>`<tr><td class="num">${fmtT(l.t)}</td><td>${esc(l.msg)}</td></tr>`).join("") || '<tr><td colspan="2" class="empty">No sync events yet.</td></tr>';
+}
+
+function renderAudit(){
+  const fuelSaved = Math.max(0,S.audit.fuelBase-S.audit.fuelAI);
+  const co2 = fuelSaved*CFG.co2PerLiter;
+  const runtimeRed = Math.max(0,S.audit.runtimeBase-S.audit.runtimeAI);
+  const renewFrac = S.audit.loadServedKWh>0 ? clamp(S.audit.renewGenKWh/S.audit.loadServedKWh,0,1.4)*100 : 0;
+  document.getElementById("gaFuelUsed").innerHTML = fmt(S.audit.fuelAI,0)+'<span class="unit">L</span>';
+  document.getElementById("gaFuelSaved").innerHTML = fmt(fuelSaved,0)+'<span class="unit">L</span>';
+  document.getElementById("gaRenewGen").innerHTML = fmt(S.audit.renewGenKWh,0)+'<span class="unit">kWh</span>';
+  document.getElementById("gaRenewFrac").innerHTML = fmt(Math.min(100,renewFrac),0)+'<span class="unit">%</span>';
+  document.getElementById("gaCo2").innerHTML = fmt(co2,0)+'<span class="unit">kg</span>';
+  document.getElementById("gaRuntime").innerHTML = fmt(runtimeRed,1)+'<span class="unit">h</span>';
+
+  const danger = getComputedStyle(document.body).getPropertyValue("--text-tertiary");
+  const accent = getComputedStyle(document.body).getPropertyValue("--accent");
+  drawBarChart(document.getElementById("auditBarChart"), [
+    {label:"Fuel (L)", values:[S.audit.fuelBase,S.audit.fuelAI], colors:[danger,accent]},
+    {label:"CO\u2082 (kg)", values:[S.audit.fuelBase*CFG.co2PerLiter,S.audit.fuelAI*CFG.co2PerLiter], colors:[danger,accent]},
+    {label:"Runtime (h)", values:[S.audit.runtimeBase,S.audit.runtimeAI], colors:[danger,accent]}
+  ]);
+  const N = Math.min(96,S.history.length);
+  const recent = S.history.slice(-N);
+  drawLineChart(document.getElementById("auditFracChart"), [{points:recent.map(r=>r.fracRenew), color:accent, area:true}], {xLabels: recent.length?[fmtHM(recent[0].t), fmtHM(recent[recent.length-1].t)]:null});
+
+  updateWhatIf();
+}
+
+function updateWhatIf(){
+  const turb = +document.getElementById("wiTurb").value;
+  const solar = +document.getElementById("wiSolar").value;
+  const batt = +document.getElementById("wiBatt").value;
+  const loadM = +document.getElementById("wiLoad").value/100;
+  document.getElementById("wiTurbLbl").textContent = turb;
+  document.getElementById("wiSolarLbl").textContent = solar+" kW";
+  document.getElementById("wiBattLbl").textContent = batt+" kWh";
+  document.getElementById("wiLoadLbl").textContent = loadM.toFixed(2)+"\u00D7";
+
+  const hoursSim = Math.max(1, S.history.length*S.simHoursPerTickBase*S.speed);
+  const fuelRatePerHour = S.audit.fuelAI/hoursSim;
+  const renewCapRatio = (turb*CFG.turbineRatedKW+solar) / Math.max(1,(S.turbineCount*CFG.turbineRatedKW+S.solarCapKW));
+  const battRatio = batt/CFG.battCapacityKWh;
+  const efficiencyGain = clamp(0.55*(renewCapRatio-1) + 0.15*(battRatio-1), -0.85, 2);
+  const projFuelRate = fuelRatePerHour * loadM * clamp(1-efficiencyGain*0.5, 0.15, 3);
+  const annualFuel = projFuelRate*8760;
+  const annualCo2 = annualFuel*CFG.co2PerLiter;
+  const currentAnnualFuel = fuelRatePerHour*8760;
+  const projFrac = clamp((S.audit.renewGenKWh/Math.max(1,S.audit.loadServedKWh))*renewCapRatio/loadM, 0, 1)*100;
+  document.getElementById("wiFuel").textContent = fmt(annualFuel,0)+" L";
+  document.getElementById("wiCo2").textContent = fmt(annualCo2,0)+" kg";
+  document.getElementById("wiFrac").textContent = fmt(Math.min(100,projFrac),0)+"%";
+  const delta = currentAnnualFuel-annualFuel;
+  document.getElementById("wiDelta").innerHTML = (delta>=0?'<span style="color:var(--good)">-':'<span style="color:var(--danger)">+')+fmt(Math.abs(delta),0)+" L</span>";
+}
+
+function render(){
+  renderHeader();
+  renderOverviewScenarios();
+  const active = document.querySelector(".page.active").id;
+  if(active==="page-dashboard") renderDashboard();
+  else if(active==="page-forecast") renderForecast();
+  else if(active==="page-optimizer") renderOptimizer();
+  else if(active==="page-anomalies") renderAnomalies();
+  else if(active==="page-offline") renderOffline();
+  else if(active==="page-audit") renderAudit();
+}
+
+/* ============================================================
+   TAB / UI WIRING
+============================================================ */
+function setTab(name){
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active", p.id==="page-"+name));
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("active", b.dataset.tab===name));
+  render();
+}
+window.setTab = setTab;
+document.getElementById("tabNav").addEventListener("click", e=>{
+  const btn = e.target.closest("button[data-tab]"); if(!btn) return;
+  setTab(btn.dataset.tab);
+});
+
+document.getElementById("btnPlay").addEventListener("click", ()=>{
+  S.running = !S.running;
+  document.getElementById("playIcon").innerHTML = S.running ? "&#10073;&#10073;" : "&#9654;";
+});
+document.getElementById("speedSel").addEventListener("change", e=>{ S.speed = +e.target.value; });
+document.getElementById("btnReset").addEventListener("click", resetSimulation);
+
+document.getElementById("btnToggleOffline").addEventListener("click", ()=>{
+  if(S.syncing) return;
+  setOnline(!S.online);
+});
+
+const scnPanel = document.getElementById("scnPanel");
+const scnBackdrop = document.getElementById("scnBackdrop");
+function openScn(){ scnPanel.classList.add("open"); scnBackdrop.classList.add("open"); }
+function closeScn(){ scnPanel.classList.remove("open"); scnBackdrop.classList.remove("open"); }
+document.getElementById("btnScenarios").addEventListener("click", openScn);
+document.getElementById("btnCloseScn").addEventListener("click", closeScn);
+scnBackdrop.addEventListener("click", closeScn);
+
+function renderScnList(){
+  const el = document.getElementById("scnList");
+  el.innerHTML = SCENARIOS.map(s=>`<button class="scn-item ${S.scenario===s.id?'active':''}" data-id="${s.id}"><div class="t">${esc(s.name)}${S.scenario===s.id?' <span style=\"color:var(--accent-strong)\">\u25CF</span>':''}</div><div class="d">${esc(s.desc)}</div></button>`).join("");
+  el.querySelectorAll(".scn-item").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const sc = SCENARIOS.find(s=>s.id===btn.dataset.id);
+      resetScenarioOverrides();
+      if(sc.id!=="outage" && !S.online) setOnline(true);
+      S.scenario = sc.id==="normal" ? null : sc.id;
+      sc.apply();
+      renderScnList();
+      render();
+    });
+  });
+}
+renderScnList();
+
+/* ============================================================
+   LIVE BACKEND PANEL (independent of the client-side simulation above;
+   polls the Python/FastAPI backend in backend/ so CLI-driven changes
+   show up here too)
+============================================================ */
+(function(){
+  const bePanel = document.getElementById("bePanel");
+  const beBackdrop = document.getElementById("beBackdrop");
+  const beUrl = document.getElementById("beUrl");
+  const beStatus = document.getElementById("beStatus");
+  const beBody = document.getElementById("beBody");
+  const beError = document.getElementById("beError");
+  const btnConnect = document.getElementById("btnBeConnect");
+  const btnDisconnect = document.getElementById("btnBeDisconnect");
+  const beTime = document.getElementById("beTime");
+  const beMode = document.getElementById("beMode");
+  const beConn = document.getElementById("beConn");
+  const beLoad = document.getElementById("beLoad");
+  const beRenew = document.getElementById("beRenew");
+  const beBatt = document.getElementById("beBatt");
+  const beDiesel = document.getElementById("beDiesel");
+  const beAlerts = document.getElementById("beAlerts");
+  const beFuelSaved = document.getElementById("beFuelSaved");
+  const beReason = document.getElementById("beReason");
+  let pollTimer = null;
+  let connected = false;
+
+  try{ const saved = localStorage.getItem("polarEmsBackendUrl"); if(saved) beUrl.value = saved; }catch(e){}
+
+  function openBe(){ bePanel.classList.add("open"); beBackdrop.classList.add("open"); }
+  function closeBe(){ bePanel.classList.remove("open"); beBackdrop.classList.remove("open"); }
+  document.getElementById("btnBackend").addEventListener("click", openBe);
+  document.getElementById("btnCloseBe").addEventListener("click", closeBe);
+  beBackdrop.addEventListener("click", closeBe);
+
+  function setStatus(kind, text){
+    beStatus.className = "badge " + (kind==="ok"?"badge-online":kind==="err"?"badge-offline":"");
+    beStatus.innerHTML = '<span class="dot"></span>' + esc(text);
+  }
+
+  function showError(msg){
+    beError.style.display = "flex";
+    beError.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg><div>' + esc(msg) + '</div>';
+  }
+  function hideError(){ beError.style.display = "none"; }
+
+  async function pollOnce(){
+    const base = beUrl.value.trim().replace(/\/$/, "");
+    try{
+      const [snapRes, auditRes] = await Promise.all([
+        fetch(base + "/api/telemetry/latest", {cache:"no-store"}),
+        fetch(base + "/api/green-audit", {cache:"no-store"}),
+      ]);
+      if(!snapRes.ok || !auditRes.ok) throw new Error("Backend responded with an error status.");
+      const snap = await snapRes.json();
+      const audit = await auditRes.json();
+      hideError();
+      setStatus("ok", "Connected — " + base);
+      beBody.style.display = "block";
+      beTime.textContent = new Date(snap.sim_time).toLocaleString(undefined,{month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false});
+      beMode.innerHTML = '<span class="pill ' + (snap.mode==="AI OPTIMIZED"?"p3":"p2") + '">' + esc(snap.mode) + '</span>';
+      beConn.innerHTML = snap.online ? '<span style="color:var(--good)">ONLINE</span>' : '<span style="color:var(--danger)">OFFLINE (' + snap.outbox + ' queued)</span>';
+      beLoad.textContent = snap.load ? snap.load.total.toFixed(0) + " kW" : "—";
+      beRenew.textContent = snap.renewables ? snap.renewables.wind_kw.toFixed(0) + " + " + snap.renewables.solar_kw.toFixed(0) + " kW (" + snap.renewables.fraction_pct.toFixed(0) + "%)" : "—";
+      beBatt.textContent = snap.battery.soc.toFixed(0) + "% · " + snap.battery.temp.toFixed(1) + "°C";
+      beDiesel.textContent = snap.diesel.on ? "RUNNING " + snap.diesel.output_kw.toFixed(0) + " kW" : "standby";
+      beAlerts.textContent = snap.alerts_open;
+      beFuelSaved.textContent = audit.fuel_saved_l.toFixed(0) + " L / " + audit.co2_avoided_kg.toFixed(0) + " kg CO₂";
+      beReason.textContent = (snap.decision && snap.decision.reason) ? snap.decision.reason : "—";
+    }catch(err){
+      setStatus("err", "Connection lost");
+      beBody.style.display = "none";
+      const mixedContent = location.protocol === "https:" && base.startsWith("http://");
+      if(mixedContent){
+        showError("Blocked: this page is served over HTTPS but " + base + " is plain HTTP. Browsers refuse to let an " +
+                   "HTTPS page call an HTTP address (“mixed content”) — this is not fixable from this panel. " +
+                   "Either deploy the backend somewhere with HTTPS (see render.yaml) and use that URL, or test by " +
+                   "serving this page itself over plain HTTP (e.g. python -m http.server) instead of from Vercel.");
+      } else {
+        showError("Could not reach " + base + ". Is the backend running? Start it with: uvicorn app.main:app --port 8000 (from the backend/ folder).");
+      }
+    }
+  }
+
+  btnConnect.addEventListener("click", async () => {
+    const base = beUrl.value.trim().replace(/\/$/, "");
+    if(!base) return;
+    try{ localStorage.setItem("polarEmsBackendUrl", beUrl.value.trim()); }catch(e){}
+    setStatus("", "Connecting…");
+    await pollOnce();
+    connected = true;
+    btnConnect.disabled = true;
+    btnDisconnect.disabled = false;
+    beUrl.disabled = true;
+    if(pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(pollOnce, 1500);
+  });
+
+  btnDisconnect.addEventListener("click", () => {
+    connected = false;
+    if(pollTimer) clearInterval(pollTimer);
+    pollTimer = null;
+    btnConnect.disabled = false;
+    btnDisconnect.disabled = true;
+    beUrl.disabled = false;
+    beBody.style.display = "none";
+    hideError();
+    setStatus("", "Not connected");
+  });
+})();
+
+["wiTurb","wiSolar","wiBatt","wiLoad"].forEach(id=>{
+  document.getElementById(id).addEventListener("input", updateWhatIf);
+});
+
+document.getElementById("horizonTabs").addEventListener("click", e=>{
+  const btn = e.target.closest(".horizon-btn"); if(!btn) return;
+  activeHorizon = +btn.dataset.h;
+  document.querySelectorAll(".horizon-btn").forEach(b=>b.classList.toggle("active", b===btn));
+  renderForecast();
+});
+
+/* ============================================================
+   INIT / RESET
+============================================================ */
+let timer=null;
+function resetSimulation(){
+  S.running=true; S.speed=+document.getElementById("speedSel").value||4;
+  S.simTime=new Date(2026,8,1,6,0,0);
+  S.online=true; S.outbox=0; S.syncing=false;
+  S.scenario=null; resetScenarioOverrides();
+  S.turbineCount=3; S.solarCapKW=CFG.solarBaseKW;
+  S.windAR=9; S.cloudAR=0.3;
+  S.ai={soc:70,battTemp:-5,cycles:0,battDeg:1.0,dieselOn:false,fuelL:9000,runtimeH:0,wear:1.0,sfcTrend:1.0};
+  S.base={soc:70,battTemp:-5,cycles:0,dieselOn:false,fuelL:9000,runtimeH:0};
+  S.audit={fuelAI:0,fuelBase:0,renewGenKWh:0,loadServedKWh:0,runtimeAI:0,runtimeBase:0};
+  S.history=[]; S.forecastPending=[];
+  S.forecastErrors={1:{load:[]},6:{load:[]},12:{load:[]},24:{load:[]}};
+  S.forecastPoints={1:[],6:[],12:[],24:[]};
+  S.alerts=[]; S.anomalyEvents=0;
+  S.health={battery:100,turbine:100,generator:100};
+  S.mode="AI OPTIMIZED"; S.decisionLog=[]; S.syncLog=[];
+  S.turbineDegradation=1.0; S.sensorFaultActive=false; S.aiFailure=false; S.tickCount=0;
+  document.getElementById("playIcon").innerHTML="&#10073;&#10073;";
+  renderScnList();
+  for(let i=0;i<8;i++) tick();
+  render();
+}
+
+for(let i=0;i<8;i++) tick();
+timer = setInterval(tick, S.tickMs);
+render();
+
+})();
+</script>

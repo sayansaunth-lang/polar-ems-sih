@@ -1,0 +1,411 @@
+<title>POLAR-EMS Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<style>
+:root{
+  --bg:#0a0d12; --bg-raised:#10141b; --surface:#131820; --surface-2:#171d27;
+  --border:#232b37; --border-strong:#323d4d;
+  --text-primary:#e8edf5; --text-secondary:#8fa0b8; --text-tertiary:#57667c;
+  --accent:#35c4c9; --accent-strong:#5fe0e4; --accent-soft:rgba(53,196,201,.12); --accent-border:rgba(53,196,201,.35);
+  --good:#5fbf8a; --good-soft:rgba(95,191,138,.12);
+  --warn:#e0a63e; --warn-soft:rgba(224,166,62,.12);
+  --danger:#e2585f; --danger-soft:rgba(226,88,95,.14);
+  --info:#5b9fe0;
+  --p1:#e2585f; --p2:#e0a63e; --p3:#35c4c9; --p4:#57667c;
+  --font-display:'Big Shoulders Display',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--text-primary);font-family:var(--font-body);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+::selection{background:var(--accent-soft);color:var(--accent-strong)}
+a{color:var(--accent)}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--accent-strong);outline-offset:2px}
+
+/* top nav */
+.topbar{position:sticky;top:0;z-index:30;background:rgba(10,13,18,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--border)}
+@supports not (backdrop-filter:blur(6px)){.topbar{background:var(--bg)}}
+.topbar-inner{max-width:1040px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:18px;overflow-x:auto}
+.topbar .brand{font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:.01em;white-space:nowrap;flex-shrink:0}
+.topbar .brand span{color:var(--accent-strong)}
+.topbar nav{display:flex;gap:2px;white-space:nowrap}
+.topbar nav a{color:var(--text-secondary);text-decoration:none;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;border-radius:6px}
+.topbar nav a:hover{color:var(--text-primary);background:var(--surface-2)}
+
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px 100px}
+
+/* title block */
+.titleblock{padding:56px 0 36px;border-bottom:1px solid var(--border);margin-bottom:40px}
+.titleblock .eyebrow{color:var(--accent-strong);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:16px}
+.titleblock h1{font-family:var(--font-display);font-weight:900;font-size:clamp(32px,5vw,50px);line-height:1.02;text-wrap:balance;max-width:20ch}
+.titleblock p.sub{margin-top:14px;color:var(--text-secondary);max-width:62ch;font-size:16px}
+.meta-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:26px}
+.meta-row div{font-size:11.5px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.05em}
+.meta-row div b{display:block;color:var(--text-primary);font-family:var(--font-mono);font-size:14px;text-transform:none;letter-spacing:0;margin-top:3px;font-weight:600}
+
+section{margin-bottom:52px;scroll-margin-top:70px}
+h2.sh{font-family:var(--font-display);font-weight:800;font-size:26px;letter-spacing:.005em;margin-bottom:6px;display:flex;align-items:baseline;gap:10px}
+h2.sh .idx{color:var(--accent);font-family:var(--font-mono);font-size:16px;font-weight:600}
+p.lede{color:var(--text-secondary);max-width:70ch;margin-bottom:22px;font-size:15px}
+h3.h3{font-family:var(--font-display);font-weight:700;font-size:18px;margin:26px 0 10px}
+p{max-width:74ch}
+p + p{margin-top:10px}
+ul.plain{margin:10px 0 0 0;padding-left:20px}
+ul.plain li{margin-bottom:6px;max-width:70ch}
+ul.plain li::marker{color:var(--accent)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.card + .card{margin-top:12px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:720px){.two-col,.three-col{grid-template-columns:1fr}}
+
+.callout{display:flex;gap:12px;background:var(--surface-2);border:1px solid var(--border-strong);border-left:3px solid var(--accent);border-radius:8px;padding:14px 16px;margin:16px 0}
+.callout.warn{border-left-color:var(--warn)}
+.callout.good{border-left-color:var(--good)}
+.callout b{color:var(--text-primary)}
+.callout .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent-strong);font-weight:700;display:block;margin-bottom:5px}
+.callout.warn .lbl{color:var(--warn)}
+.callout.good .lbl{color:var(--good)}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+th{text-align:left;background:var(--surface-2);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);padding:10px 14px;font-weight:600;border-bottom:1px solid var(--border-strong)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.param{font-family:var(--font-mono);font-size:12.5px;color:var(--accent-strong);white-space:nowrap}
+td.val{font-family:var(--font-mono);font-size:12.5px;color:var(--text-primary);white-space:nowrap}
+
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border:1px solid var(--border-strong)}
+.pill.p1{color:var(--p1);border-color:rgba(226,88,95,.4);background:rgba(226,88,95,.08)}
+.pill.p2{color:var(--p2);border-color:rgba(224,166,62,.4);background:rgba(224,166,62,.08)}
+.pill.p3{color:var(--p3);border-color:rgba(53,196,201,.4);background:rgba(53,196,201,.08)}
+.pill.p4{color:var(--text-tertiary);border-color:var(--border-strong);background:var(--surface-2)}
+
+.stepnum{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.stepnum:last-child{border-bottom:none}
+.stepnum .n{font-family:var(--font-mono);color:var(--accent);font-weight:600;font-size:14px;flex-shrink:0;width:22px}
+.stepnum .t{font-weight:600;font-size:14.5px;margin-bottom:3px}
+.stepnum .d{color:var(--text-secondary);font-size:13.5px}
+
+.qa{border:1px solid var(--border);border-radius:10px;padding:16px 18px;background:var(--surface)}
+.qa + .qa{margin-top:10px}
+.qa .q{font-weight:700;font-size:14.5px;color:var(--accent-strong);margin-bottom:6px}
+.qa .a{color:var(--text-secondary);font-size:14px}
+
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:100px;font-size:11.5px;font-weight:600;border:1px solid var(--border-strong);color:var(--text-secondary)}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:var(--text-tertiary)}
+.badge.ai{color:var(--accent-strong);border-color:var(--accent-border);background:var(--accent-soft)}
+.badge.ai .dot{background:var(--accent-strong)}
+.badge.safe{color:var(--warn);border-color:rgba(224,166,62,.35);background:var(--warn-soft)}
+.badge.safe .dot{background:var(--warn)}
+
+code.inline{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:var(--accent-strong)}
+
+.formula{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:var(--font-mono);font-size:12.5px;color:var(--text-secondary);overflow-x:auto;white-space:pre}
+
+footer.pf{border-top:1px solid var(--border);padding:26px 24px;text-align:center;color:var(--text-tertiary);font-size:11.5px;max-width:1040px;margin:0 auto}
+
+@media print{
+  .topbar{position:static}
+  .topbar-inner{overflow-x:visible;flex-wrap:wrap}
+  section{scroll-margin-top:0}
+}
+</style>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">POLAR<span>-EMS</span></div>
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#parameters">Parameters</a>
+      <a href="#mechanisms">Mechanisms</a>
+      <a href="#problem">Real-world fit</a>
+      <a href="#qa">Judge Q&amp;A</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="titleblock">
+  <div class="eyebrow">Speaker briefing &middot; Smart India Hackathon</div>
+  <h1>What's actually running inside POLAR-EMS</h1>
+  <p class="sub">A working reference for presenting the live demo: what the simulation is really computing, what every number on screen means, how the two control algorithms differ, and how this maps onto a genuine polar-station engineering problem.</p>
+  <div class="meta-row">
+    <div>Simulation<b>100% client-side</b></div>
+    <div>Controllers<b>2 (baseline + AI)</b></div>
+    <div>Priority tiers<b>4</b></div>
+    <div>Demo scenarios<b>8</b></div>
+    <div>Live pages<b>7</b></div>
+  </div>
+</div>
+
+<section id="overview">
+  <h2 class="sh"><span class="idx">01</span> What the website is actually doing</h2>
+  <p class="lede">It is not a slideshow of pretty numbers. It is a small, running physics-and-rules model of a diesel/wind/solar/battery microgrid, ticking forward in simulated time, with two independent control algorithms competing to serve the same load from the same weather.</p>
+
+  <p>Every second of real time, the page advances the simulated clock by a few hours (configurable 1&times;/4&times;/12&times;) and re-runs the full pipeline: generate this tick's weather &rarr; compute renewable output &rarr; compute station load &rarr; run the rule-based baseline controller &rarr; run the AI-heuristic optimizer &rarr; apply the hard safety layer &rarr; check for anomalies &rarr; update forecasts &rarr; accumulate the green-audit totals &rarr; redraw whichever tab is open. Nothing is pre-recorded; every chart you point at during the demo is being generated live in the browser as you talk.</p>
+
+  <div class="callout">
+    <div><span class="lbl">Why this matters for judges</span>If someone asks "is this just a mockup with fake numbers," the honest and correct answer is: no &mdash; it's a deterministic simulation with real physical relationships (power curves, seasonal solar cycles, battery energy balance, fuel-burn curves), and every KPI is derived from that running state, not hardcoded.</div>
+  </div>
+
+  <h3 class="h3">The one sentence to open with</h3>
+  <p>"Diesel is scarce and expensive, the internet can vanish for weeks, and losing power at &minus;45&deg;C is a safety event &mdash; so POLAR-EMS forecasts load and renewables, optimizes the diesel/battery/wind/solar mix in real time, and keeps making safe decisions with zero cloud connectivity."</p>
+</section>
+
+<section id="architecture">
+  <h2 class="sh"><span class="idx">02</span> The five layers, and where the demo lives</h2>
+  <p class="lede">The whole point of the architecture is that each layer can keep working if the one above it disappears. The live page demonstrates layers 1&ndash;4 running entirely in-browser; layer 5 (cloud) is simulated by the Offline Autonomy tab.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Layer</th><th>What it does here</th><th>Survives</th></tr></thead>
+    <tbody>
+      <tr><td><b>1&middot; Field sensors</b></td><td>Weather, generation, load and battery/diesel telemetry &mdash; produced by the physical model each tick</td><td class="val">Total isolation</td></tr>
+      <tr><td><b>2&middot; Edge gateway</b></td><td>Ingests that telemetry and runs every model below, entirely client-side</td><td class="val">Zero internet</td></tr>
+      <tr><td><b>3&middot; AI engine</b></td><td>Load/renewable forecasting, dispatch optimization, anomaly detection</td><td class="val">Sparse data</td></tr>
+      <tr><td><b>4&middot; Dispatch &amp; safety</b></td><td>Executes the chosen controller's decision; hard safety rules can override it</td><td class="val">AI/model failure</td></tr>
+      <tr><td><b>5&middot; Cloud portal</b></td><td>Represented by the sync outbox on the Offline Autonomy tab</td><td class="val">Days-to-weeks offline</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="parameters">
+  <h2 class="sh"><span class="idx">03</span> Every parameter, explained</h2>
+  <p class="lede">Grouped exactly as they appear across the seven tabs. Use this as the glossary if a judge points at a number and asks "what's that."</p>
+
+  <h3 class="h3">Weather &amp; season model</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Meaning</th><th>How it's generated</th></tr></thead>
+    <tbody>
+      <tr><td class="param">Temperature</td><td>Outside air temp, &deg;C</td><td>Seasonal sine curve (&minus;45&deg;C deep winter to &minus;5&deg;C deep summer) + daily swing + noise</td></tr>
+      <tr><td class="param">Wind speed</td><td>m/s at hub height</td><td>Smoothed random walk (autocorrelated) around a seasonal mean, so it drifts realistically instead of jittering tick to tick</td></tr>
+      <tr><td class="param">Irradiance</td><td>Solar input, W/m&sup2;</td><td>Seasonal sun potential &times; time-of-day factor &times; cloud cover, forced to zero through the modeled polar-night window</td></tr>
+      <tr><td class="param">Season label</td><td>Polar night / winter / summer / midnight sun</td><td>Derived from the same seasonal function that drives solar potential</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="h3">Renewable generation</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Meaning</th><th>How it's generated</th></tr></thead>
+    <tbody>
+      <tr><td class="param">Wind output</td><td>kW from the turbine array</td><td>Standard turbine power curve: 0 below 3.5 m/s cut-in, cubic ramp to rated output at 12 m/s, 0 above 25 m/s cut-out</td></tr>
+      <tr><td class="param">Solar output</td><td>kW from the PV array</td><td>Irradiance &divide; 1000 &times; array capacity &times; 92% system efficiency</td></tr>
+      <tr><td class="param">Renewable fraction</td><td>% of load served without diesel</td><td>Renewables actually absorbed by load, divided by total load, per tick and cumulatively</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="h3">Station load &mdash; four priority tiers</h3>
+  <p>This hierarchy is enforced everywhere shedding happens: amenities go first, then general power, then research, and life-support/heating are only ever touched by the hard safety override, never by an ordinary dispatch decision.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Tier</th><th>Load</th><th>Typical share</th><th>Shed order</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill p1">P1</span></td><td>Life support + heating (heating rises as temperature falls)</td><td class="val">~40&ndash;45%</td><td class="val">Never, except critical-SOC override</td></tr>
+      <tr><td><span class="pill p2">P2</span></td><td>Research / lab equipment</td><td class="val">~20&ndash;25%</td><td class="val">Third</td></tr>
+      <tr><td><span class="pill p3">P3</span></td><td>General station power</td><td class="val">~15&ndash;20%</td><td class="val">Second</td></tr>
+      <tr><td><span class="pill p4">P4</span></td><td>Amenities</td><td class="val">~8&ndash;10%</td><td class="val">First</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="h3">Battery</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="param">SOC</td><td>State of charge, % of 500&nbsp;kWh usable capacity</td></tr>
+      <tr><td class="param">Charge / discharge rate</td><td>Capped at 150&nbsp;kW in either direction</td></tr>
+      <tr><td class="param">Reserve floor</td><td>Baseline controller: fixed 20%. AI controller: 20&ndash;32%, raised when the 3-hour renewable forecast is weak</td></tr>
+      <tr><td class="param">Critical floor</td><td>10% &mdash; below this the hard safety layer takes over regardless of which controller is active</td></tr>
+      <tr><td class="param">Temperature / cycles / health</td><td>Tracked for the anomaly &amp; maintenance page; excess cycling and thermal drift degrade the health score</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="h3">Diesel generator</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="param">Rated output</td><td>300&nbsp;kW</td></tr>
+      <tr><td class="param">Specific fuel consumption (SFC)</td><td>Litres of diesel per kWh delivered &mdash; base 0.30 L/kWh, with a penalty modeled when the generator runs below ~50% load (real diesel gensets are least efficient at low load, which is exactly why the AI controller avoids starting it for small shortfalls)</td></tr>
+      <tr><td class="param">Fuel tank</td><td>12,000&nbsp;L capacity</td></tr>
+      <tr><td class="param">Runtime hours</td><td>Cumulative hours running &mdash; the number the optimizer is explicitly trying to minimize</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="h3">Forecast metrics (Forecast tab)</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="param">Horizon</td><td>How far ahead the prediction targets: 1h, 6h, 12h or 24h</td></tr>
+      <tr><td class="param">MAE</td><td>Mean absolute error between predicted and realized load, in kW &mdash; "on average, how far off"</td></tr>
+      <tr><td class="param">RMSE</td><td>Root-mean-square error &mdash; same units, penalizes large misses more than MAE</td></tr>
+      <tr><td class="param">Samples scored</td><td>How many predictions have actually been resolved against reality so far in this run</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="h3">Optimizer / dispatch outputs (Optimizer tab)</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="param">Renewables served</td><td>kW of the current load coming directly from wind + solar</td></tr>
+      <tr><td class="param">Battery</td><td>kW flowing into (+) or out of (&minus;) the battery this tick</td></tr>
+      <tr><td class="param">Diesel</td><td>kW currently being delivered by the generator</td></tr>
+      <tr><td class="param">Load shed</td><td>kW of non-critical load intentionally dropped (should be 0 in normal operation)</td></tr>
+      <tr><td class="param">Why (reason)</td><td>A plain-English sentence the controller generates for its own decision every tick &mdash; this is the single most important feature for the "is this explainable" question</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="h3">Anomalies &amp; health (Anomalies tab)</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="param">Severity</td><td>Critical / warning / info</td></tr>
+      <tr><td class="param">Detected vs. expected</td><td>The actual reading next to what the physical model says it should have been</td></tr>
+      <tr><td class="param">Subsystem health (0&ndash;100%)</td><td>Battery, turbine array, generator &mdash; decays when anomalies fire, slowly recovers otherwise</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="h3">Offline &amp; sync (Offline Autonomy tab)</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="param">Outbox count</td><td>Telemetry records generated while offline, waiting to reach the cloud</td></tr>
+      <tr><td class="param">Local subsystem status</td><td>Telemetry / AI forecasting / dispatch optimizer / safety controller &mdash; all shown ACTIVE independent of connectivity, which is the entire point of the tab</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="h3">Green Audit (cumulative KPIs)</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="param">Diesel consumed / saved</td><td>Litres burned by the AI-run station vs. the shadow rule-based baseline, since the run started</td></tr>
+      <tr><td class="param">CO&#8322; avoided</td><td>Fuel saved &times; 2.68&nbsp;kg CO&#8322; per litre (standard diesel emission factor)</td></tr>
+      <tr><td class="param">Renewable fraction</td><td>Share of all energy served by wind + solar over the whole run</td></tr>
+      <tr><td class="param">Runtime reduction</td><td>Generator hours saved vs. baseline</td></tr>
+      <tr><td class="param">What-if projection</td><td>A capacity-ratio scaling of the currently measured fuel rate &mdash; explicitly labeled a projection, not a re-simulation</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="mechanisms">
+  <h2 class="sh"><span class="idx">04</span> How the internals actually work</h2>
+  <p class="lede">This is the part that answers "so what's the AI actually doing" without hand-waving.</p>
+
+  <h3 class="h3">Two controllers, same inputs, every tick</h3>
+  <p>Both controllers see the identical weather draw and identical load for that tick, so any difference in outcome is attributable to the control logic itself &mdash; not to lucky weather. This is what makes the fuel-savings number on the Optimizer and Green Audit tabs a measured result rather than an assumption.</p>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="badge-row"><span class="badge"><span class="dot"></span>Rule-based baseline</span></div>
+      <h3 class="h3" style="margin-top:12px">Logic</h3>
+      <ul class="plain">
+        <li>Serve load from renewables first, always</li>
+        <li>Any surplus charges the battery; any deficit discharges it</li>
+        <li>Fixed 20% reserve floor, no matter the weather outlook</li>
+        <li>If the battery can't cover the rest, start diesel for exactly the shortfall</li>
+        <li>No forecast awareness &mdash; purely reactive to the current tick</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="badge-row"><span class="badge ai"><span class="dot"></span>POLAR-EMS optimizer</span></div>
+      <h3 class="h3" style="margin-top:12px">Logic</h3>
+      <ul class="plain">
+        <li>Same renewables-first, battery-second waterfall</li>
+        <li>Reserve floor moves to 32% when the next-3-hour renewable forecast is weak, 20% when it's strong &mdash; it holds back charge when it expects to need it</li>
+        <li>When diesel must start, it deliberately runs a little above the immediate shortfall to also recharge the battery, so it doesn't have to cold-start again soon</li>
+        <li>Diesel is avoided specifically because it's least fuel-efficient at low partial load &mdash; the SFC curve models this directly</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <div><span class="lbl">The judge-facing punchline</span>The baseline is not a strawman &mdash; it's a fully functional, sensible controller. The optimizer beats it only because it looks ahead and times diesel starts smarter. That's the actual value proposition of "AI-driven": not that rules are broken, but that a forecast-aware policy burns less fuel and runs the generator fewer hours for the identical job.</div>
+  </div>
+
+  <h3 class="h3">Hard safety layer &mdash; runs after both controllers, every tick</h3>
+  <div class="stepnum">
+    <div class="n">1</div>
+    <div><div class="t">Critical SOC override</div><div class="d">If battery SOC drops below 10% regardless of which controller is driving, diesel is forced to full rated output and non-critical tiers are shed &mdash; this check cannot be disabled by either controller.</div></div>
+  </div>
+  <div class="stepnum">
+    <div class="n">2</div>
+    <div><div class="t">AI/sensor failure override</div><div class="d">Triggering the "AI service failure" scenario doesn't just change a label &mdash; it actually re-routes the live dispatch through the rule-based controller's logic for as long as the fault is active. The mode badge (<span class="badge ai" style="vertical-align:middle"><span class="dot"></span>AI OPTIMIZED</span> / <span class="badge safe" style="vertical-align:middle"><span class="dot"></span>SAFE FALLBACK</span>) always reflects which logic is actually driving the station, not a cosmetic state.</div></div>
+  </div>
+
+  <h3 class="h3">Anomaly detection &mdash; statistical, not a black box</h3>
+  <p>Every anomaly check compares an actual reading against what the physical model says it should be, and only fires when the gap crosses a threshold. That's deliberate: a judge can ask "how do you know it's anomalous" and the answer is always a specific expected-vs-detected comparison, never "the model said so."</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Check</th><th>Trigger</th></tr></thead>
+    <tbody>
+      <tr><td>Turbine underperformance</td><td>Actual wind output &gt;25% below the power-curve prediction for the current wind speed</td></tr>
+      <tr><td>Battery thermal / degradation</td><td>Temperature drifting outside &minus;10&deg;C to 15&deg;C with an accelerated rise</td></tr>
+      <tr><td>Generator efficiency drift</td><td>Specific fuel consumption &gt;15% above the baseline value</td></tr>
+      <tr><td>Sensor fault</td><td>An implausible reading (e.g. a dropout to zero) inconsistent with surrounding telemetry</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="h3">Forecasting &mdash; seasonal-naive, explicitly not a neural net</h3>
+  <p>The forecast for a future hour blends the seasonal expectation for that hour (same time of year, same time of day) with the current deviation from that expectation, decayed the further out the prediction reaches:</p>
+  <div class="formula">predicted(t+h) = seasonal_baseline(t+h) + current_deviation &times; e<sup>&minus;h/14</sup> + noise</div>
+  <p>This is intentional: it's a simple, auditable statistical model rather than a trained network, which is easier to defend under judging time pressure and is exactly the kind of "explainable first" choice the safety framing calls for. Accuracy is verified, not assumed &mdash; every prediction is time-stamped, and once the simulation reaches that real moment, MAE/RMSE are recalculated against what actually happened.</p>
+
+  <h3 class="h3">Fuel &amp; CO&#8322; accounting</h3>
+  <div class="formula">fuel_used (L) = diesel_kW &times; SFC(load_fraction) &times; hours
+fuel_saved = fuel_used_baseline &minus; fuel_used_AI
+CO2_avoided (kg) = fuel_saved &times; 2.68</div>
+  <p>2.68 kg CO&#8322; per litre is a standard published diesel combustion emission factor, not a tuned number &mdash; state that plainly if asked.</p>
+</section>
+
+<section id="problem">
+  <h2 class="sh"><span class="idx">05</span> How this maps onto the real problem</h2>
+  <p class="lede">Every feature in the demo exists because of a specific, named constraint of running a polar station &mdash; not because it looked good on a dashboard.</p>
+
+  <div class="three-col">
+    <div class="card">
+      <h3 class="h3" style="margin-top:0">Fuel is scarce &amp; costly</h3>
+      <p style="font-size:13.5px">Every litre is shipped in at extreme cost. <b>Answer:</b> forecast-aware dispatch that avoids starting diesel for shortfalls the battery can cover, and avoids running it inefficiently at low partial load.</p>
+    </div>
+    <div class="card">
+      <h3 class="h3" style="margin-top:0">Internet is unreliable</h3>
+      <p style="font-size:13.5px">Satellite links can drop for weeks. <b>Answer:</b> every control layer runs at the edge; the Offline Autonomy tab proves telemetry, forecasting, optimization and safety never pause, only the cloud sync queues.</p>
+    </div>
+    <div class="card">
+      <h3 class="h3" style="margin-top:0">Failure is a safety event</h3>
+      <p style="font-size:13.5px">Losing heat at &minus;45&deg;C is life-threatening. <b>Answer:</b> a strict, independently-enforced load-priority hierarchy plus a hard-coded override that cannot be overruled by either controller.</p>
+    </div>
+    <div class="card">
+      <h3 class="h3" style="margin-top:0">Equipment degrades in extreme cold</h3>
+      <p style="font-size:13.5px">Batteries, turbines and sensors drift under stress. <b>Answer:</b> statistical anomaly detection flags degradation early, with a plain-English recommendation, before it becomes a failure.</p>
+    </div>
+    <div class="card">
+      <h3 class="h3" style="margin-top:0">"Why should we trust an AI here?"</h3>
+      <p style="font-size:13.5px"><b>Answer:</b> it's not opaque &mdash; every dispatch decision stores the reason it was made, and the safety layer sits outside the AI entirely, so trust doesn't depend on the model being right 100% of the time.</p>
+    </div>
+    <div class="card">
+      <h3 class="h3" style="margin-top:0">Judges expect rigor, not vibes</h3>
+      <p style="font-size:13.5px"><b>Answer:</b> the baseline vs. optimized comparison runs on identical conditions, so the fuel/CO&#8322; savings shown are a measured delta, not an assumed one &mdash; and change if the scenario changes.</p>
+    </div>
+  </div>
+</section>
+
+<section id="qa">
+  <h2 class="sh"><span class="idx">06</span> Judge Q&amp;A cheat sheet</h2>
+  <p class="lede">Straight answers, no overclaiming &mdash; this is the tone that reads as engineering maturity rather than a pitch.</p>
+
+  <div class="qa"><div class="q">Is this real station data?</div><div class="a">No, and the site says so explicitly. It's a synthetic physical model (power curves, seasonal solar/polar-night cycles, priority-weighted load, battery/diesel dynamics) &mdash; not random numbers, and not a live feed. That's a deliberate, stated engineering choice for a hackathon build.</div></div>
+  <div class="qa"><div class="q">Why AI/optimization instead of rules only?</div><div class="a">Rules alone can't adapt their diesel/battery balance to a shifting weather forecast. The demo proves the delta directly: identical conditions, two controllers, one measurably burns less fuel and runs the generator fewer hours.</div></div>
+  <div class="qa"><div class="q">Why not deep learning / RL for dispatch?</div><div class="a">A constrained, rule-explainable heuristic is verifiable and safe to reason about for a system where a wrong decision has safety consequences. That matters more here than raw model sophistication.</div></div>
+  <div class="qa"><div class="q">What happens if the AI is just wrong, or unavailable?</div><div class="a">The hard safety layer sits outside the optimizer and can't be overridden by it. Trigger the "AI service failure" scenario live &mdash; the dashboard visibly switches to SAFE FALLBACK and dispatch keeps running on deterministic rules.</div></div>
+  <div class="qa"><div class="q">What happens with zero internet for weeks?</div><div class="a">Nothing changes operationally &mdash; telemetry, forecasting, optimization and safety all run at the edge. Only the cloud sync queues records in a local outbox until connectivity returns, then uploads in a batch.</div></div>
+  <div class="qa"><div class="q">How is fuel/CO&#8322; savings calculated?</div><div class="a">Two controllers run in parallel on identical weather and load. Fuel saved is the litre difference between them; CO&#8322; avoided is that difference times the standard 2.68 kg/L diesel emission factor.</div></div>
+  <div class="qa"><div class="q">What would it take to run this on a real station?</div><div class="a">Swap the synthetic telemetry generator for real sensor/BMS/genset feeds into the same edge pipeline &mdash; the forecasting, optimization, safety and anomaly-detection logic are all designed to consume exactly that shape of data already.</div></div>
+</section>
+
+</div>
+
+<footer class="pf">POLAR-EMS &middot; internal briefing document &middot; for Smart India Hackathon presentation use</footer>
