@@ -24,7 +24,7 @@ from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 
-BASE_URL = os.environ.get("POLAR_EMS_API", "http://127.0.0.1:8000")
+BASE_URL = os.environ.get("POLAR_EMS_API", "https://polar-ems-backend.onrender.com").rstrip("/")
 console = Console()
 
 
