@@ -53,7 +53,7 @@ def check_connection() -> bool:
         return False
 
 
-def render_status(snap: dict) -> Panel:
+def render_status(snap: dict, audit: dict | None = None) -> Panel:
     mode_color = "cyan" if snap["mode"] == "AI OPTIMIZED" else "yellow"
     conn_color = "green" if snap["online"] else "red"
 
@@ -76,6 +76,9 @@ def render_status(snap: dict) -> Panel:
     d = snap["diesel"]
     t.add_row("Diesel", f"{'RUNNING ' + format(d['output_kw'], '.0f') + ' kW' if d['on'] else 'standby'}, "
                         f"fuel {d['fuel_l']:.0f}/{d['tank_cap_l']} L, runtime {d['runtime_h']:.1f} h")
+    t.add_row("Open alerts", str(snap.get("alerts_open", 0)))
+    if audit:
+        t.add_row("Fuel saved", f"{audit['fuel_saved_l']} L  ({audit['co2_avoided_kg']} kg CO2 avoided)")
     if snap.get("decision", {}).get("reason"):
         t.add_row("Why", snap["decision"]["reason"])
     return Panel(t, title="POLAR-EMS live status", border_style="cyan")
@@ -83,7 +86,8 @@ def render_status(snap: dict) -> Panel:
 
 def cmd_status():
     snap = api_get("/api/telemetry/latest")
-    console.print(render_status(snap))
+    audit = api_get("/api/green-audit")
+    console.print(render_status(snap, audit))
 
 
 def cmd_watch():
@@ -92,7 +96,8 @@ def cmd_watch():
         with Live(console=console, refresh_per_second=1) as live:
             while True:
                 snap = api_get("/api/telemetry/latest")
-                live.update(render_status(snap))
+                audit = api_get("/api/green-audit")
+                live.update(render_status(snap, audit))
                 time.sleep(1)
     except KeyboardInterrupt:
         pass
