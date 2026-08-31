@@ -1,0 +1,228 @@
+<meta charset="utf-8">
+<title>POLAR-EMS Pitch Script</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0d12; --bg-raised:#10141b; --surface:#131820; --surface-2:#171d27;
+  --border:#232b37; --border-strong:#323d4d;
+  --text-primary:#e8edf5; --text-secondary:#8fa0b8; --text-tertiary:#57667c;
+  --accent:#35c4c9; --accent-strong:#5fe0e4; --accent-soft:rgba(53,196,201,.12); --accent-border:rgba(53,196,201,.35);
+  --good:#5fbf8a; --warn:#e0a63e; --danger:#e2585f;
+  --font-display:'Big Shoulders Display',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--text-primary);font-family:var(--font-body);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent-strong);outline-offset:2px}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+.topbar{position:sticky;top:0;z-index:30;background:rgba(10,13,18,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--border)}
+@supports not (backdrop-filter:blur(6px)){.topbar{background:var(--bg)}}
+.topbar-inner{max-width:1000px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:18px;overflow-x:auto}
+.topbar .brand{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:.01em;white-space:nowrap;flex-shrink:0}
+.topbar .brand span{color:var(--accent-strong)}
+.topbar nav{display:flex;gap:2px;white-space:nowrap}
+.topbar nav a{color:var(--text-secondary);text-decoration:none;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;border-radius:6px}
+.topbar nav a:hover{color:var(--text-primary);background:var(--surface-2)}
+
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px 100px}
+.titleblock{padding:50px 0 32px;border-bottom:1px solid var(--border);margin-bottom:40px}
+.titleblock .eyebrow{color:var(--accent-strong);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:16px}
+.titleblock h1{font-family:var(--font-display);font-weight:900;font-size:clamp(30px,4.6vw,46px);line-height:1.03;text-wrap:balance;max-width:22ch}
+.titleblock p.sub{margin-top:14px;color:var(--text-secondary);max-width:64ch;font-size:15.5px}
+.meta-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:26px}
+.meta-row div{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.05em}
+.meta-row div b{display:block;color:var(--text-primary);font-family:var(--font-mono);font-size:14px;text-transform:none;letter-spacing:0;margin-top:3px;font-weight:600}
+
+section{margin-bottom:48px;scroll-margin-top:66px}
+h2.sh{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:.005em;margin-bottom:6px}
+p.lede{color:var(--text-secondary);max-width:70ch;margin-bottom:20px;font-size:14.5px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.steplist .step{display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--border)}
+.steplist .step:last-child{border-bottom:none}
+.steplist .step .n{font-family:var(--font-mono);color:var(--accent);font-weight:600;font-size:14px;flex-shrink:0;width:20px}
+.steplist .step .t{font-weight:600;font-size:14px;margin-bottom:3px}
+.steplist .step .d{color:var(--text-secondary);font-size:13px}
+
+.pitch-block{background:var(--surface-2);border:1px solid var(--accent-border);border-left:3px solid var(--accent);border-radius:10px;padding:22px 24px;font-size:16.5px;line-height:1.7;color:var(--text-primary)}
+
+.segment{border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden;margin-bottom:16px}
+.segment-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 20px;background:var(--surface-2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.segment-head .name{font-family:var(--font-display);font-weight:700;font-size:17px}
+.segment-head .time{font-family:var(--font-mono);color:var(--accent-strong);font-size:12.5px;background:var(--accent-soft);border:1px solid var(--accent-border);padding:3px 10px;border-radius:100px;white-space:nowrap}
+.segment-body{padding:20px 22px}
+.spoken{font-size:16px;line-height:1.75;color:var(--text-primary)}
+.spoken .beat{color:var(--text-tertiary);font-style:italic}
+.cue{display:flex;gap:8px;align-items:flex-start;background:var(--surface-2);border:1px dashed var(--border-strong);border-radius:8px;padding:9px 12px;margin:12px 0;font-family:var(--font-mono);font-size:12px;color:var(--accent-strong)}
+.cue b{color:var(--warn);font-family:var(--font-body);text-transform:uppercase;font-size:10px;letter-spacing:.06em;flex-shrink:0;padding-top:1px}
+
+.callout{display:flex;gap:12px;background:var(--surface-2);border:1px solid var(--border-strong);border-left:3px solid var(--accent);border-radius:8px;padding:14px 16px;margin:14px 0}
+.callout.warn{border-left-color:var(--warn)}
+.callout.danger{border-left-color:var(--danger)}
+.callout .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent-strong);font-weight:700;display:block;margin-bottom:5px}
+.callout.warn .lbl{color:var(--warn)}
+.callout.danger .lbl{color:var(--danger)}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th{text-align:left;background:var(--surface-2);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);padding:10px 12px;font-weight:600;border-bottom:1px solid var(--border-strong)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.t{font-family:var(--font-mono);color:var(--accent-strong);white-space:nowrap;font-weight:600}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.two-col{grid-template-columns:1fr}}
+footer.pf{border-top:1px solid var(--border);padding:24px;text-align:center;color:var(--text-tertiary);font-size:11.5px;max-width:1000px;margin:0 auto}
+</style>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">POLAR<span>-EMS</span> · Pitch Script</div>
+    <nav>
+      <a href="#howto">How to use</a>
+      <a href="#thirty">30-sec version</a>
+      <a href="#script">Full script</a>
+      <a href="#checklist">Checklist</a>
+      <a href="#trouble">If it breaks</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="titleblock">
+  <div class="eyebrow">Presentation script &middot; Smart India Hackathon</div>
+  <h1>What to actually say while you present POLAR-EMS</h1>
+  <p class="sub">A spoken script built around your real, working demo &mdash; not slides describing it. Every cue below points at something that genuinely happens when you click it.</p>
+  <div class="meta-row">
+    <div>Full version<b>~6 minutes</b></div>
+    <div>Fallback<b>30 seconds</b></div>
+    <div>Segments<b>7, independently trimmable</b></div>
+    <div>Speakers<b>1 (splits to 2, see below)</b></div>
+  </div>
+</div>
+
+<section id="howto">
+  <h2 class="sh">How to use this</h2>
+  <div class="steplist">
+    <div class="step"><div class="n">1</div><div><div class="t">Read it out loud twice, verbatim</div><div class="d">Then stop reading it and start saying it in your own words from memory. A memorized script sounds like a presentation; a read-aloud one sounds like a hostage note.</div></div></div>
+    <div class="step"><div class="n">2</div><div><div class="t">Time yourself once, for real</div><div class="d">The 6-minute target assumes a measured, confident pace. If you're consistently running long, cut the Forecast half of Segment 4 first &mdash; it's the least essential beat.</div></div></div>
+    <div class="step"><div class="n">3</div><div><div class="t">Cues in the dashed boxes are for you, not the judges</div><div class="d">They tell you what to click. Never read a cue out loud &mdash; if you catch yourself saying "now I will click the Optimizer tab," stop and just click it.</div></div></div>
+    <div class="step"><div class="n">4</div><div><div class="t">Know the 30-second version cold</div><div class="d">If a judge says "you have one minute," you fall back to Section 2, not a panicked summary of everything.</div></div></div>
+  </div>
+</section>
+
+<section id="thirty">
+  <h2 class="sh">30-second version (memorize this one first)</h2>
+  <p class="lede">Your insurance policy if time gets cut without warning &mdash; which happens constantly in hackathon rounds.</p>
+  <div class="pitch-block">
+    "Polar research stations run on diesel shipped in at enormous cost, with internet that can vanish for weeks, and a power failure that's a safety emergency, not an inconvenience. POLAR-EMS is a proposed AI-driven energy management system that forecasts demand and renewable output, optimizes the diesel-battery-wind-solar mix in real time, and keeps making safe decisions with zero internet connection. <span class="beat" style="color:var(--text-tertiary)">[open the dashboard]</span> And here it is, actually running &mdash; live, right now, computing every number you see."
+  </div>
+</section>
+
+<section id="script">
+  <h2 class="sh">Full script</h2>
+  <p class="lede">Seven segments, each independently timed. Spoken text is in the light panels; anything in a dashed box is a stage direction for you.</p>
+
+  <div class="segment">
+    <div class="segment-head"><span class="name">1 &middot; Hook &amp; the problem</span><span class="time">0:00 &ndash; 0:45</span></div>
+    <div class="segment-body">
+      <div class="spoken">"Before I say anything about the technology, picture the situation. <span class="beat">[pause]</span> A research station at the bottom of the world. No power grid. Every litre of diesel arrives by ship, at a cost most of us would find absurd. The internet can disappear for weeks at a time. And if the power fails at minus 45 degrees, that's not an inconvenience &mdash; it's a safety emergency, for the people living there and the equipment keeping them alive.<br><br>That's the actual engineering problem we chose &mdash; not because it's dramatic, but because it forces you to get three things right at once: fuel efficiency, total autonomy, and safety that never depends on anything working perfectly."</div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="segment-head"><span class="name">2 &middot; The solution, one sentence</span><span class="time">0:45 &ndash; 1:15</span></div>
+    <div class="segment-body">
+      <div class="spoken">"So we built POLAR-EMS &mdash; an AI-driven energy management system for polar research stations. In one sentence: it forecasts load and renewable generation ahead of time, continuously decides the optimal mix of battery, wind, solar and diesel, and does all of that at the edge, with a hard safety layer underneath that keeps working even if the AI itself fails.<br><br>I want to show you this actually running &mdash; not slides about it."</div>
+      <div class="cue"><b>Cue</b> Open polar-ems-web.vercel.app, Dashboard tab, before you say the next line.</div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="segment-head"><span class="name">3 &middot; Live dashboard</span><span class="time">1:15 &ndash; 2:15</span></div>
+    <div class="segment-body">
+      <div class="spoken">"This is the live dashboard &mdash; and I want to be upfront about something: this is a synthetic simulation, not real station telemetry, because none of us have access to an actual Antarctic station. But it isn't random numbers either &mdash; it's a physical model. Wind speed drives power through a real turbine power curve. Solar output follows the actual seasonal day-night cycle of a polar location, including true polar night. Every number on this screen &mdash; load, battery, diesel, renewables &mdash; is being computed live, right now, while I'm talking.<br><br><span class="beat">[point to the power flow diagram]</span> Here's the power flow: wind and solar feed the load first, the battery covers the gap, and diesel only starts when it actually has to."</div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="segment-head"><span class="name">4 &middot; Forecast + Optimizer (the core)</span><span class="time">2:15 &ndash; 3:15</span></div>
+    <div class="segment-body">
+      <div class="spoken">"Two things make this AI-driven rather than just a good-looking dashboard. First &mdash; forecasting. <span class="beat">[click Forecast tab]</span> It predicts load and renewable output ahead of time, and we score it honestly with MAE and RMSE against what actually happens &mdash; not a claimed accuracy, a measured one.<br><br>Second, and this is the core of the project &mdash; <span class="beat">[click Optimizer tab]</span> &mdash; a dispatch optimizer that runs two controllers side by side, on identical conditions: a simple rule-based baseline, and our forecast-aware optimizer. Every decision it makes comes with a plain-English reason. <span class="beat">[point to the reasoning box]</span> You can read exactly why it chose to discharge the battery instead of starting the generator. It is not a black box."</div>
+      <div class="cue"><b>Cue</b> If short on time, this segment survives being cut to just the Optimizer half.</div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="segment-head"><span class="name">5 &middot; Safety &amp; offline autonomy (your best moment)</span><span class="time">3:15 &ndash; 4:15</span></div>
+    <div class="segment-body">
+      <div class="spoken">"Here's the part I actually care most about. <span class="beat">[open Demo Scenarios, click "AI service failure"]</span> Watch the mode badge. <span class="beat">[point]</span> The AI just failed &mdash; on purpose, right now &mdash; and dispatch didn't stop. It fell back to a hard-coded safety controller instantly. That fallback sits outside the AI entirely; it cannot be overridden by it.<br><br>And connectivity &mdash; <span class="beat">[click "Internet outage"]</span> &mdash; the station just went offline. Telemetry, forecasting, optimization, safety: all of it keeps running at the edge. Only the cloud sync queues up, and when we reconnect <span class="beat">[toggle back online]</span> it catches up automatically. For a station where satellite links can vanish for weeks, that's not a nice-to-have &mdash; that's the entire point."</div>
+      <div class="cue"><b>Cue</b> Reset the scenario to "Normal operation" right after this segment, before moving on.</div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="segment-head"><span class="name">6 &middot; Real engineering &amp; impact</span><span class="time">4:15 &ndash; 5:15</span></div>
+    <div class="segment-body">
+      <div class="spoken">"This isn't only a frontend simulation. We built an independent Python backend &mdash; FastAPI, deployed live &mdash; running the exact same model as a real server, with a terminal client we can drive from a command line. <span class="beat">[optional: switch to VS Code, run cli.py, pick "Watch live status"]</span> I can trigger a change from a terminal, and it updates the live website in real time, because a real deployment would need exactly this: an API, a server, something a station's edge gateway could actually run.<br><br>On impact &mdash; <span class="beat">[click Green Audit tab]</span> &mdash; because our optimizer and the baseline run on identical conditions, this fuel-saved and CO&#8322;-avoided number is a measured difference in our simulation, not an assumed one. We're not claiming this is what a real station would save; we're showing the method that would measure it honestly once it is."</div>
+      <div class="cue"><b>Cue</b> The VS Code/CLI beat is a bonus, not required &mdash; skip it if you're already tight on time.</div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="segment-head"><span class="name">7 &middot; Close</span><span class="time">5:15 &ndash; 5:45</span></div>
+    <div class="segment-body">
+      <div class="spoken">"Diesel is expensive, connectivity isn't guaranteed, and failure has real consequences. POLAR-EMS is our proposed answer: forecast ahead, optimize continuously, and never let safety depend on the AI being right. It's a prototype today &mdash; but the edge-first design, the explainable dispatch, and the hard safety floor underneath it are exactly what a real deployment would need.<br><br>Thank you &mdash; happy to take questions, or show any part of this live again."</div>
+    </div>
+  </div>
+</section>
+
+<section id="checklist">
+  <h2 class="sh">Before you walk up</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-weight:700;font-size:16px;margin-bottom:10px">On the laptop</h3>
+      <div class="steplist">
+        <div class="step"><div class="n">1</div><div><div class="t">Reset the simulation</div><div class="d">Demo Scenarios &rarr; Normal operation, and hit Reset, so it opens clean.</div></div></div>
+        <div class="step"><div class="n">2</div><div><div class="t">Have the tab already open</div><div class="d">polar-ems-web.vercel.app loaded and idle before you're called up &mdash; don't type the URL live.</div></div></div>
+        <div class="step"><div class="n">3</div><div><div class="t">Warm up the Render backend</div><div class="d">If you're doing the CLI beat, hit <code>/health</code> once beforehand &mdash; free-tier cold start takes 30-50s and you don't want that live.</div></div></div>
+        <div class="step"><div class="n">4</div><div><div class="t">Zoom the browser to ~110%</div><div class="d">Small text on a projector is the single most common demo failure that has nothing to do with your code.</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-weight:700;font-size:16px;margin-bottom:10px">In your head</h3>
+      <div class="steplist">
+        <div class="step"><div class="n">1</div><div><div class="t">Know the 30-second version cold</div><div class="d">This is your real insurance policy, not the full script.</div></div></div>
+        <div class="step"><div class="n">2</div><div><div class="t">Decide who says what, if two of you present</div><div class="d">Common split: Presenter A does Segments 1, 2, 7 (problem, intro, close); Presenter B drives the live demo, Segments 3&ndash;6.</div></div></div>
+        <div class="step"><div class="n">3</div><div><div class="t">Skim the Judge Q&amp;A doc once more</div><div class="d">Especially "did you use AI coding tools" and "what AI is actually running" &mdash; those come up almost every time.</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="trouble">
+  <h2 class="sh">If something breaks live</h2>
+  <div class="callout danger">
+    <div><span class="lbl">Wifi/projector fails mid-demo</span>Say this out loud, don't panic-apologize: <i>"Actually &mdash; this is a good demonstration of the point. The dashboard itself needs zero internet to keep running; only the Live Backend panel does."</i> Then keep going on the main tabs, which need nothing.</div>
+  </div>
+  <div class="callout warn">
+    <div><span class="lbl">Render backend is asleep / CLI can't connect</span>Skip the CLI beat entirely &mdash; it was always marked optional. Nothing else in the script depends on it.</div>
+  </div>
+  <div class="callout">
+    <div><span class="lbl">A judge interrupts with a question mid-segment</span>Answer it in one or two sentences, then say <i>"let me actually show you that"</i> and continue &mdash; don't try to finish the interrupted sentence from before.</div>
+  </div>
+  <div class="callout">
+    <div><span class="lbl">You're running long and there's a hard cutoff</span>Cut in this order: second half of Segment 4 (Forecast) &rarr; the VS Code/CLI beat in Segment 6 &rarr; shorten Segment 1 to two sentences. Never cut Segment 5 &mdash; it's the strongest moment you have.</div>
+  </div>
+</section>
+
+</div>
+<footer class="pf">POLAR-EMS &middot; pitch script &middot; for Smart India Hackathon presentation use</footer>
