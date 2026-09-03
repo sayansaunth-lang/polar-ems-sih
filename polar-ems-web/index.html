@@ -25,6 +25,7 @@
   --danger:#e2585f;
   --danger-soft:rgba(226,88,95,.14);
   --info:#5b9fe0;
+  --ml:#a78bfa;
   --p1:#e2585f;
   --p2:#e0a63e;
   --p3:#35c4c9;
@@ -456,7 +457,7 @@ footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center
 <!-- ============ FORECAST ============ -->
 <section class="page" id="page-forecast">
   <div class="section-head">
-    <div><h1 class="pt">Forecasting</h1><p class="lede">Seasonal-naive statistical model &mdash; not a trained neural network. Predicts load and renewable output at four horizons, scored against realized actuals.</p></div>
+    <div><h1 class="pt">Forecasting</h1><p class="lede">Two load forecasters run side by side, scored against realized actuals: a seasonal-naive statistical baseline, and a genuine trained model &mdash; an online linear regressor that learns from this session's own telemetry as it arrives.</p></div>
   </div>
 
   <div class="grid kpi-row" style="grid-template-columns:repeat(4,1fr)" id="horizonTabs">
@@ -466,14 +467,22 @@ footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center
     <button class="card kpi horizon-btn" data-h="24" style="cursor:pointer;text-align:left"><span class="l">Horizon</span><span class="v">24h</span></button>
   </div>
 
-  <div class="grid three-col" style="margin-bottom:14px">
-    <div class="card kpi"><span class="l">Load MAE</span><span class="v" id="fMaeLoad">&mdash;<span class="unit">kW</span></span></div>
-    <div class="card kpi"><span class="l">Load RMSE</span><span class="v" id="fRmseLoad">&mdash;<span class="unit">kW</span></span></div>
+  <div class="grid kpi-row" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+    <div class="card kpi"><span class="l">Baseline MAE</span><span class="v" id="fMaeLoad">&mdash;<span class="unit">kW</span></span></div>
+    <div class="card kpi"><span class="l">Baseline RMSE</span><span class="v" id="fRmseLoad">&mdash;<span class="unit">kW</span></span></div>
+    <div class="card kpi"><span class="l">ML model MAE</span><span class="v" id="fMlMae" style="color:var(--ml)">&mdash;<span class="unit">kW</span></span></div>
+    <div class="card kpi"><span class="l">ML model RMSE</span><span class="v" id="fMlRmse" style="color:var(--ml)">&mdash;<span class="unit">kW</span></span></div>
     <div class="card kpi"><span class="l">Samples scored</span><span class="v" id="fSamples">&mdash;</span></div>
   </div>
 
   <div class="card" style="margin-bottom:14px">
-    <div class="section-head"><h2 class="st">Load: forecast vs. actual</h2><div class="legend"><span><i class="ln" style="background:var(--text-primary)"></i>Actual</span><span><i class="ln dash" style="color:var(--accent)"></i>Forecast</span></div></div>
+    <div class="section-head"><h2 class="st">ML forecaster</h2><span class="pill p3" id="mlUpdateCount">0 updates</span></div>
+    <p style="font-size:12.5px;color:var(--text-secondary);margin-bottom:10px">An online linear regression (Widrow-Hoff / LMS rule) predicting station load from hour-of-day, season, temperature, wind and cloud cover. It re-trains one step every simulated tick from real telemetry &mdash; no offline dataset, no cloud training. Its error should fall the longer the simulation runs. Note it may start out <i>less</i> accurate than the statistical baseline: that baseline is a formula hand-fitted to this simulation's own equations, while this model has to learn the relationship purely from noisy observed data, same as it would on a real station. These are its current learned weights:</p>
+    <div id="mlWeights" style="font-family:var(--font-mono);font-size:11.5px;line-height:1.7;color:var(--text-secondary)">&mdash;</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="section-head"><h2 class="st">Load: forecast vs. actual</h2><div class="legend"><span><i class="ln" style="background:var(--text-primary)"></i>Actual</span><span><i class="ln dash" style="color:var(--accent)"></i>Statistical baseline</span><span><i class="ln dash" style="color:var(--ml)"></i>ML model</span></div></div>
     <svg id="fcLoadChart" class="chart-svg" viewBox="0 0 1000 220"></svg>
   </div>
   <div class="grid two-col" style="margin-bottom:14px">
@@ -490,9 +499,9 @@ footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center
   <div class="card">
     <h2 class="st" style="margin-bottom:10px">Model inputs</h2>
     <div class="land-grid">
-      <div class="land-item"><h3 style="font-size:14px">Load model</h3><p>Seasonal same-hour baseline blended with short-term persistence of the current deviation, decayed toward the seasonal mean as the horizon grows. Inputs: hour-of-day, day-of-year, outside temperature, recent load trend.</p></div>
-      <div class="land-item"><h3 style="font-size:14px">Renewable model</h3><p>Deterministic power-curve projection (wind speed &rarr; turbine output; irradiance &rarr; PV output) combined with persistence of the current weather deviation, decayed over the horizon. Solar is forced toward zero through the modeled polar-night window.</p></div>
-      <div class="land-item"><h3 style="font-size:14px">Scoring</h3><p>Each forecast is time-stamped for a target moment; once the simulation reaches that moment, the realized actual is compared against the stored prediction to update a rolling MAE/RMSE per horizon.</p></div>
+      <div class="land-item"><h3 style="font-size:14px">Statistical baseline</h3><p>Seasonal same-hour value blended with short-term persistence of the current deviation, decayed toward the seasonal mean as the horizon grows. No training, no learned parameters &mdash; a fixed formula.</p></div>
+      <div class="land-item"><h3 style="font-size:14px">ML model</h3><p>An online linear regression (least-mean-squares / Widrow-Hoff rule) with 8 weights, trained one gradient step per tick from this session's own telemetry: hour-of-day, season, temperature, wind, cloud cover &rarr; load. Genuinely learned, not hardcoded &mdash; its weights are shown above and start at zero.</p></div>
+      <div class="land-item"><h3 style="font-size:14px">Scoring</h3><p>Each forecast is time-stamped for a target moment; once the simulation reaches that moment, the realized actual is compared against both stored predictions to update rolling MAE/RMSE per horizon, for each model separately.</p></div>
     </div>
   </div>
 </section>
@@ -756,6 +765,8 @@ const S = {
   forecastPending:[], // {targetT,horizon,predLoad,predWind,predSolar}
   forecastErrors:{1:{load:[]},6:{load:[]},12:{load:[]},24:{load:[]}},
   forecastPoints:{1:[],6:[],12:[],24:[]}, // completed {t,actual,pred} for chart at chosen horizon (load)
+  mlForecastErrors:{1:[],6:[],12:[],24:[]},
+  ml:{weights:new Array(8).fill(0), updates:0},
   alerts:[], anomalyEvents:0,
   health:{battery:100,turbine:100,generator:100},
   mode:"AI OPTIMIZED",
@@ -1078,6 +1089,39 @@ function checkAnomalies(gen){
 }
 
 /* ============================================================
+   ML FORECASTER — genuine trained model, not a heuristic.
+   Online linear regression (LMS / Widrow-Hoff rule): predicted load
+   is a dot product of learned weights with a small feature vector;
+   weights are updated by one gradient step every simulated tick
+   using that tick's real (features, actual load) pair. No offline
+   dataset, no cloud training — it learns only from telemetry this
+   session has actually seen.
+============================================================ */
+const ML_LR = 0.05, ML_L2 = 0.0005;
+function mlFeatures(hour, doy, temp, wind, cloud){
+  return [
+    1,
+    Math.sin(2*Math.PI*hour/24), Math.cos(2*Math.PI*hour/24),
+    Math.sin(2*Math.PI*doy/365), Math.cos(2*Math.PI*doy/365),
+    clamp(temp/50,-2,2), clamp(wind/20,0,3), clamp(cloud,0,1)
+  ];
+}
+function mlPredict(features){
+  const w = S.ml.weights;
+  let y = 0; for(let i=0;i<w.length;i++) y += w[i]*features[i];
+  return y;
+}
+function mlTrainStep(features, actualLoad){
+  const w = S.ml.weights;
+  const pred = mlPredict(features);
+  const error = actualLoad - pred;
+  for(let i=0;i<w.length;i++){
+    w[i] += ML_LR*error*features[i] - ML_LR*ML_L2*w[i];
+  }
+  S.ml.updates++;
+}
+
+/* ============================================================
    FORECAST MODULE
 ============================================================ */
 function generateForecasts(load){
@@ -1093,7 +1137,9 @@ function generateForecasts(load){
     const predSolar = clamp(pot*950/1000*S.solarCapKW*0.92 + (S.weather.irr - (solarPotential(S.weather.doy)*dayFactor(S.weather.hour,S.weather.doy)*950/1000*S.solarCapKW*0.92))*decay*0.3, 0, S.solarCapKW);
     const windDecay = 9.5 + (S.windAR-9.5)*decay;
     const predWind = windPowerCurve(windDecay, S.turbineCount*CFG.turbineRatedKW);
-    S.forecastPending.push({targetT, horizon:h, predLoad, predWind, predSolar});
+    const seasonalTempT = seasonalTemp(doyT);
+    const mlPredLoad = mlPredict(mlFeatures(hourT, doyT, seasonalTempT, 9.5, 0.32));
+    S.forecastPending.push({targetT, horizon:h, predLoad, predWind, predSolar, mlPredLoad});
   });
   if(S.forecastPending.length>400) S.forecastPending.splice(0, S.forecastPending.length-400);
 }
@@ -1106,8 +1152,12 @@ function resolveForecasts(actualLoad, actualWind, actualSolar){
       const arr = S.forecastErrors[f.horizon].load;
       arr.push({abs:errL, sq:errL*errL});
       if(arr.length>200) arr.shift();
+      const mlErrL = Math.abs(f.mlPredLoad-actualLoad);
+      const mlArr = S.mlForecastErrors[f.horizon];
+      mlArr.push({abs:mlErrL, sq:mlErrL*mlErrL});
+      if(mlArr.length>200) mlArr.shift();
       const pts = S.forecastPoints[f.horizon];
-      pts.push({t:f.targetT, actual:actualLoad, pred:f.predLoad, predWind:f.predWind, actualWind, predSolar:f.predSolar, actualSolar});
+      pts.push({t:f.targetT, actual:actualLoad, pred:f.predLoad, mlPred:f.mlPredLoad, predWind:f.predWind, actualWind, predSolar:f.predSolar, actualSolar});
       if(pts.length>60) pts.shift();
     } else still.push(f);
   });
@@ -1150,6 +1200,7 @@ function tick(){
   S.audit.runtimeAI = S.ai.runtimeH;
   S.audit.runtimeBase = S.base.runtimeH;
 
+  mlTrainStep(mlFeatures(S.weather.hour, S.weather.doy, S.weather.temp, S.weather.wind, S.weather.cloud), load.total);
   generateForecasts(load);
   resolveForecasts(load.total, gen.windPow, gen.solarPow);
   checkAnomalies(gen);
@@ -1463,15 +1514,26 @@ function renderForecast(){
   document.getElementById("fRmseLoad").innerHTML = (rmse!=null?rmse.toFixed(1):"\u2014")+'<span class="unit">kW</span>';
   document.getElementById("fSamples").textContent = errs.length;
 
+  const mlErrs = S.mlForecastErrors[activeHorizon];
+  const mlMae = mlErrs.length ? mlErrs.reduce((a,b)=>a+b.abs,0)/mlErrs.length : null;
+  const mlRmse = mlErrs.length ? Math.sqrt(mlErrs.reduce((a,b)=>a+b.sq,0)/mlErrs.length) : null;
+  document.getElementById("fMlMae").innerHTML = (mlMae!=null?mlMae.toFixed(1):"\u2014")+'<span class="unit">kW</span>';
+  document.getElementById("fMlRmse").innerHTML = (mlRmse!=null?mlRmse.toFixed(1):"\u2014")+'<span class="unit">kW</span>';
+  document.getElementById("mlUpdateCount").textContent = S.ml.updates+" updates";
+  const wLabels = ["bias","hour_sin","hour_cos","season_sin","season_cos","temp","wind","cloud"];
+  document.getElementById("mlWeights").textContent = wLabels.map((l,i)=>l+"="+S.ml.weights[i].toFixed(3)).join("   ");
+
   const pts = S.forecastPoints[activeHorizon];
   const N = Math.min(48, pts.length);
   const recent = pts.slice(-N);
   const primary = getComputedStyle(document.body).getPropertyValue("--text-primary");
   const accent = getComputedStyle(document.body).getPropertyValue("--accent");
   const info = getComputedStyle(document.body).getPropertyValue("--info");
+  const mlColor = getComputedStyle(document.body).getPropertyValue("--ml");
   drawLineChart(document.getElementById("fcLoadChart"), [
     {points:recent.map(r=>r.actual), color:primary},
-    {points:recent.map(r=>r.pred), color:accent, dashed:true}
+    {points:recent.map(r=>r.pred), color:accent, dashed:true},
+    {points:recent.map(r=>r.mlPred), color:mlColor, dashed:true}
   ], {minZero:true, xLabels: recent.length?[fmtT(recent[0].t), fmtT(recent[recent.length-1].t)]:null});
   drawLineChart(document.getElementById("fcWindChart"), [
     {points:recent.map(r=>r.actualWind), color:primary},
@@ -1834,6 +1896,8 @@ function resetSimulation(){
   S.history=[]; S.forecastPending=[];
   S.forecastErrors={1:{load:[]},6:{load:[]},12:{load:[]},24:{load:[]}};
   S.forecastPoints={1:[],6:[],12:[],24:[]};
+  S.mlForecastErrors={1:[],6:[],12:[],24:[]};
+  S.ml={weights:new Array(8).fill(0), updates:0};
   S.alerts=[]; S.anomalyEvents=0;
   S.health={battery:100,turbine:100,generator:100};
   S.mode="AI OPTIMIZED"; S.decisionLog=[]; S.syncLog=[];
