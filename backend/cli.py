@@ -27,7 +27,6 @@ from rich.table import Table
 BASE_URL = os.environ.get("POLAR_EMS_API", "https://polar-ems-backend.onrender.com").rstrip("/")
 console = Console()
 
-
 def api_get(path: str, **params):
     r = requests.get(f"{BASE_URL}{path}", params=params, timeout=5)
     r.raise_for_status()
@@ -194,6 +193,27 @@ def cmd_speed():
         console.print(f"[green]Speed set to {result['speed']}x.[/green]")
 
 
+def cmd_ml():
+    val = input("Horizon in hours (1, 6, 12, or 24) [default 1]: ").strip() or "1"
+    try:
+        horizon = int(val)
+    except ValueError:
+        console.print("[red]Enter a whole number.[/red]")
+        return
+    data = api_get("/api/forecast/ml", horizon=horizon)
+    m = data["model"]
+    t = Table.grid(padding=(0, 2))
+    t.add_column(justify="right", style="dim")
+    t.add_column()
+    t.add_row("Model", m["model_type"])
+    t.add_row("Predicted load", f"{data['predicted_load_kw']} kW  (horizon: {data['horizon_h']}h)")
+    t.add_row("Test MAE", f"{m['test_mae_kw']} kW")
+    t.add_row("Test RMSE", f"{m['test_rmse_kw']} kW")
+    t.add_row("Trained / held out on", f"{m['n_train']} / {m['n_test']} synthetic samples")
+    t.add_row("Feature importances", ", ".join(f"{k}={v}" for k, v in m["feature_importances"].items()))
+    console.print(Panel(t, title="ML load forecaster (scikit-learn, genuinely trained)", border_style="magenta"))
+
+
 MENU = """
 [bold cyan]POLAR-EMS terminal client[/bold cyan]  ({base_url})
 
@@ -205,6 +225,7 @@ MENU = """
   6) Simulation control (start/pause/reset)
   7) Toggle internet outage
   8) Set simulation speed
+  9) ML forecaster info (trained model, MAE/RMSE, feature importances)
   0) Exit
 """
 
@@ -218,6 +239,7 @@ def main():
     actions = {
         "1": cmd_status, "2": cmd_watch, "3": cmd_alerts, "4": cmd_audit,
         "5": cmd_scenario, "6": cmd_sim_control, "7": cmd_connectivity, "8": cmd_speed,
+        "9": cmd_ml,
     }
     while True:
         console.print(MENU.format(base_url=BASE_URL))

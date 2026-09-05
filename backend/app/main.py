@@ -22,6 +22,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from .engine import SCENARIOS, SCENARIO_IDS, SimulationEngine
+from .ml_forecast import get_metrics, predict_for_horizon, train_model
 
 engine = SimulationEngine()
 _tick_task: Optional[asyncio.Task] = None
@@ -40,6 +41,9 @@ async def _tick_loop():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global _tick_task
+    metrics = train_model()
+    print(f"[ml] GradientBoostingRegressor trained: test MAE {metrics['test_mae_kw']} kW, "
+          f"RMSE {metrics['test_rmse_kw']} kW, on {metrics['n_train']} synthetic samples.")
     _tick_task = asyncio.create_task(_tick_loop())
     print("POLAR-EMS backend started. Simulation clock ticking every "
           f"{TICK_INTERVAL_SECONDS}s of real time.")
@@ -166,6 +170,16 @@ def forecast_renewables(horizon: int = 1):
     if horizon not in (1, 6, 12, 24):
         raise HTTPException(400, "horizon must be one of 1, 6, 12, 24")
     return {"horizon_h": horizon, "points": engine.forecast_points[horizon][-48:]}
+
+
+@app.get("/api/forecast/ml", tags=["forecast"])
+def forecast_ml(horizon: int = 1):
+    """A genuinely trained scikit-learn model, distinct from the seasonal-naive
+    statistical forecaster above. See app/ml_forecast.py for how it's trained."""
+    if horizon not in (1, 6, 12, 24):
+        raise HTTPException(400, "horizon must be one of 1, 6, 12, 24")
+    pred = predict_for_horizon(engine, horizon)
+    return {"horizon_h": horizon, "predicted_load_kw": round(pred, 1), "model": get_metrics()}
 
 
 # --------------------------------------------------------------------------
