@@ -1,0 +1,377 @@
+<meta charset="utf-8">
+<title>POLAR-EMS Video Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0d12; --bg-raised:#10141b; --surface:#131820; --surface-2:#171d27;
+  --border:#232b37; --border-strong:#323d4d;
+  --text-primary:#e8edf5; --text-secondary:#8fa0b8; --text-tertiary:#57667c;
+  --accent:#35c4c9; --accent-strong:#5fe0e4; --accent-soft:rgba(53,196,201,.12); --accent-border:rgba(53,196,201,.35);
+  --good:#5fbf8a; --warn:#e0a63e; --danger:#e2585f; --info:#5b9fe0;
+  --font-display:'Big Shoulders Display',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--text-primary);font-family:var(--font-body);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+::selection{background:var(--accent-soft);color:var(--accent-strong)}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent-strong);outline-offset:2px}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+.topbar{position:sticky;top:0;z-index:30;background:rgba(10,13,18,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--border)}
+@supports not (backdrop-filter:blur(6px)){.topbar{background:var(--bg)}}
+.topbar-inner{max-width:1080px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:18px;overflow-x:auto}
+.topbar .brand{font-family:var(--font-display);font-weight:800;font-size:16px;letter-spacing:.01em;white-space:nowrap;flex-shrink:0}
+.topbar .brand span{color:var(--accent-strong)}
+.topbar nav{display:flex;gap:2px;white-space:nowrap}
+.topbar nav a{color:var(--text-secondary);text-decoration:none;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;border-radius:6px}
+.topbar nav a:hover{color:var(--text-primary);background:var(--surface-2)}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 100px}
+.titleblock{padding:50px 0 32px;border-bottom:1px solid var(--border);margin-bottom:40px}
+.titleblock .eyebrow{color:var(--accent-strong);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:16px}
+.titleblock h1{font-family:var(--font-display);font-weight:900;font-size:clamp(30px,4.6vw,46px);line-height:1.03;text-wrap:balance;max-width:22ch}
+.titleblock p.sub{margin-top:14px;color:var(--text-secondary);max-width:64ch;font-size:15.5px}
+.meta-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:26px}
+.meta-row div{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.05em}
+.meta-row div b{display:block;color:var(--text-primary);font-family:var(--font-mono);font-size:14px;text-transform:none;letter-spacing:0;margin-top:3px;font-weight:600}
+
+section{margin-bottom:52px;scroll-margin-top:66px}
+h2.sh{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:.005em;margin-bottom:6px}
+p.lede{color:var(--text-secondary);max-width:70ch;margin-bottom:20px;font-size:14.5px}
+h3.h3{font-family:var(--font-display);font-weight:700;font-size:16px;margin:20px 0 8px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.card + .card{margin-top:14px}
+
+.master-prompt{background:var(--surface-2);border:1px solid var(--accent-border);border-left:3px solid var(--accent);border-radius:10px;padding:20px 22px;font-family:var(--font-mono);font-size:13px;line-height:1.75;color:var(--text-primary);white-space:pre-wrap}
+.neg-prompt{background:var(--surface-2);border:1px solid var(--border-strong);border-left:3px solid var(--danger);border-radius:10px;padding:16px 20px;font-family:var(--font-mono);font-size:12.5px;color:var(--text-secondary);margin-top:12px}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+th{text-align:left;background:var(--surface-2);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);padding:10px 12px;font-weight:600;border-bottom:1px solid var(--border-strong)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.t{font-family:var(--font-mono);color:var(--accent-strong);white-space:nowrap;font-weight:600}
+
+.scene{border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden;margin-bottom:16px}
+.scene-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:var(--surface-2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.scene-head .name{font-family:var(--font-display);font-weight:700;font-size:18px}
+.scene-head .time{font-family:var(--font-mono);color:var(--accent-strong);font-size:13px;background:var(--accent-soft);border:1px solid var(--accent-border);padding:3px 10px;border-radius:100px}
+.scene-body{padding:18px 20px;display:grid;gap:14px}
+.field{display:grid;grid-template-columns:120px 1fr;gap:14px}
+@media(max-width:640px){.field{grid-template-columns:1fr}}
+.field .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);font-weight:600;padding-top:2px}
+.field .v{font-size:13.5px;color:var(--text-primary)}
+.field .v.mono{font-family:var(--font-mono);font-size:12.5px;color:var(--text-secondary);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;line-height:1.6}
+.field .v.narr{font-style:italic;color:var(--accent-strong);font-size:14.5px}
+.osd{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;background:var(--surface-2);border:1px solid var(--border-strong);color:var(--text-primary);text-transform:uppercase}
+.shot-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:rgba(224,166,62,.12);color:var(--warn);border:1px solid rgba(224,166,62,.35)}
+
+.callout{display:flex;gap:12px;background:var(--surface-2);border:1px solid var(--border-strong);border-left:3px solid var(--accent);border-radius:8px;padding:14px 16px;margin:14px 0}
+.callout.warn{border-left-color:var(--warn)}
+.callout .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent-strong);font-weight:700;display:block;margin-bottom:5px}
+.callout.warn .lbl{color:var(--warn)}
+
+.steplist{counter-reset:step}
+.steplist .step{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+.steplist .step:last-child{border-bottom:none}
+.steplist .step .n{font-family:var(--font-mono);color:var(--accent);font-weight:600;font-size:14px;flex-shrink:0;width:20px}
+.steplist .step .t{font-weight:600;font-size:14px;margin-bottom:3px}
+.steplist .step .d{color:var(--text-secondary);font-size:13px}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.two-col{grid-template-columns:1fr}}
+ul.plain{margin:8px 0 0 0;padding-left:20px}
+ul.plain li{margin-bottom:6px;font-size:13.5px;color:var(--text-secondary)}
+ul.plain li::marker{color:var(--accent)}
+ul.plain li b{color:var(--text-primary)}
+
+footer.pf{border-top:1px solid var(--border);padding:24px;text-align:center;color:var(--text-tertiary);font-size:11.5px;max-width:1080px;margin:0 auto}
+</style>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">POLAR<span>-EMS</span> · Video Concept</div>
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#master">Master Prompt</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#scenes">Scenes</a>
+      <a href="#audio">Audio</a>
+      <a href="#footage">Real Footage</a>
+      <a href="#reveal">Final Reveal</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="titleblock">
+  <div class="eyebrow">Promotional / demo video &middot; Smart India Hackathon</div>
+  <h1>An 82-second film for a station that can't afford to go dark</h1>
+  <p class="sub">A complete production concept for an AI-generated + real-footage hybrid video: cinematic Antarctic documentary crossed with a product launch, built around your actual POLAR-EMS dashboard. Every claim below is framed as a proposed/prototype capability, not a measured real-world result.</p>
+  <div class="meta-row">
+    <div>Runtime<b>0:00 &ndash; 1:22</b></div>
+    <div>Scenes<b>10</b></div>
+    <div>Real footage inserts<b>5</b></div>
+    <div>Story arc<b>Problem &rarr; Solution</b></div>
+  </div>
+</div>
+
+<section id="overview">
+  <h2 class="sh">How the story is built</h2>
+  <p class="lede">The requested arc &mdash; Problem &rarr; Data &rarr; AI Analysis &rarr; Prediction &rarr; Optimization &rarr; Impact &rarr; Solution &mdash; maps directly onto the ten scenes below. Nothing here needs to be shot on location: scenes 1&ndash;3, the exterior cutaways in 5&ndash;9, and the final reveal are AI-generated; scenes 4&ndash;8 each carry one real screen capture from your live site.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Story beat</th><th>Scene(s)</th><th>Feature(s) shown</th></tr></thead>
+    <tbody>
+      <tr><td>Problem</td><td class="t">1&ndash;2</td><td>Isolation, no grid, fuel/renewable dependency, extreme environment</td></tr>
+      <tr><td>Data</td><td class="t">3</td><td>Weather/environmental sensing, continuous telemetry</td></tr>
+      <tr><td>AI Analysis</td><td class="t">4</td><td>Real-time energy monitoring, battery/storage state</td></tr>
+      <tr><td>Prediction</td><td class="t">5</td><td>AI-based demand &amp; renewable forecasting</td></tr>
+      <tr><td>Optimization</td><td class="t">6</td><td>Intelligent dispatch, load prioritization, energy optimization</td></tr>
+      <tr><td>Impact (reliability)</td><td class="t">7</td><td>Anomaly/fault detection, predictive maintenance, offline resilience</td></tr>
+      <tr><td>Impact (sustainability)</td><td class="t">8</td><td>Carbon/fuel reduction (simulated), reliable supply</td></tr>
+      <tr><td>Solution</td><td class="t">9&ndash;10</td><td>Unified system recap + project reveal</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout warn">
+    <div><span class="lbl">Honesty guardrail</span>No scene claims a measured real-world outcome. Scene 8's on-screen text explicitly reads <b>"Modeled in simulation"</b> and narration uses <b>engineered / designed / proposed</b> language throughout &mdash; keep this framing if you edit the script, since overclaiming is the fastest way to lose judge credibility.</div>
+  </div>
+</section>
+
+<section id="master">
+  <h2 class="sh">Master style prompt</h2>
+  <p class="lede">Paste this once as a style prefix (or system/reference prompt, depending on your tool) before every individual shot prompt in Section 5. It's what keeps 10 separately generated clips looking like one film.</p>
+  <div class="master-prompt">A premium, cinematic documentary about an Antarctic polar research station, shot in the visual language of a high-end technology product launch fused with nature-documentary realism. Consistent color grade: deep cold blues, whites and greys with warm amber interior-light accents and occasional aurora green/violet in the sky. Environment: vast snow and ice fields, a small isolated research station with wind turbines, solar panels, satellite dishes, and frost-covered metal structures; realistic blowing snow and atmospheric haze. Camera language: slow, confident, smooth movement — gentle drone pushes, controlled dolly-ins, restrained handheld only for brief tension beats; no whip pans, no shaky found-footage look. Lighting: natural polar light — blue-hour twilight, overcast diffusion, warm practical window light, aurora as the only stylized light source. Technology reads as realistic and grounded: physical hardware (turbines, panels, sensors, cables, monitors), not glowing holograms; any on-screen digital data is restrained, thin-lined, teal-and-white, resembling real telemetry rather than sci-fi HUDs. Mood: quiet tension resolving into confidence and calm competence. Photorealistic, 4K, shallow depth of field where appropriate, consistent lens character (35–85mm equivalent), subtle anamorphic flare only on wide exterior shots. No on-screen text baked into the video — text is composited in post.</div>
+  <div class="neg-prompt"><b style="color:var(--danger)">Negative / avoid:</b> cartoon, illustration, anime, oversaturated neon, cyberpunk, glowing holograms, futuristic sci-fi HUD overlays, unrealistic robots, warped hands, distorted or close-up human faces, baked-in text or watermarks, blurry or low-resolution output, extra limbs, morphing geometry.</div>
+  <p style="margin-top:12px;font-size:12.5px;color:var(--text-tertiary)">Faces are deliberately avoided throughout &mdash; current AI video tools render them inconsistently. Use silhouettes, gloved hands, or wide figures in parkas wherever a human presence helps a shot.</p>
+</section>
+
+<section id="timeline">
+  <h2 class="sh">Timeline at a glance</h2>
+  <p class="lede">Treat timestamps as targets: lock them to your actual recorded voiceover length once it exists, not the other way around.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Time</th><th>Scene</th><th>Visual</th><th>On-screen text</th></tr></thead>
+    <tbody>
+      <tr><td class="t">0:00&ndash;0:06</td><td>1 &middot; Isolation</td><td>Aerial over ice field, station lights, aurora</td><td>&mdash;</td></tr>
+      <tr><td class="t">0:06&ndash;0:12</td><td>2 &middot; Stakes</td><td>Generator / turbine / solar panel, storm building</td><td>NO GRID. NO BACKUP.</td></tr>
+      <tr><td class="t">0:12&ndash;0:19</td><td>3 &middot; Data</td><td>Frosted sensor, faint telemetry lines</td><td>EVERY WATT, MEASURED.</td></tr>
+      <tr><td class="t">0:19&ndash;0:28</td><td>4 &middot; Monitoring <span class="shot-badge">real UI</span></td><td>Control room &rarr; Dashboard tab</td><td>REAL-TIME MONITORING</td></tr>
+      <tr><td class="t">0:28&ndash;0:37</td><td>5 &middot; Prediction <span class="shot-badge">real UI</span></td><td>Forecast tab, aurora cutaway</td><td>AI-BASED DEMAND FORECASTING</td></tr>
+      <tr><td class="t">0:37&ndash;0:47</td><td>6 &middot; Optimization <span class="shot-badge">real UI</span></td><td>Optimizer tab, exterior match-cut</td><td>INTELLIGENT ENERGY OPTIMIZATION</td></tr>
+      <tr><td class="t">0:47&ndash;0:56</td><td>7 &middot; Resilience <span class="shot-badge">real UI</span></td><td>Anomalies + Offline Autonomy tabs, whiteout</td><td>ANOMALY DETECTION &rarr; OFFLINE AUTONOMY</td></tr>
+      <tr><td class="t">0:56&ndash;1:05</td><td>8 &middot; Impact <span class="shot-badge">real UI</span></td><td>Green Audit tab, ice shelf aerial</td><td>LESS FUEL. LOWER EMISSIONS.</td></tr>
+      <tr><td class="t">1:05&ndash;1:12</td><td>9 &middot; One system</td><td>Fast UI montage + hero exterior</td><td>MONITOR. PREDICT. OPTIMIZE. PROTECT.</td></tr>
+      <tr><td class="t">1:12&ndash;1:22</td><td>10 &middot; Reveal</td><td>Logo build, wordmark, tagline</td><td>POLAR-EMS + disclaimer + SIH tag</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="scenes">
+  <h2 class="sh">Scene-by-scene breakdown</h2>
+  <p class="lede">Full narration, camera direction, on-screen text and AI video-generation prompts for every shot.</p>
+
+  <div class="scene">
+    <div class="scene-head"><span class="name">Scene 1 &middot; Isolation</span><span class="time">0:00 &ndash; 0:06</span></div>
+    <div class="scene-body">
+      <div class="field"><div class="k">Visual</div><div class="v">Extreme wide aerial at dusk: a small research station glows amid an endless ice field, faint aurora ribbons overhead, snow drifting across the foreground.</div></div>
+      <div class="field"><div class="k">Camera</div><div class="v">Slow, barely-perceptible drone push-in; deep parallax between snow foreground and distant station lights.</div></div>
+      <div class="field"><div class="k">On-screen text</div><div class="v"><span class="osd">ANTARCTIC RESEARCH STATION — 82°S</span> (small caption, bottom-left)</div></div>
+      <div class="field"><div class="k">Narration</div><div class="v narr">"At the bottom of the world, a research station runs on borrowed time."</div></div>
+      <div class="field"><div class="k">AI prompt</div><div class="v mono">Cinematic aerial drone shot at dusk over a vast Antarctic ice field; a small isolated research station with warm interior lights glowing in the distance; faint green aurora ribbons in a deep blue-purple sky; fine snow drift blowing across the foreground; ultra-realistic documentary style; shallow atmospheric haze; slow steady push-in; deep blues and cold whites with warm amber station lights; 4K photorealistic; no text, no people.</div></div>
+      <div class="field"><div class="k">Sound</div><div class="v">Low sustained cinematic drone, distant wind, single low string note fading in.</div></div>
+      <div class="field"><div class="k">Transition out</div><div class="v">Hard cut on the wind gust to Scene 2's generator close-up.</div></div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-head"><span class="name">Scene 2 &middot; Stakes</span><span class="time">0:06 &ndash; 0:12</span></div>
+    <div class="scene-body">
+      <div class="field"><div class="k">Visual</div><div class="v">Three quick shots: diesel generator venting heat into freezing air &rarr; wind turbine blades turning against grey sky &rarr; solar panels dusted with snow as a gust signals an incoming storm.</div></div>
+      <div class="field"><div class="k">Camera</div><div class="v">Stabilized tracking shots, ~2s each; low angle looking up at the turbine ties the three energy sources together visually.</div></div>
+      <div class="field"><div class="k">On-screen text</div><div class="v"><span class="osd">NO GRID. NO BACKUP.</span> (uppercase, letter-spaced, bottom third)</div></div>
+      <div class="field"><div class="k">Narration</div><div class="v narr">"No grid. No backup. Just diesel, wind and sun — and whatever keeps them balanced."</div></div>
+      <div class="field"><div class="k">AI prompt (3 shots)</div><div class="v mono">(a) Close-up of a diesel generator exhaust venting visible heat distortion into freezing Antarctic air, frosted metal casing, muted grey daylight, industrial documentary realism, shallow depth of field.
+(b) Low-angle tracking shot looking up at a wind turbine's blades slowly rotating against an overcast polar sky, subtle frost on the tower, cold color grade, slow tilt.
+(c) Wide shot of a solar panel array dusted with snow on a station rooftop, wind visibly lifting loose snow off the panels, dramatic overcast sky suggesting an incoming storm, photorealistic.</div></div>
+      <div class="field"><div class="k">Sound</div><div class="v">Generator hum under wind gusts, mechanical turbine whir, rising low tension pad.</div></div>
+      <div class="field"><div class="k">Transition out</div><div class="v">Whip to a macro rack-focus on the sensor in Scene 3.</div></div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-head"><span class="name">Scene 3 &middot; Data</span><span class="time">0:12 &ndash; 0:19</span></div>
+    <div class="scene-body">
+      <div class="field"><div class="k">Visual</div><div class="v">Macro on a frosted anemometer rotating in wind; rack focus from ice crystals to the spinning cups; faint, restrained teal telemetry lines trace along a cable toward the station.</div></div>
+      <div class="field"><div class="k">Camera</div><div class="v">Push-in to macro, rack focus, then pull back to reveal the cable run.</div></div>
+      <div class="field"><div class="k">On-screen text</div><div class="v"><span class="osd">EVERY WATT, MEASURED.</span> (top-left, for rhythm variation)</div></div>
+      <div class="field"><div class="k">Narration</div><div class="v narr">"Every watt matters here — so we built a system that watches everything, all the time."</div></div>
+      <div class="field"><div class="k">AI prompt</div><div class="v mono">Macro cinematic shot of a frost-covered anemometer weather sensor rotating in high wind, fine ice crystals visible on the housing, shallow depth of field rack focus from ice detail to rotating cups, faint thin glowing teal telemetry line subtly tracing along a nearby cable toward a building, restrained realism (not sci-fi), cold blue-white grade, photorealistic.</div></div>
+      <div class="field"><div class="k">Sound</div><div class="v">Soft electronic tick/pulse begins, wind softens, first subtle UI blip introduced.</div></div>
+      <div class="field"><div class="k">Transition out</div><div class="v">Smooth push through a frosted window into the control room for Scene 4.</div></div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-head"><span class="name">Scene 4 &middot; Real-Time Monitoring</span><span class="time">0:19 &ndash; 0:28</span></div>
+    <div class="scene-body">
+      <div class="field"><div class="k">Visual</div><div class="v">Through a frosted window into a dim control room; a monitor glows with your real <b>Dashboard tab</b> (power flow + KPI cards). Small "POLAR-EMS" wordmark bug appears bottom-right and persists for the rest of the film.</div></div>
+      <div class="field"><div class="k">Camera</div><div class="v">Smooth dolly through the window, settle on a medium shot of the monitor, slow push-in on the screen.</div></div>
+      <div class="field"><div class="k">On-screen text</div><div class="v"><span class="osd">REAL-TIME MONITORING</span></div></div>
+      <div class="field"><div class="k">Narration</div><div class="v narr">"POLAR-EMS reads the station's pulse in real time — power, battery, weather, load, the moment it happens."</div></div>
+      <div class="field"><div class="k">AI prompt (room only)</div><div class="v mono">Cinematic interior of a dim, minimalist polar station control room at night; a single desk monitor casts cool blue-white light across a frost-rimmed window; soft practical lighting; shallow depth of field; slow dolly-in toward the screen; screen left blank for compositing; moody documentary realism; visible dust particles in the light beam.</div></div>
+      <div class="field"><div class="k">Real footage</div><div class="v"><span class="shot-badge">insert here</span> Dashboard tab: Power Flow diagram + KPI row. See Section 6 for capture instructions.</div></div>
+      <div class="field"><div class="k">Sound</div><div class="v">Tempo lifts slightly, soft synth arpeggio enters, UI chime on each data update.</div></div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-head"><span class="name">Scene 5 &middot; Prediction</span><span class="time">0:28 &ndash; 0:37</span></div>
+    <div class="scene-body">
+      <div class="field"><div class="k">Visual</div><div class="v">Screen cuts to the <b>Forecast tab</b> (forecast-vs-actual chart, horizon buttons animating). Brief 2s cutaway to an exterior aurora shot for rhythm.</div></div>
+      <div class="field"><div class="k">Camera</div><div class="v">Near-static medium shot on the monitor with an imperceptible dolly-left; hard cut to the aurora cutaway and back.</div></div>
+      <div class="field"><div class="k">On-screen text</div><div class="v"><span class="osd">AI-BASED DEMAND FORECASTING</span></div></div>
+      <div class="field"><div class="k">Narration</div><div class="v narr">"Then it looks ahead — forecasting demand and renewable output hours before they happen, so decisions are never a guess."</div></div>
+      <div class="field"><div class="k">AI prompt (cutaway)</div><div class="v mono">Wide cinematic shot of vivid green and violet aurora rippling over a dark Antarctic horizon, silhouette of research-station antennas in the foreground, photorealistic, ultra high detail, cold color grade, slow ambient drift, no text, no people.</div></div>
+      <div class="field"><div class="k">Real footage</div><div class="v"><span class="shot-badge">insert here</span> Forecast tab: load forecast vs. actual chart, ideally mid-animation as a horizon button is clicked.</div></div>
+      <div class="field"><div class="k">Sound</div><div class="v">Arpeggio continues building, soft whoosh on the tab-switch cut.</div></div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-head"><span class="name">Scene 6 &middot; Optimization</span><span class="time">0:37 &ndash; 0:47</span></div>
+    <div class="scene-body">
+      <div class="field"><div class="k">Visual</div><div class="v">The film's technical centerpiece — hold longest. Screen shows the <b>Optimizer tab</b>: power flow animating between wind/solar/battery/diesel, the "Why" reasoning box populating live. Match-cut to the real station exterior exactly as a decision "confirms."</div></div>
+      <div class="field"><div class="k">Camera</div><div class="v">Confident push-in on the monitor; match-cut to a locked-off wide exterior shot timed to the confirm sound.</div></div>
+      <div class="field"><div class="k">On-screen text</div><div class="v"><span class="osd">INTELLIGENT ENERGY OPTIMIZATION</span><br><span style="font-size:11.5px;color:var(--text-tertiary)">Battery · Wind · Solar · Diesel — balanced automatically</span></div></div>
+      <div class="field"><div class="k">Narration</div><div class="v narr">"An AI-driven optimizer weighs battery, wind, solar and diesel every second, choosing the mix that protects critical systems while easing the load on fuel."</div></div>
+      <div class="field"><div class="k">AI prompt (match-cut)</div><div class="v mono">Cinematic wide shot of an Antarctic research station at dusk, wind turbine blades turning steadily, a faint glow from the generator shed dimming slightly as if power draw is easing, snow gently falling, photorealistic, calm confident mood, slow static hold, cold blue grade with warm interior window lights.</div></div>
+      <div class="field"><div class="k">Real footage</div><div class="v"><span class="shot-badge">insert here</span> Optimizer tab: Current Decision card + reasoning box + power flow diagram. Time the recording so the reasoning text populates exactly as narration says "choosing the mix."</div></div>
+      <div class="field"><div class="k">Sound</div><div class="v">Musical peak begins; a confident low "confirm" tone lands exactly on the match-cut; percussion layer starts.</div></div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-head"><span class="name">Scene 7 &middot; Resilience</span><span class="time">0:47 &ndash; 0:56</span></div>
+    <div class="scene-body">
+      <div class="field"><div class="k">Visual</div><div class="v">Screen shifts: an alert appears on <b>Anomalies &amp; Maintenance</b>, then cuts to <b>Offline Autonomy</b> as the badge flips to OFFLINE. Cut to exterior: a whiteout gust begins obscuring the satellite dish, implying comms loss.</div></div>
+      <div class="field"><div class="k">Camera</div><div class="v">Screen shots stay locked-off and calm; the exterior whiteout gets a slight handheld shake for contrast.</div></div>
+      <div class="field"><div class="k">On-screen text</div><div class="v"><span class="osd">ANOMALY DETECTION</span> &rarr; <span class="osd">OFFLINE AUTONOMY</span></div></div>
+      <div class="field"><div class="k">Narration</div><div class="v narr">"It spots wear before it becomes failure — and if a link drops or the wind turns violent, safety protocols keep critical systems powered, no matter what."</div></div>
+      <div class="field"><div class="k">AI prompt</div><div class="v mono">Cinematic shot of a small satellite dish on an Antarctic station gradually obscured by a fast-moving whiteout snowstorm, dramatic low light, wind-blown snow streaking across frame, photorealistic, tense atmosphere, slight handheld shake, cold desaturated grade, no text, no people.</div></div>
+      <div class="field"><div class="k">Real footage</div><div class="v"><span class="shot-badge">insert here</span> Anomalies tab alert card, then Offline Autonomy tab's hero badge switching to OFFLINE — trigger this live via the Demo Scenarios panel while recording.</div></div>
+      <div class="field"><div class="k">Sound</div><div class="v">Brief tension dip (sub-bass rumble, wind swell), resolving cleanly into a reassuring low chime as the OFFLINE badge locks in.</div></div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-head"><span class="name">Scene 8 &middot; Impact</span><span class="time">0:56 &ndash; 1:05</span></div>
+    <div class="scene-body">
+      <div class="field"><div class="k">Visual</div><div class="v">Screen cuts to the <b>Green Audit tab</b> (fuel saved / CO2 avoided cards and bar chart animating in). Cut to a serene, wide aerial over untouched ice shelf — deliberate contrast with Scene 7's storm.</div></div>
+      <div class="field"><div class="k">Camera</div><div class="v">Smooth, unhurried rising drone shot over the ice shelf.</div></div>
+      <div class="field"><div class="k">On-screen text</div><div class="v"><span class="osd">LESS FUEL. LOWER EMISSIONS.</span><br><span style="font-size:11px;color:var(--text-tertiary)">Modeled in simulation — see Green Audit</span></div></div>
+      <div class="field"><div class="k">Narration</div><div class="v narr">"Less fuel burned. Fewer emergency generator runs. A lighter footprint in one of Earth's most fragile environments — engineered by design."</div></div>
+      <div class="field"><div class="k">AI prompt</div><div class="v mono">Majestic rising aerial drone shot over a pristine, untouched Antarctic ice shelf under soft daylight, clean white and pale-blue tones, subtle wind-carved snow texture below, calm expansive mood, photorealistic, slow steady upward movement, no station or technology visible, 4K.</div></div>
+      <div class="field"><div class="k">Real footage</div><div class="v"><span class="shot-badge">insert here</span> Green Audit tab: fuel-saved / CO2-avoided KPI cards + baseline-vs-optimized bar chart.</div></div>
+      <div class="field"><div class="k">Sound</div><div class="v">Full musical swell, warm pad layers; wind fades to near-silence for the ice-shelf shot (deliberate breathing room).</div></div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-head"><span class="name">Scene 9 &middot; One System</span><span class="time">1:05 &ndash; 1:12</span></div>
+    <div class="scene-body">
+      <div class="field"><div class="k">Visual</div><div class="v">Fast, confident montage: 4 quick UI cuts (Dashboard &rarr; Forecast &rarr; Optimizer &rarr; Offline Autonomy) intercut with one exterior hero shot of the station at blue-hour twilight.</div></div>
+      <div class="field"><div class="k">Camera</div><div class="v">Match-cuts landing on music downbeats; no camera movement within each UI cut.</div></div>
+      <div class="field"><div class="k">On-screen text</div><div class="v"><span class="osd">MONITOR.</span> <span class="osd">PREDICT.</span> <span class="osd">OPTIMIZE.</span> <span class="osd">PROTECT.</span> (one flashes per cut)</div></div>
+      <div class="field"><div class="k">Narration</div><div class="v narr">"One dashboard. Every system. Built to keep polar research powered, resilient, and one step ahead."</div></div>
+      <div class="field"><div class="k">AI prompt (hero cut)</div><div class="v mono">Cinematic hero wide shot of an Antarctic research station glowing warmly at blue-hour twilight, aurora faintly visible above, wind turbine and solar array both operating, photorealistic, confident hopeful mood, slow static hold, premium documentary grade.</div></div>
+      <div class="field"><div class="k">Real footage</div><div class="v"><span class="shot-badge">insert here</span> Four short (1–1.5s) clips, one per tab already captured above — no new recording needed, just re-cut.</div></div>
+      <div class="field"><div class="k">Sound</div><div class="v">Percussive layer peaks; each cut punctuated by a soft whoosh + UI-chime hybrid.</div></div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-head"><span class="name">Scene 10 &middot; Final Reveal</span><span class="time">1:12 &ndash; 1:22</span></div>
+    <div class="scene-body">
+      <div class="field"><div class="k">Visual</div><div class="v">Hard cut to near-black. A thin teal compass/snowflake emblem draws itself on, resolving into the "POLAR-EMS" wordmark. Tagline, disclaimer, and event tag fade in beneath, in sequence. See Section 7 for the full spec.</div></div>
+      <div class="field"><div class="k">Camera</div><div class="v">Static graphic; a very slow 2–3% zoom-out for subtle life.</div></div>
+      <div class="field"><div class="k">On-screen text</div><div class="v">POLAR-EMS &middot; "AI-Driven Smart Energy Management for Polar Research Stations" &middot; "Prototype / Proposed Solution — Simulated Demonstration" &middot; "Smart India Hackathon 2026"</div></div>
+      <div class="field"><div class="k">Narration</div><div class="v narr">"POLAR-EMS — a proposed AI energy system for the stations that can't afford to go dark."</div></div>
+      <div class="field"><div class="k">AI prompt</div><div class="v mono">Minimalist motion-graphic reveal on a near-black background: a thin, clean teal geometric compass-and-snowflake emblem draws itself in with smooth vector-like lines, then resolves into bold condensed white wordmark typography; subtle soft glow; no particles, no cartoon sparkle; premium tech product-launch aesthetic; slow gentle zoom-out; 4K, clean and restrained.</div></div>
+      <div class="field"><div class="k">Sound</div><div class="v">Music resolves to one sustained warm chord, then near-silence with a soft low brand-sting tone; a faint wind whisper lingers under the silence, echoing the opening.</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="audio">
+  <h2 class="sh">Music &amp; sound design</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 class="h3" style="margin-top:0">Score arc</h3>
+      <ul class="plain">
+        <li><b>0:00–0:12</b> — sparse, tense ambient drone + wind, no melody</li>
+        <li><b>0:12–0:19</b> — a single soft electronic pulse enters, signaling "data"</li>
+        <li><b>0:19–0:37</b> — synth arpeggio builds under the first two UI scenes</li>
+        <li><b>0:37–0:56</b> — hybrid orchestral-electronic peak with percussion (think confident tech-keynote score, not action-trailer bombast)</li>
+        <li><b>0:56–1:05</b> — warm pad swell, wind drops out for breathing room</li>
+        <li><b>1:05–1:12</b> — percussive layer peaks again for the montage</li>
+        <li><b>1:12–1:22</b> — resolves to one sustained chord, then near-silence + brand sting</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="h3" style="margin-top:0">Key sound effects</h3>
+      <ul class="plain">
+        <li>Wind: constant bed, intensity tracks each scene's mood</li>
+        <li>Generator hum, turbine whir, distant ice-shelf creak</li>
+        <li>Soft UI blip on each data point / KPI update</li>
+        <li>Whoosh on every tab-switch cut</li>
+        <li>Low "confirm" tone exactly on the Scene 6 match-cut</li>
+        <li>Sub-bass rumble under the Scene 7 whiteout, resolving to a clean chime</li>
+        <li>Final brand sting: soft low hit + short shimmer tail</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="footage">
+  <h2 class="sh">Incorporating your real dashboard footage</h2>
+  <p class="lede">Five inserts, all from <a href="https://polar-ems-web.vercel.app" target="_blank" rel="noopener">polar-ems-web.vercel.app</a>. None of this needs AI video generation — it's a straightforward screen recording composited into the AI-generated monitor shots.</p>
+  <div class="steplist">
+    <div class="step"><div class="n">1</div><div><div class="t">Record at native resolution, full-screen</div><div class="d">1920×1080 minimum (2560×1440 or higher preferred). Hide the browser chrome — use F11 fullscreen or crop it in the edit.</div></div></div>
+    <div class="step"><div class="n">2</div><div><div class="t">Trigger motion before you hit record</div><div class="d">Open the Demo Scenarios panel and pick a scenario relevant to that scene (e.g. "Low renewable generation" for Scene 6, "Internet outage" for Scene 7) a few seconds before recording, so charts and badges are actively animating rather than sitting static.</div></div></div>
+    <div class="step"><div class="n">3</div><div><div class="t">Capture each tab separately, 6–10s per clip</div><div class="d">Dashboard, Forecast, Optimizer, Anomalies &amp; Maintenance, Offline Autonomy, Green Audit — six short clips covering the five insert points (Offline Autonomy needs two beats: the alert, then the OFFLINE badge).</div></div></div>
+    <div class="step"><div class="n">4</div><div><div class="t">Record at 60fps if your tool allows it</div><div class="d">The charts and the flow-diagram's dashed-line animation read far more smoothly at 60fps than 30fps when composited into a cinematic shot.</div></div></div>
+    <div class="step"><div class="n">5</div><div><div class="t">Composite as a screen-insert, not a flat overlay</div><div class="d">In your editor (DaVinci Resolve, Premiere, or CapCut), corner-pin or perspective-warp the recording onto the AI-generated monitor's screen area; add a faint screen glow/bloom and a very subtle reflection to sell it as physically on that display, matching the site's own dark teal palette so it never looks pasted on.</div></div></div>
+    <div class="step"><div class="n">6</div><div><div class="t">Add gentle motion even to a static capture</div><div class="d">A slow 3–5% Ken Burns zoom on every screen insert prevents it from reading as a flat, dead screenshot.</div></div></div>
+    <div class="step"><div class="n">7</div><div><div class="t">Hide or restyle the cursor</div><div class="d">A default OS cursor breaks the premium feel. Hide it during recording (most screen recorders have this option), or replace clicks with a subtle animated highlight ring added in post.</div></div></div>
+  </div>
+</section>
+
+<section id="reveal">
+  <h2 class="sh">Final 10-second reveal — full spec</h2>
+  <p class="lede">This is the frame judges should be able to screenshot and reference. Keep it uncluttered and hold the last frame.</p>
+  <div class="card">
+    <div class="table-wrap"><table>
+      <thead><tr><th>Beat</th><th>Element</th><th>Timing</th></tr></thead>
+      <tbody>
+        <tr><td class="t">1:12–1:14</td><td>Hard cut to near-black; emblem begins drawing in thin teal lines</td><td>2s</td></tr>
+        <tr><td class="t">1:14–1:16</td><td>Emblem resolves; "POLAR-EMS" wordmark builds in (Big Shoulders Display, bold, condensed)</td><td>2s</td></tr>
+        <tr><td class="t">1:16–1:18</td><td>Tagline fades in: "AI-Driven Smart Energy Management for Polar Research Stations"</td><td>2s</td></tr>
+        <tr><td class="t">1:18–1:20</td><td>Disclaimer fades in, smaller type: "Prototype / Proposed Solution — Simulated Demonstration"</td><td>2s</td></tr>
+        <tr><td class="t">1:20–1:22</td><td>Event tag settles in: "Smart India Hackathon 2026" (+ team name if desired); hold on final static frame</td><td>2s</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="callout">
+    <div><span class="lbl">Why the disclaimer stays on screen</span>It's small, but it's what lets you say anything confident in the narration leading up to it — the film can sound impressive precisely because this line does the honest work of framing everything before it as a proposed system.</div>
+  </div>
+</section>
+
+</div>
+<footer class="pf">POLAR-EMS &middot; video production concept &middot; for Smart India Hackathon use</footer>
