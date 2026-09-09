@@ -38,7 +38,8 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:var(--bg)}
 body{
-  background:var(--bg);
+  background:transparent; /* html above stays the canvas-level fallback color; body must not
+    also paint an opaque box or it covers the fixed .cine-bg-video (z-index:-1) sitting under it */
   color:var(--text-primary);
   font-family:var(--font-body);
   font-size:14px;
@@ -116,7 +117,7 @@ nav.tabs button{
 nav.tabs button:hover{color:var(--text-primary)}
 nav.tabs button.active{color:var(--accent-strong);border-bottom-color:var(--accent-strong)}
 
-main{flex:1;padding:22px 20px 60px;max-width:1400px;margin:0 auto;width:100%}
+main{flex:1;padding:22px 20px 60px;max-width:1400px;margin:0 auto;width:100%;background:var(--bg)}
 .page{display:none}
 .page.active{display:block;animation:fade .2s ease}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -290,7 +291,21 @@ footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center
 ============================================================ */
 .cine-hero{position:relative;min-height:100vh;display:flex;flex-direction:column;overflow:hidden;padding:26px 6vw 60px;background:
   radial-gradient(60% 50% at 82% 8%,rgba(53,196,201,.12),transparent 60%),
-  radial-gradient(45% 35% at 8% 0%,rgba(53,196,201,.05),transparent 60%),var(--bg)}
+  radial-gradient(45% 35% at 8% 0%,rgba(53,196,201,.05),transparent 60%),transparent}
+/* Cinematic Antarctic station backdrop. Fixed to the viewport (not the hero
+   section) so it stays put as one continuous, uninterrupted loop behind the
+   whole page while scrolling — the opaque header/twin/dashboard sections
+   naturally cover it once scrolled past, same as they'd cover a flat color.
+   z-index:-1 (a negative stacking level) is what lets it show through
+   .cine-hero's transparent background while still painting below every
+   normal in-flow section — see CSS2.1 Appendix E stacking order. No asset =
+   falls back to the flat var(--bg) canvas color, never blank. */
+.cine-bg-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;pointer-events:none;opacity:0;transition:opacity 1.2s ease}
+.cine-bg-video.is-ready{opacity:1}
+.cine-bg-overlay{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  linear-gradient(180deg,rgba(4,7,11,.6) 0%,rgba(6,10,15,.38) 30%,rgba(6,10,15,.3) 58%,rgba(4,7,11,.72) 100%),
+  radial-gradient(120% 90% at 50% 105%,rgba(4,7,11,.6),transparent 62%)}
+@media(prefers-reduced-motion:reduce){.cine-bg-video{display:none}}
 #cineCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;cursor:grab}
 #cineCanvas.dragging{cursor:grabbing}
 .cine-topbar{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:8px 0 40px}
@@ -359,6 +374,9 @@ footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center
 </style>
 
 <div id="app">
+
+<video class="cine-bg-video" id="cineBgVideo" autoplay muted loop playsinline preload="none" poster="assets/video/polar-station-poster.jpg" aria-hidden="true"></video>
+<div class="cine-bg-overlay" aria-hidden="true"></div>
 
 <section class="cine-hero" id="cineHero">
   <canvas id="cineCanvas" aria-hidden="true"></canvas>
@@ -2174,6 +2192,29 @@ const twinSelection = (function(){
   };
 })();
 
+/* ---------------- Background video (cinematic Antarctic site backdrop) ----------------
+   Fixed behind the whole page (see .cine-bg-video/.cine-bg-overlay CSS) — one
+   continuous, uninterrupted loop for the entire scroll, not per-section clips.
+   Loads lazily, fades in once playable. Respects prefers-reduced-motion and
+   degrades silently to the flat background if the asset is ever missing. */
+(function siteBackgroundVideo(){
+  const video = document.getElementById("cineBgVideo");
+  if (!video) return;
+  if (reduceMotion) { video.remove(); return; }
+
+  const source = document.createElement("source");
+  source.src = "assets/video/polar-station-background.mp4";
+  source.type = "video/mp4";
+  video.appendChild(source);
+  video.addEventListener("loadeddata", () => {
+    video.classList.add("is-ready");
+    video.play().catch(() => {}); // retry once decoded — the pre-buffer play() below can be rejected too early
+  }, { once:true });
+  video.preload = "auto";
+  video.load();
+  video.play().catch(() => {}); // autoplay can be blocked pre-interaction; poster/gradient covers that gap either way
+})();
+
 /* ---------------- Enter / skip controls ---------------- */
 document.getElementById("cineEnter").addEventListener("click", () => window.PolarEMS.scrollToDashboard());
 document.getElementById("cineSkip").addEventListener("click", () => window.PolarEMS.scrollToDashboard());
@@ -2229,8 +2270,8 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
   function isNarrow(){ return window.innerWidth < 641; }
   function layoutFor(narrow){
     return narrow
-      ? { rig:new THREE.Vector3(0.55,-0.05,0), home:new THREE.Vector3(0.75,0.35,9.6), look:new THREE.Vector3(0.75,0.1,0), fov:54 }
-      : { rig:new THREE.Vector3(2.1,0.1,0), home:new THREE.Vector3(1.4,0.2,9), look:new THREE.Vector3(1.8,0.1,0), fov:45 };
+      ? { rig:new THREE.Vector3(0.55,1.0,0), home:new THREE.Vector3(0.75,0.35,9.6), look:new THREE.Vector3(0.75,-0.9,0), fov:54 }
+      : { rig:new THREE.Vector3(2.1,1.15,0), home:new THREE.Vector3(1.4,0.2,9), look:new THREE.Vector3(1.8,-0.6,0), fov:45 };
   }
   let layout = layoutFor(isNarrow());
   camera.fov = layout.fov;
