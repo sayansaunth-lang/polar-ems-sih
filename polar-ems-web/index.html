@@ -282,9 +282,186 @@ footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center
   main{padding:16px 14px 50px}
   .scn-panel{width:88vw;right:-88vw}
 }
+
+/* ============================================================
+   CINEMATIC HERO + DIGITAL TWIN
+   Reads live simulation state via window.PolarEMS (see the adapter
+   at the bottom of the main script) — no independent/fake data.
+============================================================ */
+.cine-hero{position:relative;min-height:100vh;display:flex;flex-direction:column;overflow:hidden;padding:26px 6vw 60px;background:
+  radial-gradient(60% 50% at 82% 8%,rgba(53,196,201,.12),transparent 60%),
+  radial-gradient(45% 35% at 8% 0%,rgba(53,196,201,.05),transparent 60%),var(--bg)}
+#cineCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;cursor:grab}
+#cineCanvas.dragging{cursor:grabbing}
+.cine-topbar{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:8px 0 40px}
+.cine-body{position:relative;z-index:2;flex:1;display:grid;grid-template-columns:1.15fr .85fr;gap:52px;align-items:center;max-width:1320px;margin:0 auto;width:100%}
+@media(max-width:980px){.cine-body{grid-template-columns:1fr;gap:36px}}
+.cine-eyebrow{color:var(--accent-strong);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:18px;display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--accent-border);padding:6px 13px;border-radius:100px}
+.cine-hero h1{font-family:var(--font-display);font-weight:900;font-size:clamp(34px,5vw,60px);line-height:1.01;letter-spacing:.005em;text-wrap:balance;color:var(--text-primary)}
+.cine-hero h1 .accent{color:var(--accent-strong)}
+.cine-hero p.lead{margin:18px 0 0;font-size:16px;color:var(--text-secondary);max-width:50ch;line-height:1.65}
+.cine-ctas{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+.cine-ctas .btn{padding:13px 22px;font-size:13.5px}
+.cine-hud{position:relative;background:var(--surface-2);border:1px solid var(--border-strong);border-radius:14px;padding:20px 20px 16px;box-shadow:0 30px 70px -24px rgba(0,0,0,.6)}
+.cine-hud-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.cine-hud-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);font-weight:600;display:flex;align-items:center;gap:7px}
+.cine-hud-title .lv{width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px var(--good-soft);animation:cinepulse 1.8s infinite}
+@keyframes cinepulse{0%,100%{opacity:1}50%{opacity:.35}}
+.cine-hud-rows{display:grid;grid-template-columns:1fr 1fr;gap:13px 16px}
+.cine-hud-row .l{font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.cine-hud-row .v{font-family:var(--font-mono);font-weight:600;font-size:18px;color:var(--text-primary);font-variant-numeric:tabular-nums}
+.cine-hud-row .v .u{font-size:11px;color:var(--text-secondary);font-weight:500;margin-left:2px}
+.cine-hud-row.wide{grid-column:1/-1}
+.cine-hud-foot{margin-top:12px;padding-top:11px;border-top:1px solid var(--border);font-size:10px;color:var(--text-tertiary);display:flex;justify-content:space-between}
+.cine-drag-hint{position:absolute;z-index:3;font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);display:flex;align-items:center;gap:6px;pointer-events:none;opacity:0;transition:opacity .4s;bottom:6px;left:0}
+.cine-drag-hint.show{opacity:1}
+.cine-scroll-cue{position:relative;z-index:2;align-self:center;margin-top:30px;color:var(--text-tertiary);animation:cinebob 2.2s ease-in-out infinite;text-align:center}
+@keyframes cinebob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+@media(prefers-reduced-motion:reduce){.cine-scroll-cue,.cine-hud-title .lv{animation:none}}
+
+/* digital twin */
+.twin-section{padding:80px 6vw 90px;background:var(--bg-raised);border-bottom:1px solid var(--border)}
+.twin-head{max-width:680px;margin:0 auto 36px}
+.twin-kicker{font-family:var(--font-mono);font-size:11px;color:var(--accent-strong);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px}
+.twin-head h2{font-family:var(--font-display);font-weight:800;font-size:clamp(22px,3vw,32px);color:var(--text-primary);margin-bottom:10px}
+.twin-head p{color:var(--text-secondary);font-size:14.5px;line-height:1.6}
+.twin-wrap{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;max-width:1320px;margin:0 auto;align-items:stretch}
+@media(max-width:900px){.twin-wrap{grid-template-columns:1fr}}
+.twin-scroll{overflow-x:auto}
+.twin-card svg{width:100%;min-width:520px;height:auto;display:block}
+.twin-line{fill:none;stroke:var(--border-strong);stroke-width:2;transition:stroke .3s,stroke-width .3s}
+.twin-line.flow{stroke:var(--accent-border);stroke-dasharray:6 6;animation:twinflow 1s linear infinite}
+.twin-line.sel{stroke:var(--accent-strong);stroke-width:3}
+@media(prefers-reduced-motion:reduce){.twin-line.flow{animation:none}}
+@keyframes twinflow{to{stroke-dashoffset:-24}}
+.twin-node{cursor:pointer}
+.twin-node circle.ring{fill:var(--surface-2);stroke:var(--border-strong);stroke-width:1.5;transition:stroke .2s,fill .2s}
+.twin-node:hover circle.ring,.twin-node.sel circle.ring{stroke:var(--accent-strong);fill:var(--accent-soft)}
+.twin-node:focus-visible{outline:none}
+.twin-node:focus-visible circle.ring{stroke:var(--accent-strong);stroke-width:2.5}
+.twin-node .tlabel{font-family:var(--font-body);font-size:12px;font-weight:700;fill:var(--text-primary)}
+.twin-node .tval{font-family:var(--font-mono);font-size:10.5px;fill:var(--text-tertiary)}
+.twin-info{display:flex;flex-direction:column}
+.twin-info .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}
+.twin-info h3{font-family:var(--font-display);font-weight:700;font-size:19px;color:var(--text-primary)}
+.twin-info p.desc{font-size:13px;color:var(--text-secondary);line-height:1.6;margin:10px 0 14px}
+.twin-info .stat-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--border);font-size:12.5px}
+.twin-info .stat-row:first-of-type{border-top:none}
+.twin-info .stat-row .k{color:var(--text-tertiary)}
+.twin-info .stat-row .v{font-family:var(--font-mono);font-weight:600;text-align:right}
+.twin-hint{font-size:11px;color:var(--text-tertiary);margin-top:auto;padding-top:14px}
+
+@media(max-width:640px){
+  .cine-hero{padding:20px 5vw 40px}
+  .twin-section{padding:56px 5vw 64px}
+}
 </style>
 
 <div id="app">
+
+<section class="cine-hero" id="cineHero">
+  <canvas id="cineCanvas" aria-hidden="true"></canvas>
+  <div class="cine-topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8"><path d="M12 2v20M2 12h20M4.5 4.5l15 15M19.5 4.5l-15 15" stroke-linecap="round"/><circle cx="12" cy="12" r="3.4" fill="var(--accent-soft)" stroke="var(--accent-strong)"/></svg>
+      </div>
+      <div class="brand-text"><div class="name">POLAR-EMS</div><div class="sub">Vostok Ridge Station</div></div>
+    </div>
+    <button class="btn small" id="cineSkip">Skip intro ↓</button>
+  </div>
+  <div class="cine-body">
+    <div>
+      <div class="cine-eyebrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>Simulation mode &middot; synthetic telemetry</div>
+      <h1>Energy intelligence <span class="accent">for a grid that will never reach you.</span></h1>
+      <p class="lead">POLAR-EMS is a microgrid brain for an isolated Antarctic research station &mdash; forecasting load and renewables, optimizing diesel/battery/wind/solar dispatch, and staying in full control through weeks of dead satellite links.</p>
+      <div class="cine-ctas">
+        <button class="btn primary" id="cineEnter"><span>Enter the system &rarr;</span></button>
+        <a class="btn" href="#twin">See the energy flow</a>
+      </div>
+    </div>
+    <div class="cine-hud">
+      <div class="cine-hud-top"><div class="cine-hud-title"><span class="lv"></span>Station telemetry</div><div class="num" id="cineClock" style="font-size:12.5px;color:var(--text-secondary)">&mdash;</div></div>
+      <div class="cine-hud-rows">
+        <div class="cine-hud-row"><div class="l">Outside temp</div><div class="v" id="cineTemp">&mdash;</div></div>
+        <div class="cine-hud-row"><div class="l">Wind speed</div><div class="v" id="cineWind">&mdash;</div></div>
+        <div class="cine-hud-row wide"><div class="l">Battery state of charge</div><div class="v" id="cineSoc">&mdash;</div><div class="progress" style="margin-top:7px"><div id="cineSocBar" style="width:0%;background:var(--accent)"></div></div></div>
+        <div class="cine-hud-row"><div class="l">Diesel runtime</div><div class="v" id="cineDiesel">&mdash;</div></div>
+        <div class="cine-hud-row"><div class="l">Mode</div><div class="v" id="cineMode" style="font-size:13px">&mdash;</div></div>
+      </div>
+      <div class="cine-hud-foot"><span>SRC: live simulation, this session</span><span id="cineConn">&mdash;</span></div>
+    </div>
+  </div>
+  <div class="cine-drag-hint" id="cineDragHint">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3-3 3 3M9 13l3 3 3-3"/><rect x="4" y="4" width="16" height="16" rx="4"/></svg>
+    Drag the core to rotate it
+  </div>
+  <div class="cine-scroll-cue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+</section>
+
+<section class="twin-section" id="twin">
+  <div class="twin-head">
+    <div class="twin-kicker">// digital twin</div>
+    <h2>How energy actually moves through the station, right now</h2>
+    <p>Four sources converge at one station bus, which distributes to priority-tiered loads. Click any node — these are the live numbers from the simulation running below, not illustrations.</p>
+  </div>
+  <div class="twin-wrap">
+    <div class="card twin-card">
+     <div class="twin-scroll">
+      <svg viewBox="0 0 960 420" id="twinSvg" role="img" aria-label="Live energy flow diagram: wind, solar, battery and diesel converge at the station bus, which distributes to priority-tiered station loads">
+        <path class="twin-line" id="twinLineWind" d="M182,68 L558,208"/>
+        <path class="twin-line" id="twinLineSolar" d="M182,158 L558,206"/>
+        <path class="twin-line" id="twinLineBattery" d="M182,258 L558,214"/>
+        <path class="twin-line" id="twinLineDiesel" d="M182,358 L558,216"/>
+        <path class="twin-line" id="twinLineLoads" d="M600,210 L818,210"/>
+
+        <g class="twin-node" id="twinNodeWind" data-node="wind" tabindex="0" role="button" aria-label="Wind turbines — view live status">
+          <circle class="ring" cx="150" cy="60" r="30"/>
+          <circle class="dot" cx="150" cy="60" r="4" fill="var(--accent-strong)"/>
+          <text class="tlabel" x="150" y="102" text-anchor="middle">Wind</text>
+          <text class="tval" x="150" y="115" text-anchor="middle" id="twinValWind">&mdash;</text>
+        </g>
+        <g class="twin-node" id="twinNodeSolar" data-node="solar" tabindex="0" role="button" aria-label="Solar array — view live status">
+          <circle class="ring" cx="150" cy="160" r="30"/>
+          <circle class="dot" cx="150" cy="160" r="4" fill="var(--text-tertiary)"/>
+          <text class="tlabel" x="150" y="202" text-anchor="middle">Solar</text>
+          <text class="tval" x="150" y="215" text-anchor="middle" id="twinValSolar">&mdash;</text>
+        </g>
+        <g class="twin-node" id="twinNodeBattery" data-node="battery" tabindex="0" role="button" aria-label="Battery bank — view live status">
+          <circle class="ring" cx="150" cy="260" r="30"/>
+          <circle class="dot" cx="150" cy="260" r="4" fill="var(--warn)"/>
+          <text class="tlabel" x="150" y="302" text-anchor="middle">Battery</text>
+          <text class="tval" x="150" y="315" text-anchor="middle" id="twinValBattery">&mdash;</text>
+        </g>
+        <g class="twin-node" id="twinNodeDiesel" data-node="diesel" tabindex="0" role="button" aria-label="Diesel generator — view live status">
+          <circle class="ring" cx="150" cy="360" r="30"/>
+          <circle class="dot" cx="150" cy="360" r="4" fill="var(--text-tertiary)" id="twinDotDiesel"/>
+          <text class="tlabel" x="150" y="402" text-anchor="middle">Diesel</text>
+          <text class="tval" x="150" y="415" text-anchor="middle" id="twinValDiesel">&mdash;</text>
+        </g>
+        <g class="twin-node" id="twinNodeBus" data-node="bus" tabindex="0" role="button" aria-label="Station bus — view live status">
+          <circle class="ring" cx="580" cy="210" r="38"/>
+          <circle class="dot" cx="580" cy="210" r="4" fill="var(--good)"/>
+          <text class="tlabel" x="580" y="258" text-anchor="middle">Station bus</text>
+          <text class="tval" x="580" y="271" text-anchor="middle" id="twinValBus">&mdash;</text>
+        </g>
+        <g class="twin-node" id="twinNodeLoads" data-node="loads" tabindex="0" role="button" aria-label="Station loads — view live status">
+          <circle class="ring" cx="860" cy="210" r="32"/>
+          <circle class="dot" cx="860" cy="210" r="4" fill="var(--accent-strong)"/>
+          <text class="tlabel" x="860" y="254" text-anchor="middle">Loads</text>
+          <text class="tval" x="860" y="267" text-anchor="middle">4 tiers</text>
+        </g>
+      </svg>
+     </div>
+    </div>
+    <div class="card twin-info" id="twinInfo">
+      <div class="hd"><h3 id="twinInfoTitle">Station bus</h3><span class="pill p3" id="twinInfoBadge">BALANCED</span></div>
+      <p class="desc" id="twinInfoDesc">Every source converges here before distribution — this is the single point the dispatch optimizer actually controls.</p>
+      <div id="twinInfoStats"></div>
+      <div class="twin-hint">Click a node above to inspect it, or press Tab then Enter. Updates live, every second.</div>
+    </div>
+  </div>
+</section>
 
 <header class="hdr">
   <div class="hdr-top">
@@ -748,6 +925,7 @@ const CFG = {
 /* ============================================================
    STATE
 ============================================================ */
+const heroHooks = []; // subscribers notified every render tick — see the PolarEMS adapter at the bottom of this file
 const S = {
   running:true, speed:4, tickMs:1000, simHoursPerTickBase:0.25,
   simTime:new Date(2026,8,1,6,0,0),
@@ -1697,6 +1875,7 @@ function updateWhatIf(){
 function render(){
   renderHeader();
   renderOverviewScenarios();
+  heroHooks.forEach(fn=>{ try{ fn(); }catch(e){ console.error("[hero hook]", e); } });
   const active = document.querySelector(".page.active").id;
   if(active==="page-dashboard") renderDashboard();
   else if(active==="page-forecast") renderForecast();
@@ -1912,5 +2091,281 @@ for(let i=0;i<8;i++) tick();
 timer = setInterval(tick, S.tickMs);
 render();
 
+/* ============================================================
+   ADAPTER — the ONLY seam the 3D hero layer is allowed to touch.
+   Read-only snapshot of live sim state, plus a tick subscription and
+   a scroll helper. No separate/duplicate simulation is ever run for
+   the 3D layer; it renders exactly what this returns, every tick.
+============================================================ */
+window.PolarEMS = {
+  snapshot(){
+    const h = S.history[S.history.length-1] || null;
+    return {
+      simTime: S.simTime, mode: S.mode, online: S.online, syncing: S.syncing,
+      battery: { soc:S.ai.soc, temp:S.ai.battTemp, health:S.health.battery, cycles:S.ai.cycles },
+      diesel: { on:S.ai.dieselOn, fuelL:S.ai.fuelL, tankCapL:CFG.dieselTankCapL, runtimeH:S.ai.runtimeH,
+                outputKw: h ? h.dieselAI : 0 },
+      weather: S.weather,
+      load: h ? h.load.total : 0,
+      windKw: h ? h.windPow : 0, solarKw: h ? h.solarPow : 0,
+      renewKw: h ? h.renewPow : 0, fracRenew: h ? h.fracRenew : 0,
+      health: S.health,
+      reason: S.currentDecisionAI ? S.currentDecisionAI.reason : "",
+      scenario: S.scenario,
+    };
+  },
+  onTick(cb){ heroHooks.push(cb); },
+  scrollToDashboard(){ document.querySelector(".hdr").scrollIntoView({behavior:"smooth"}); },
+};
+
+})();
+</script>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+/* ============================================================
+   CINEMATIC HERO + DIGITAL TWIN — the ONLY new layer added on top
+   of the existing POLAR-EMS simulation. Every number here comes
+   from window.PolarEMS.snapshot()/.onTick(), which is a read-only
+   view onto the same simulation state the dashboard tabs below
+   already render. No independent data, no independent simulation.
+============================================================ */
+import * as THREE from "three";
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const fine = window.matchMedia("(pointer: fine)").matches;
+
+function fmtHM(d){ return d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit",hour12:false}); }
+
+/* ---------------- Enter / skip controls ---------------- */
+document.getElementById("cineEnter").addEventListener("click", () => window.PolarEMS.scrollToDashboard());
+document.getElementById("cineSkip").addEventListener("click", () => window.PolarEMS.scrollToDashboard());
+
+/* ---------------- Live HUD (real sim data) ---------------- */
+(function hud(){
+  const $clock = document.getElementById("cineClock");
+  const $temp = document.getElementById("cineTemp");
+  const $wind = document.getElementById("cineWind");
+  const $soc = document.getElementById("cineSoc");
+  const $socBar = document.getElementById("cineSocBar");
+  const $diesel = document.getElementById("cineDiesel");
+  const $mode = document.getElementById("cineMode");
+  const $conn = document.getElementById("cineConn");
+
+  window.PolarEMS.onTick(() => {
+    const s = window.PolarEMS.snapshot();
+    $clock.textContent = fmtHM(s.simTime) + " sim time";
+    $temp.innerHTML = s.weather.temp.toFixed(1) + '<span class="u">&deg;C</span>';
+    $wind.innerHTML = s.weather.wind.toFixed(1) + '<span class="u">m/s</span>';
+    $soc.innerHTML = s.battery.soc.toFixed(0) + '<span class="u">%</span>';
+    $socBar.style.width = s.battery.soc.toFixed(0) + "%";
+    $diesel.innerHTML = s.diesel.runtimeH.toFixed(1) + '<span class="u">h</span>';
+    $mode.textContent = s.mode;
+    $mode.style.color = s.mode === "AI OPTIMIZED" ? "var(--accent-strong)" : "var(--warn)";
+    $conn.textContent = s.online ? "ONLINE" : "OFFLINE — edge autonomy";
+    $conn.style.color = s.online ? "var(--good)" : "var(--danger)";
+  });
+})();
+
+/* ---------------- Hero scene: energy core (drag to rotate) ---------------- */
+(function heroScene(){
+  const canvas = document.getElementById("cineCanvas");
+  const dragHint = document.getElementById("cineDragHint");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(1.4, 0.2, 9);
+
+  const core = new THREE.Group();
+  core.position.set(2.1, 0.1, 0);
+  scene.add(core);
+
+  const wire = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.7, 1),
+    new THREE.MeshBasicMaterial({ color:0x35c4c9, wireframe:true, transparent:true, opacity:0.4 })
+  );
+  core.add(wire);
+
+  const glow = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(0.9, 2),
+    new THREE.MeshPhysicalMaterial({ color:0x0e2530, emissive:0x35c4c9, emissiveIntensity:0.7, roughness:0.2, metalness:0.1, transparent:true, opacity:0.95, clearcoat:0.6 })
+  );
+  core.add(glow);
+
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(2.3, 0.01, 8, 128),
+    new THREE.MeshBasicMaterial({ color:0x5fe0e4, transparent:true, opacity:0.32 })
+  );
+  ring.rotation.x = Math.PI / 2.4;
+  core.add(ring);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  const key = new THREE.PointLight(0x5fe0e4, 14, 22);
+  key.position.set(2, 3, 4);
+  scene.add(key);
+  const rim = new THREE.PointLight(0x35c4c9, 6, 22);
+  rim.position.set(-4, -2, -3);
+  scene.add(rim);
+
+  const count = 220;
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const r = 6 + Math.random() * 12;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+    positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    positions[i*3+2] = r * Math.cos(phi);
+  }
+  const particleGeo = new THREE.BufferGeometry();
+  particleGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({ color:0x35c4c9, size:0.026, transparent:true, opacity:0.4 }));
+  scene.add(particles);
+
+  let mouseX = 0, mouseY = 0;
+  window.addEventListener("pointermove", (e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5);
+    mouseY = (e.clientY / window.innerHeight - 0.5);
+  });
+
+  let dragging = false, lastX = 0, lastY = 0, userYaw = 0, userPitch = 0, idleTimer = null;
+  function showHint(){ if (fine) dragHint.classList.add("show"); }
+  function hideHint(){ dragHint.classList.remove("show"); }
+  new IntersectionObserver((entries) => { if (entries[0].isIntersecting) showHint(); else hideHint(); }, { threshold: 0.3 }).observe(document.getElementById("cineHero"));
+
+  canvas.addEventListener("pointerdown", (e) => {
+    dragging = true; lastX = e.clientX; lastY = e.clientY;
+    canvas.classList.add("dragging");
+    canvas.setPointerCapture(e.pointerId);
+    hideHint(); clearTimeout(idleTimer);
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    userYaw += (e.clientX - lastX) * 0.006;
+    userPitch += (e.clientY - lastY) * 0.006;
+    userPitch = Math.max(-1, Math.min(1, userPitch));
+    lastX = e.clientX; lastY = e.clientY;
+  });
+  function endDrag(){
+    if (!dragging) return;
+    dragging = false;
+    canvas.classList.remove("dragging");
+    idleTimer = setTimeout(showHint, 1800);
+  }
+  canvas.addEventListener("pointerup", endDrag);
+  canvas.addEventListener("pointerleave", endDrag);
+
+  function resize() {
+    const hero = document.getElementById("cineHero");
+    const w = hero.clientWidth, h = hero.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  const clock = new THREE.Clock();
+  let looping = false;
+  function tick() {
+    const t = clock.getElapsedTime();
+    const autoSpin = dragging ? 0 : t * 0.15;
+    core.rotation.y = autoSpin + userYaw;
+    core.rotation.x = Math.sin(t * 0.12) * 0.12 + userPitch;
+    glow.scale.setScalar(1 + Math.sin(t * 1.4) * 0.06);
+    particles.rotation.y = t * 0.014;
+
+    camera.position.x += ((mouseX * 1.0 + 1.4) - camera.position.x) * 0.03;
+    camera.position.y += ((-mouseY * 0.6) - camera.position.y) * 0.03;
+    camera.lookAt(1.8, 0.1, 0);
+
+    renderer.render(scene, camera);
+    if (looping && !reduceMotion) requestAnimationFrame(tick);
+  }
+  renderer.render(scene, camera);
+  if (!reduceMotion) {
+    new IntersectionObserver((entries) => {
+      const visible = entries[0].isIntersecting;
+      if (visible && !looping) { looping = true; tick(); }
+      else if (!visible) looping = false;
+    }, { threshold: 0.01 }).observe(document.getElementById("cineHero"));
+  }
+})();
+
+/* ---------------- Digital twin: clickable, live-updating energy-flow network ---------------- */
+(function twin(){
+  const lineFor = { wind:"twinLineWind", solar:"twinLineSolar", battery:"twinLineBattery", diesel:"twinLineDiesel", loads:"twinLineLoads" };
+  const $title = document.getElementById("twinInfoTitle");
+  const $badge = document.getElementById("twinInfoBadge");
+  const $desc = document.getElementById("twinInfoDesc");
+  const $stats = document.getElementById("twinInfoStats");
+  let selected = "bus";
+
+  function describe(key, s){
+    const battOnline = s.battery.soc > 20;
+    switch(key){
+      case "wind": return { label:"Wind turbines", pillClass: s.windKw>1?"p3":"p4", badge: s.windKw>1?"ONLINE":"IDLE",
+        desc:"Cut-in speed 3.5 m/s, rated output at 12 m/s.",
+        stats:[["Output", s.windKw.toFixed(1)+" kW"],["Wind speed", s.weather.wind.toFixed(1)+" m/s"]] };
+      case "solar": return { label:"Solar array", pillClass: s.solarKw>0.5?"p3":"p4", badge: s.solarKw>0.5?"GENERATING":"STANDBY",
+        desc: s.solarKw<0.5 ? "Near-zero output — either night, cloud cover, or the modeled polar-night window." : "Contributing to the bus alongside wind.",
+        stats:[["Output", s.solarKw.toFixed(1)+" kW"],["Irradiance", s.weather.irr.toFixed(0)+" W/m²"]] };
+      case "battery": return { label:"Battery bank", pillClass: battOnline?"p3":"p1", badge: s.battery.soc<10?"CRITICAL":(s.battery.soc<20?"LOW":"NORMAL"),
+        desc:"Reserve floor moves between 20–32% depending on the short-term renewable forecast.",
+        stats:[["State of charge", s.battery.soc.toFixed(0)+"%"],["Temperature", s.battery.temp.toFixed(1)+"°C"],["Health", s.battery.health.toFixed(0)+"%"]] };
+      case "diesel": return { label:"Diesel generator", pillClass: s.diesel.on?"p2":"p4", badge: s.diesel.on?"RUNNING":"STANDBY",
+        desc: s.diesel.on ? "Started because battery and renewables can't cover the current shortfall." : "Held in reserve by the optimizer.",
+        stats:[["Output", s.diesel.outputKw.toFixed(1)+" kW"],["Fuel remaining", s.diesel.fuelL.toFixed(0)+" / "+s.diesel.tankCapL+" L"],["Runtime", s.diesel.runtimeH.toFixed(1)+" h"]] };
+      case "loads": return { label:"Station loads", pillClass:"p3", badge:"4 TIERS",
+        desc:"Priority-tiered distribution — P1 life support is never shed by the optimizer, only by the hard safety override.",
+        stats:[["Total load", s.load.toFixed(1)+" kW"],["Renewable fraction", s.fracRenew.toFixed(0)+"%"],["Mode", s.mode]] };
+      default: return { label:"Station bus", pillClass: s.online?"p3":"p2", badge: s.online?"BALANCED":"EDGE AUTONOMY",
+        desc: s.reason || "Every source converges here before distribution — the single point the dispatch optimizer actually controls.",
+        stats:[["Total load", s.load.toFixed(1)+" kW"],["Renewable share", s.fracRenew.toFixed(0)+"%"],["Mode", s.mode]] };
+    }
+  }
+
+  function paint(s){
+    const d = describe(selected, s);
+    $title.textContent = d.label;
+    $badge.textContent = d.badge;
+    $badge.className = "pill " + d.pillClass;
+    $desc.textContent = d.desc;
+    $stats.innerHTML = d.stats.map(([k,v]) => `<div class="stat-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("");
+
+    document.getElementById("twinValWind").textContent = s.windKw.toFixed(1)+" kW";
+    document.getElementById("twinValSolar").textContent = s.solarKw.toFixed(1)+" kW";
+    document.getElementById("twinValBattery").textContent = s.battery.soc.toFixed(0)+"% SOC";
+    document.getElementById("twinValDiesel").textContent = s.diesel.on ? s.diesel.outputKw.toFixed(0)+" kW" : "Standby";
+    document.getElementById("twinDotDiesel").setAttribute("fill", s.diesel.on ? "var(--warn)" : "var(--text-tertiary)");
+    document.getElementById("twinValBus").textContent = s.load.toFixed(1)+" kW";
+  }
+
+  function select(key){
+    selected = key;
+    document.querySelectorAll(".twin-node").forEach(n => n.classList.toggle("sel", n.dataset.node === key));
+    document.querySelectorAll(".twin-line").forEach(l => l.classList.remove("sel"));
+    const lineId = lineFor[key];
+    if (lineId) document.getElementById(lineId).classList.add("sel");
+    else Object.values(lineFor).forEach(id => document.getElementById(id).classList.add("sel"));
+    paint(window.PolarEMS.snapshot());
+  }
+
+  document.querySelectorAll(".twin-node").forEach(n => {
+    n.addEventListener("click", () => select(n.dataset.node));
+    n.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(n.dataset.node); } });
+  });
+
+  function startFlow(){ if (!reduceMotion) Object.values(lineFor).forEach(id => document.getElementById(id).classList.add("flow")); }
+  new IntersectionObserver((entries, obs) => {
+    if (entries[0].isIntersecting) { startFlow(); obs.disconnect(); }
+  }, { threshold: 0.3 }).observe(document.getElementById("twin"));
+
+  select("bus");
+  window.PolarEMS.onTick(() => paint(window.PolarEMS.snapshot()));
 })();
 </script>
