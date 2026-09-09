@@ -2220,12 +2220,25 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-  const homePos = new THREE.Vector3(1.4, 0.2, 9);
-  const homeLook = new THREE.Vector3(1.8, 0.1, 0);
-  camera.position.copy(homePos);
+
+  /* -------- bespoke mobile composition --------
+     Below 760px the hero's two-column grid collapses to one column
+     (see .cine-body in <style>), so the rig can no longer sit off to
+     the right of a side-by-side text/HUD layout -- it needs to be
+     recomposed toward center with a wider FOV, not just uniformly
+     scaled by the renderer's resize(). */
+  function isNarrow(){ return window.innerWidth < 641; }
+  function layoutFor(narrow){
+    return narrow
+      ? { rig:new THREE.Vector3(0.55,-0.05,0), home:new THREE.Vector3(0.75,0.35,9.6), look:new THREE.Vector3(0.75,0.1,0), fov:54 }
+      : { rig:new THREE.Vector3(2.1,0.1,0), home:new THREE.Vector3(1.4,0.2,9), look:new THREE.Vector3(1.8,0.1,0), fov:45 };
+  }
+  let layout = layoutFor(isNarrow());
+  camera.fov = layout.fov;
+  camera.position.copy(layout.home);
 
   const rig = new THREE.Group();
-  rig.position.set(2.1, 0.1, 0);
+  rig.position.copy(layout.rig);
   scene.add(rig);
 
   const core = new THREE.Group();
@@ -2372,15 +2385,16 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
   function worldPos(localPos){ return rig.position.clone().add(localPos); }
   function focusFor(key){
     const sat = satellites[key];
-    if (!sat) return { pos: homePos.clone(), look: homeLook.clone() }; // bus / loads -> overview
+    if (!sat) return { pos: layout.home.clone(), look: layout.look.clone() }; // bus / loads -> overview
     const wp = worldPos(sat.group.position);
     const dir = wp.clone().normalize();
-    return { pos: wp.clone().add(new THREE.Vector3(dir.x*1.5+0.4, dir.y*0.9+0.35, 2.5)), look: wp };
+    const spread = isNarrow() ? 1.05 : 1.5;
+    return { pos: wp.clone().add(new THREE.Vector3(dir.x*spread+0.3, dir.y*(spread*0.6)+0.3, isNarrow()?1.9:2.5)), look: wp };
   }
   let focusKey = twinSelection.get();
-  const camPosTarget = homePos.clone();
-  const camLookTarget = homeLook.clone();
-  const camLookCurrent = homeLook.clone();
+  const camPosTarget = layout.home.clone();
+  const camLookTarget = layout.look.clone();
+  const camLookCurrent = layout.look.clone();
   function applyFocus(key){
     focusKey = key;
     const f = focusFor(key);
@@ -2440,11 +2454,21 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
   canvas.addEventListener("pointerup", endDrag);
   canvas.addEventListener("pointerleave", (e)=>{ dragging=false; canvas.classList.remove("dragging"); idleTimer=setTimeout(showHint,1800); });
 
+  let narrowMode = isNarrow();
   function resize() {
     const hero = document.getElementById("cineHero");
     const w = hero.clientWidth, h = hero.clientHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
+
+    const narrow = isNarrow();
+    if (narrow !== narrowMode) {
+      narrowMode = narrow;
+      layout = layoutFor(narrow);
+      rig.position.copy(layout.rig);
+      if (focusKey === "bus" || focusKey === "loads") { camPosTarget.copy(layout.home); camLookTarget.copy(layout.look); }
+    }
+    camera.fov = layout.fov;
     camera.updateProjectionMatrix();
   }
   window.addEventListener("resize", resize);
@@ -2478,8 +2502,9 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
     Object.entries(beamMats).forEach(([k,mat]) => { mat.opacity = active[k] ? 0.55 : 0.14; });
 
     if (focusKey === "bus" || focusKey === "loads") {
-      camPosTarget.set(mouseX * 1.0 + 1.4, -mouseY * 0.6 + 0.2, 9 + scrollProgress*2.2);
-      camLookTarget.copy(homeLook);
+      const pMag = narrowMode ? 0.3 : 1.0;
+      camPosTarget.set(mouseX * pMag + layout.home.x, -mouseY * (pMag*0.6) + layout.home.y, layout.home.z + scrollProgress*2.2);
+      camLookTarget.copy(layout.look);
     }
     camera.position.lerp(camPosTarget, lerpRate);
     camLookCurrent.lerp(camLookTarget, lerpRate);
