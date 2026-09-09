@@ -318,6 +318,8 @@ footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center
 .cine-scroll-cue{position:relative;z-index:2;align-self:center;margin-top:30px;color:var(--text-tertiary);animation:cinebob 2.2s ease-in-out infinite;text-align:center}
 @keyframes cinebob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
 @media(prefers-reduced-motion:reduce){.cine-scroll-cue,.cine-hud-title .lv{animation:none}}
+.cine-quality-tag{position:absolute;z-index:3;right:6vw;bottom:14px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em;color:var(--text-tertiary);opacity:.5;text-transform:uppercase;pointer-events:none}
+@media(max-width:640px){.cine-quality-tag{display:none}}
 
 /* digital twin */
 .twin-section{padding:80px 6vw 90px;background:var(--bg-raised);border-bottom:1px solid var(--border)}
@@ -397,6 +399,7 @@ footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center
     Drag the core to rotate it
   </div>
   <div class="cine-scroll-cue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+  <div class="cine-quality-tag" id="cineQualityTag">Render tier: &mdash;</div>
 </section>
 
 <section class="twin-section" id="twin">
@@ -2138,6 +2141,39 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 const fine = window.matchMedia("(pointer: fine)").matches;
 
 function fmtHM(d){ return d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit",hour12:false}); }
+function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+
+/* ---------------- GPU quality tier ----------------
+   Coarse device heuristics only -- no WebGL vendor/renderer probing
+   (unreliable across browsers and often blocked). Drives particle
+   count, geometry detail and pixel-ratio cap for the hero scene. */
+const QUALITY = (function(){
+  const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
+  const cores = navigator.hardwareConcurrency || 4;
+  const mem = navigator.deviceMemory || 4;
+  const narrow = window.innerWidth < 760;
+  let tier = "HIGH";
+  if (reduceMotion) tier = "LOW";
+  else if ((isCoarsePointer && narrow) || cores <= 2 || mem <= 2) tier = "LOW";
+  else if (isCoarsePointer || cores <= 4 || mem <= 4) tier = "MEDIUM";
+  const presets = {
+    HIGH:   { pixelRatio: Math.min(window.devicePixelRatio||1, 2), particles: 220, icoDetail: 1, torusSeg: 128, satSeg: 16, antialias: true },
+    MEDIUM: { pixelRatio: Math.min(window.devicePixelRatio||1, 1.5), particles: 90, icoDetail: 0, torusSeg: 64, satSeg: 10, antialias: true },
+    LOW:    { pixelRatio: 1, particles: 0, icoDetail: 0, torusSeg: 32, satSeg: 6, antialias: false },
+  };
+  return Object.assign({ tier }, presets[tier]);
+})();
+
+/* ---------------- Shared selection state (links hero scene <-> digital twin) ---------------- */
+const twinSelection = (function(){
+  let current = "bus";
+  const listeners = [];
+  return {
+    get(){ return current; },
+    set(key, source){ if (key === current) return; current = key; listeners.forEach(fn => fn(key, source)); },
+    onChange(fn){ listeners.push(fn); },
+  };
+})();
 
 /* ---------------- Enter / skip controls ---------------- */
 document.getElementById("cineEnter").addEventListener("click", () => window.PolarEMS.scrollToDashboard());
@@ -2169,62 +2205,193 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
   });
 })();
 
-/* ---------------- Hero scene: energy core (drag to rotate) ---------------- */
+/* ---------------- Hero scene: microgrid bus + individually-modeled
+   generation/storage subsystems, with click-to-focus camera moves
+   cross-linked to the digital twin below (shared twinSelection). ---------------- */
 (function heroScene(){
   const canvas = document.getElementById("cineCanvas");
   const dragHint = document.getElementById("cineDragHint");
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const qualityTag = document.getElementById("cineQualityTag");
+  if (qualityTag) qualityTag.textContent = "Render tier: " + QUALITY.tier;
+  dragHint.lastChild.textContent = " Drag to rotate · click a subsystem to focus";
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:QUALITY.antialias, alpha:true });
+  renderer.setPixelRatio(QUALITY.pixelRatio);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-  camera.position.set(1.4, 0.2, 9);
+  const homePos = new THREE.Vector3(1.4, 0.2, 9);
+  const homeLook = new THREE.Vector3(1.8, 0.1, 0);
+  camera.position.copy(homePos);
+
+  const rig = new THREE.Group();
+  rig.position.set(2.1, 0.1, 0);
+  scene.add(rig);
 
   const core = new THREE.Group();
-  core.position.set(2.1, 0.1, 0);
-  scene.add(core);
+  rig.add(core);
 
   const wire = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(1.7, 1),
+    new THREE.IcosahedronGeometry(1.7, QUALITY.icoDetail),
     new THREE.MeshBasicMaterial({ color:0x35c4c9, wireframe:true, transparent:true, opacity:0.4 })
   );
   core.add(wire);
 
   const glow = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(0.9, 2),
+    new THREE.IcosahedronGeometry(0.9, QUALITY.icoDetail+1),
     new THREE.MeshPhysicalMaterial({ color:0x0e2530, emissive:0x35c4c9, emissiveIntensity:0.7, roughness:0.2, metalness:0.1, transparent:true, opacity:0.95, clearcoat:0.6 })
   );
   core.add(glow);
 
   const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(2.3, 0.01, 8, 128),
+    new THREE.TorusGeometry(2.3, 0.01, 8, QUALITY.torusSeg),
     new THREE.MeshBasicMaterial({ color:0x5fe0e4, transparent:true, opacity:0.32 })
   );
   ring.rotation.x = Math.PI / 2.4;
   core.add(ring);
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-  const key = new THREE.PointLight(0x5fe0e4, 14, 22);
-  key.position.set(2, 3, 4);
-  scene.add(key);
+  const keyLight = new THREE.PointLight(0x5fe0e4, 14, 22);
+  keyLight.position.set(2, 3, 4);
+  scene.add(keyLight);
   const rim = new THREE.PointLight(0x35c4c9, 6, 22);
   rim.position.set(-4, -2, -3);
   scene.add(rim);
 
-  const count = 220;
-  const positions = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const r = 6 + Math.random() * 12;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(2 * Math.random() - 1);
-    positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
-    positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
-    positions[i*3+2] = r * Math.cos(phi);
+  let particles = null;
+  if (QUALITY.particles > 0) {
+    const count = QUALITY.particles;
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const r = 6 + Math.random() * 12;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+      positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i*3+2] = r * Math.cos(phi);
+    }
+    const particleGeo = new THREE.BufferGeometry();
+    particleGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({ color:0x35c4c9, size:0.026, transparent:true, opacity:0.4 }));
+    scene.add(particles);
   }
-  const particleGeo = new THREE.BufferGeometry();
-  particleGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({ color:0x35c4c9, size:0.026, transparent:true, opacity:0.4 }));
-  scene.add(particles);
+
+  /* -------- individually-modeled generation / storage subsystems -------- */
+  const satRadius = 2.7;
+  function satPos(angleDeg){
+    const a = angleDeg * Math.PI/180;
+    return new THREE.Vector3(Math.cos(a)*satRadius, Math.sin(a)*satRadius*0.55, Math.sin(a)*satRadius*0.4);
+  }
+  const satellites = {};
+
+  (function windTurbine(){
+    const g = new THREE.Group();
+    g.position.copy(satPos(95));
+    const tower = new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.045,1.05,QUALITY.satSeg), new THREE.MeshBasicMaterial({color:0x57667c}));
+    tower.position.y = -0.5;
+    g.add(tower);
+    const nacelle = new THREE.Mesh(new THREE.BoxGeometry(0.14,0.09,0.09), new THREE.MeshBasicMaterial({color:0x8fa0b8}));
+    g.add(nacelle);
+    const hub = new THREE.Group();
+    hub.position.set(0.09,0,0);
+    g.add(hub);
+    const bladeMat = new THREE.MeshBasicMaterial({ color:0x35c4c9, transparent:true, opacity:0.4 });
+    for (let i=0;i<3;i++){
+      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.46,0.045,0.01), bladeMat);
+      blade.position.x = 0.24;
+      const bg = new THREE.Group();
+      bg.rotation.z = (i/3) * Math.PI*2;
+      bg.add(blade);
+      hub.add(bg);
+    }
+    rig.add(g);
+    satellites.wind = { group:g,
+      update(s){
+        const active = s.windKw > 1;
+        hub.rotation.x += reduceMotion ? 0 : (0.02 + Math.min(0.3, s.windKw/55));
+        bladeMat.opacity = active ? 0.9 : 0.35;
+        bladeMat.color.set(active ? 0x35c4c9 : 0x3a4553);
+      } };
+  })();
+
+  (function solarArray(){
+    const g = new THREE.Group();
+    g.position.copy(satPos(10));
+    g.rotation.z = -0.25;
+    const panelMat = new THREE.MeshPhysicalMaterial({ color:0x0e2530, emissive:0x5fe0e4, emissiveIntensity:0.15, roughness:0.35, metalness:0.2 });
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(0.62,0.4,0.02), panelMat));
+    g.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(0.62,0.4,0.02)), new THREE.LineBasicMaterial({color:0x8fa0b8})));
+    rig.add(g);
+    satellites.solar = { group:g,
+      update(s){ panelMat.emissiveIntensity = 0.1 + Math.min(1, s.solarKw/55) * 0.9; } };
+  })();
+
+  (function batteryBank(){
+    const g = new THREE.Group();
+    g.position.copy(satPos(180));
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(0.34,0.5,0.22), new THREE.MeshBasicMaterial({color:0x171d27, transparent:true, opacity:0.55})));
+    g.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(0.34,0.5,0.22)), new THREE.LineBasicMaterial({color:0x57667c})));
+    const fillMat = new THREE.MeshBasicMaterial({ color:0x5fbf8a });
+    const fill = new THREE.Mesh(new THREE.BoxGeometry(0.26,0.42,0.14), fillMat);
+    g.add(fill);
+    rig.add(g);
+    satellites.battery = { group:g,
+      update(s){
+        const soc = clamp01(s.battery.soc/100);
+        const h = Math.max(0.03, soc);
+        fill.scale.y = h;
+        fill.position.y = -0.21 * (1-h);
+        fillMat.color.set(s.battery.soc<20 ? 0xe2585f : s.battery.soc<40 ? 0xe0a63e : 0x5fbf8a);
+      } };
+  })();
+
+  (function dieselGenerator(){
+    const g = new THREE.Group();
+    g.position.copy(satPos(265));
+    const bodyMat = new THREE.MeshPhysicalMaterial({ color:0x171d27, emissive:0xe0a63e, emissiveIntensity:0.05, roughness:0.4, metalness:0.3 });
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,0.34,QUALITY.satSeg), bodyMat);
+    body.rotation.z = Math.PI/2;
+    g.add(body);
+    const stack = new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,0.22,8), new THREE.MeshBasicMaterial({color:0x57667c}));
+    stack.position.set(-0.1,0.16,0);
+    g.add(stack);
+    rig.add(g);
+    satellites.diesel = { group:g,
+      update(s){ bodyMat.emissiveIntensity = s.diesel.on ? (0.35 + Math.sin(performance.now()/220)*0.15) : 0.04; } };
+  })();
+
+  const beamMats = {};
+  ["wind","solar","battery","diesel"].forEach(k => {
+    const mat = new THREE.LineBasicMaterial({ color:0x35c4c9, transparent:true, opacity:0.16 });
+    const geo = new THREE.BufferGeometry().setFromPoints([satellites[k].group.position, new THREE.Vector3(0,0,0)]);
+    rig.add(new THREE.Line(geo, mat));
+    beamMats[k] = mat;
+  });
+
+  /* -------- click-to-focus camera choreography, linked to the digital twin -------- */
+  function worldPos(localPos){ return rig.position.clone().add(localPos); }
+  function focusFor(key){
+    const sat = satellites[key];
+    if (!sat) return { pos: homePos.clone(), look: homeLook.clone() }; // bus / loads -> overview
+    const wp = worldPos(sat.group.position);
+    const dir = wp.clone().normalize();
+    return { pos: wp.clone().add(new THREE.Vector3(dir.x*1.5+0.4, dir.y*0.9+0.35, 2.5)), look: wp };
+  }
+  let focusKey = twinSelection.get();
+  const camPosTarget = homePos.clone();
+  const camLookTarget = homeLook.clone();
+  const camLookCurrent = homeLook.clone();
+  function applyFocus(key){
+    focusKey = key;
+    const f = focusFor(key);
+    camPosTarget.copy(f.pos);
+    camLookTarget.copy(f.look);
+  }
+  twinSelection.onChange((key) => applyFocus(key));
+
+  const raycaster = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+  let downX = 0, downY = 0, downT = 0;
 
   let mouseX = 0, mouseY = 0;
   window.addEventListener("pointermove", (e) => {
@@ -2239,6 +2406,7 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
 
   canvas.addEventListener("pointerdown", (e) => {
     dragging = true; lastX = e.clientX; lastY = e.clientY;
+    downX = e.clientX; downY = e.clientY; downT = performance.now();
     canvas.classList.add("dragging");
     canvas.setPointerCapture(e.pointerId);
     hideHint(); clearTimeout(idleTimer);
@@ -2250,14 +2418,27 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
     userPitch = Math.max(-1, Math.min(1, userPitch));
     lastX = e.clientX; lastY = e.clientY;
   });
-  function endDrag(){
+  function endDrag(e){
     if (!dragging) return;
     dragging = false;
     canvas.classList.remove("dragging");
     idleTimer = setTimeout(showHint, 1800);
+    const moved = Math.hypot(e.clientX-downX, e.clientY-downY);
+    if (moved < 6 && performance.now()-downT < 500) {
+      const rect = canvas.getBoundingClientRect();
+      ndc.x = ((e.clientX-rect.left)/rect.width)*2-1;
+      ndc.y = -((e.clientY-rect.top)/rect.height)*2+1;
+      raycaster.setFromCamera(ndc, camera);
+      const targets = [];
+      Object.entries(satellites).forEach(([k,s]) => s.group.traverse(o => { if (o.isMesh) { o.userData.selKey = k; targets.push(o); } }));
+      wire.userData.selKey = "bus"; glow.userData.selKey = "bus";
+      targets.push(wire, glow);
+      const hits = raycaster.intersectObjects(targets, false);
+      if (hits.length) twinSelection.set(hits[0].object.userData.selKey, "hero");
+    }
   }
   canvas.addEventListener("pointerup", endDrag);
-  canvas.addEventListener("pointerleave", endDrag);
+  canvas.addEventListener("pointerleave", (e)=>{ dragging=false; canvas.classList.remove("dragging"); idleTimer=setTimeout(showHint,1800); });
 
   function resize() {
     const hero = document.getElementById("cineHero");
@@ -2269,30 +2450,58 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
   window.addEventListener("resize", resize);
   resize();
 
+  let scrollProgress = 0;
+  function updateScrollProgress(){
+    const hero = document.getElementById("cineHero");
+    const r = hero.getBoundingClientRect();
+    scrollProgress = clamp01(-r.top / Math.max(1, r.height - window.innerHeight*0.4));
+  }
+  window.addEventListener("scroll", updateScrollProgress, { passive:true });
+  updateScrollProgress();
+
+  let latestSnap = null;
+  window.PolarEMS.onTick(() => { latestSnap = window.PolarEMS.snapshot(); });
+
   const clock = new THREE.Clock();
   let looping = false;
+  const lerpRate = reduceMotion ? 1 : 0.055;
   function tick() {
     const t = clock.getElapsedTime();
     const autoSpin = dragging ? 0 : t * 0.15;
     core.rotation.y = autoSpin + userYaw;
     core.rotation.x = Math.sin(t * 0.12) * 0.12 + userPitch;
     glow.scale.setScalar(1 + Math.sin(t * 1.4) * 0.06);
-    particles.rotation.y = t * 0.014;
+    if (particles) particles.rotation.y = t * 0.014;
 
-    camera.position.x += ((mouseX * 1.0 + 1.4) - camera.position.x) * 0.03;
-    camera.position.y += ((-mouseY * 0.6) - camera.position.y) * 0.03;
-    camera.lookAt(1.8, 0.1, 0);
+    if (latestSnap) Object.values(satellites).forEach(s => s.update(latestSnap));
+    const active = latestSnap ? { wind: latestSnap.windKw>1, solar: latestSnap.solarKw>0.5, battery: true, diesel: latestSnap.diesel.on } : {};
+    Object.entries(beamMats).forEach(([k,mat]) => { mat.opacity = active[k] ? 0.55 : 0.14; });
+
+    if (focusKey === "bus" || focusKey === "loads") {
+      camPosTarget.set(mouseX * 1.0 + 1.4, -mouseY * 0.6 + 0.2, 9 + scrollProgress*2.2);
+      camLookTarget.copy(homeLook);
+    }
+    camera.position.lerp(camPosTarget, lerpRate);
+    camLookCurrent.lerp(camLookTarget, lerpRate);
+    camera.lookAt(camLookCurrent);
+    if (particles) particles.material.opacity = 0.4 * (1 - scrollProgress*0.6);
 
     renderer.render(scene, camera);
     if (looping && !reduceMotion) requestAnimationFrame(tick);
   }
+  applyFocus(twinSelection.get());
   renderer.render(scene, camera);
   if (!reduceMotion) {
+    const heroEl = document.getElementById("cineHero");
+    function startLoop(){ if (!looping) { looping = true; tick(); } }
     new IntersectionObserver((entries) => {
-      const visible = entries[0].isIntersecting;
-      if (visible && !looping) { looping = true; tick(); }
-      else if (!visible) looping = false;
-    }, { threshold: 0.01 }).observe(document.getElementById("cineHero"));
+      if (entries[0].isIntersecting) startLoop(); else looping = false;
+    }, { threshold: 0.01 }).observe(heroEl);
+    // IntersectionObserver's first callback can be delayed by a frame or more on
+    // some browsers/embeds; since the hero is always the first section, check
+    // synchronously too so the loop (and any pending camera focus) starts at once.
+    const r = heroEl.getBoundingClientRect();
+    if (r.bottom > 0 && r.top < window.innerHeight) startLoop();
   }
 })();
 
@@ -2303,7 +2512,6 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
   const $badge = document.getElementById("twinInfoBadge");
   const $desc = document.getElementById("twinInfoDesc");
   const $stats = document.getElementById("twinInfoStats");
-  let selected = "bus";
 
   function describe(key, s){
     const battOnline = s.battery.soc > 20;
@@ -2330,7 +2538,7 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
   }
 
   function paint(s){
-    const d = describe(selected, s);
+    const d = describe(twinSelection.get(), s);
     $title.textContent = d.label;
     $badge.textContent = d.badge;
     $badge.className = "pill " + d.pillClass;
@@ -2345,8 +2553,7 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
     document.getElementById("twinValBus").textContent = s.load.toFixed(1)+" kW";
   }
 
-  function select(key){
-    selected = key;
+  function applySelection(key){
     document.querySelectorAll(".twin-node").forEach(n => n.classList.toggle("sel", n.dataset.node === key));
     document.querySelectorAll(".twin-line").forEach(l => l.classList.remove("sel"));
     const lineId = lineFor[key];
@@ -2356,16 +2563,17 @@ document.getElementById("cineSkip").addEventListener("click", () => window.Polar
   }
 
   document.querySelectorAll(".twin-node").forEach(n => {
-    n.addEventListener("click", () => select(n.dataset.node));
-    n.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(n.dataset.node); } });
+    n.addEventListener("click", () => twinSelection.set(n.dataset.node, "twin"));
+    n.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); twinSelection.set(n.dataset.node, "twin"); } });
   });
+  twinSelection.onChange((key) => applySelection(key));
 
   function startFlow(){ if (!reduceMotion) Object.values(lineFor).forEach(id => document.getElementById(id).classList.add("flow")); }
   new IntersectionObserver((entries, obs) => {
     if (entries[0].isIntersecting) { startFlow(); obs.disconnect(); }
   }, { threshold: 0.3 }).observe(document.getElementById("twin"));
 
-  select("bus");
+  applySelection(twinSelection.get());
   window.PolarEMS.onTick(() => paint(window.PolarEMS.snapshot()));
 })();
 </script>
