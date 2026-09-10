@@ -27,14 +27,21 @@ from rich.table import Table
 BASE_URL = os.environ.get("POLAR_EMS_API", "https://polar-ems-backend.onrender.com").rstrip("/")
 console = Console()
 
+# Render's free tier spins the backend down after ~15 min idle; the next
+# request has to wake the container back up, which can take 30-50+ seconds.
+# A short timeout here would report that perfectly healthy wake-up delay as
+# a hard failure, so we give it real room -- this does not slow down a
+# backend that's already awake, which responds in milliseconds either way.
+REQUEST_TIMEOUT = 45
+
 def api_get(path: str, **params):
-    r = requests.get(f"{BASE_URL}{path}", params=params, timeout=5)
+    r = requests.get(f"{BASE_URL}{path}", params=params, timeout=REQUEST_TIMEOUT)
     r.raise_for_status()
     return r.json()
 
 
 def api_post(path: str, json=None):
-    r = requests.post(f"{BASE_URL}{path}", json=json, timeout=5)
+    r = requests.post(f"{BASE_URL}{path}", json=json, timeout=REQUEST_TIMEOUT)
     if not r.ok:
         console.print(f"[red]Error {r.status_code}:[/red] {r.text}")
         return None
@@ -42,6 +49,8 @@ def api_post(path: str, json=None):
 
 
 def check_connection() -> bool:
+    if "onrender.com" in BASE_URL:
+        console.print("[dim]Connecting... a sleeping Render free-tier service can take up to a minute to wake up on its first request.[/dim]")
     try:
         h = api_get("/health")
         console.print(f"[green]Connected[/green] to {BASE_URL} - sim time {h['sim_time']}")
