@@ -1,0 +1,225 @@
+<title>POLAR-EMS Technical Explainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<style>
+:root{
+  --bg:#0a0d12; --bg-raised:#10141b; --surface:#131820; --surface-2:#171d27;
+  --border:#232b37; --border-strong:#323d4d;
+  --text-primary:#e8edf5; --text-secondary:#8fa0b8; --text-tertiary:#57667c;
+  --accent:#35c4c9; --accent-strong:#5fe0e4; --accent-soft:rgba(53,196,201,.12); --accent-border:rgba(53,196,201,.35);
+  --good:#5fbf8a; --good-soft:rgba(95,191,138,.12);
+  --warn:#e0a63e; --warn-soft:rgba(224,166,62,.12);
+  --danger:#e2585f; --danger-soft:rgba(226,88,95,.14);
+  --info:#5b9fe0; --ml:#a78bfa; --gb:#ff9166;
+  --p1:#e2585f; --p2:#e0a63e; --p3:#35c4c9; --p4:#57667c;
+  --font-display:'Big Shoulders Display',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--text-primary);font-family:var(--font-body);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 100px}
+a{color:var(--accent)}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code.inline{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:var(--accent-strong)}
+
+/* cover */
+.cover{padding:70px 0 40px;border-bottom:1px solid var(--border);margin-bottom:40px}
+.cover .eyebrow{color:var(--accent-strong);font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:16px}
+.cover h1{font-family:var(--font-display);font-weight:900;font-size:44px;line-height:1.02;letter-spacing:.005em;max-width:20ch}
+.cover p.sub{margin-top:16px;font-size:16.5px;color:var(--text-secondary);max-width:60ch;line-height:1.6}
+.cover .meta{margin-top:28px;display:flex;gap:22px;flex-wrap:wrap;font-size:12px;color:var(--text-tertiary)}
+.cover .meta b{color:var(--text-secondary);font-weight:600}
+
+/* sections */
+section{margin-bottom:48px;page-break-inside:avoid}
+h2.sh{font-family:var(--font-display);font-weight:800;font-size:26px;letter-spacing:.005em;display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+h2.sh .idx{font-family:var(--font-mono);font-size:14px;color:var(--accent-strong);font-weight:600}
+p.lede{color:var(--text-secondary);max-width:70ch;margin-bottom:20px}
+h3.h3{font-family:var(--font-display);font-weight:700;font-size:16px;margin:22px 0 10px;color:var(--text-primary)}
+p{margin-bottom:12px}
+ul,ol{margin:0 0 14px 22px}
+li{margin-bottom:6px;color:var(--text-secondary)}
+li b{color:var(--text-primary)}
+strong{color:var(--text-primary)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.card.raised{background:var(--surface-2)}
+.callout{display:flex;gap:12px;background:var(--surface-2);border:1px solid var(--border-strong);border-left:3px solid var(--accent);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13.5px;color:var(--text-secondary)}
+.callout b{color:var(--accent-strong)}
+.callout.warn{border-left-color:var(--warn)}
+.callout.warn b{color:var(--warn)}
+
+/* layer diagram */
+.layer-row{display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.layer-row + .layer-row{margin-top:7px}
+.layer-row .idx{font-family:var(--font-mono);color:var(--accent);font-weight:600;font-size:13px;width:18px;flex-shrink:0}
+.layer-row .lbl{font-weight:600;font-size:13.5px;width:140px;flex-shrink:0}
+.layer-row .desc{color:var(--text-secondary);font-size:12.5px;flex:1}
+.layer-row .surv{font-size:10.5px;color:var(--text-tertiary);flex-shrink:0;text-align:right;width:150px}
+
+/* tick pipeline */
+.pipe{display:flex;flex-direction:column;gap:0;margin:18px 0}
+.pipe-step{display:flex;gap:14px;padding:12px 0;border-top:1px solid var(--border)}
+.pipe-step:first-child{border-top:none}
+.pipe-step .n{font-family:var(--font-mono);color:var(--accent-strong);font-weight:700;font-size:13px;width:22px;flex-shrink:0;padding-top:1px}
+.pipe-step .body{flex:1}
+.pipe-step .t{font-weight:600;font-size:13.5px;margin-bottom:2px}
+.pipe-step .d{font-size:12.5px;color:var(--text-secondary)}
+.pipe-step code.inline{margin:0 2px}
+
+/* comparison table */
+table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);padding:8px 10px;border-bottom:1px solid var(--border-strong);font-weight:600}
+td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text-secondary)}
+td b, td.b{color:var(--text-primary)}
+tr:last-child td{border-bottom:none}
+
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-size:10.5px;font-weight:700;border:1px solid var(--border-strong);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.03em}
+.pill.ml{color:var(--ml);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.08)}
+.pill.gb{color:var(--gb);border-color:rgba(255,145,102,.4);background:rgba(255,145,102,.08)}
+.pill.rule{color:var(--text-tertiary);border-color:var(--border-strong);background:var(--surface-2)}
+.pill.good{color:var(--good);border-color:rgba(95,191,138,.4);background:var(--good-soft)}
+
+.model-row{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-top:1px solid var(--border)}
+.model-row:first-child{border-top:none}
+.model-row .pill{flex-shrink:0;margin-top:2px}
+.model-row .body{flex:1}
+.model-row .t{font-weight:600;font-size:13.5px;margin-bottom:3px}
+.model-row .d{font-size:12.5px;color:var(--text-secondary)}
+
+footer.pf{border-top:1px solid var(--border);padding-top:20px;margin-top:10px;text-align:center;color:var(--text-tertiary);font-size:11px}
+
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none}
+}
+</style>
+
+<div class="wrap">
+
+<div class="cover">
+  <div class="eyebrow">Technical explainer &middot; not a pitch document</div>
+  <h1>How POLAR-EMS actually works, end to end</h1>
+  <p class="sub">What the system is for, what runs inside it every second it's alive, and how that combination measurably accomplishes its goal &mdash; keeping an isolated polar research station powered safely while burning less diesel.</p>
+  <div class="meta">
+    <span><b>Live site</b> polar-ems-web.vercel.app</span>
+    <span><b>Backend</b> polar-ems-backend.onrender.com</span>
+    <span><b>Source</b> github.com/sayansaunth-lang/polar-ems-sih</span>
+  </div>
+</div>
+
+<section>
+  <h2 class="sh"><span class="idx">01</span> Purpose &mdash; the goal task</h2>
+  <p class="lede">POLAR-EMS exists to solve one concrete operational problem for an isolated Antarctic research station, then prove &mdash; with numbers, not claims &mdash; that it solves it better than the alternative.</p>
+
+  <p>A polar station's power system is a self-contained microgrid: wind turbines, solar panels, a battery bank, and a diesel generator as the fallback of last resort. There is no utility grid to fall back on. Every litre of diesel arrived by ship or aircraft at enormous cost, satellite internet can vanish for weeks at a time, and losing heating or life-support power in a &minus;40&deg;C environment is a safety event, not an inconvenience.</p>
+
+  <p>The goal task, precisely stated: <b>continuously decide, tick by tick, how much power to draw from wind, solar, battery and diesel to meet station load &mdash; minimizing diesel burned and generator runtime &mdash; while guaranteeing that critical loads (life support, heating) never lose power, even if the AI, the sensors, or the internet link fail.</b></p>
+
+  <div class="callout"><b>Why this needs to be measured, not asserted:</b> it would be easy to build a dashboard that simply claims to save fuel. POLAR-EMS instead runs two independent dispatch controllers &mdash; a fixed-rule baseline and a forecast-aware optimizer &mdash; on <i>identical</i> weather and load conditions every single tick, so the fuel/CO&#8322; delta shown on the Green Audit tab is a measured difference between two real running controllers, not a hardcoded number.</div>
+</section>
+
+<section>
+  <h2 class="sh"><span class="idx">02</span> System architecture at a glance</h2>
+  <p class="lede">Five layers, each one able to keep operating if everything above it disappears &mdash; the architecture itself is the safety argument.</p>
+
+  <div class="layer-row"><span class="idx">01</span><span class="lbl">Field sensors</span><span class="desc">Weather, battery, generator and per-zone load telemetry.</span><span class="surv">Simulated here from a physical model</span></div>
+  <div class="layer-row"><span class="idx">02</span><span class="lbl">Edge gateway</span><span class="desc">Ingests and stores telemetry locally; runs every model below entirely offline.</span><span class="surv">Survives total internet loss</span></div>
+  <div class="layer-row"><span class="idx">03</span><span class="lbl">AI engine</span><span class="desc">Load/renewable forecasting, dispatch optimization, anomaly detection.</span><span class="surv">Survives sparse/noisy data</span></div>
+  <div class="layer-row"><span class="idx">04</span><span class="lbl">Dispatch &amp; safety</span><span class="desc">Executes source selection and load shedding; falls back to hard-coded rules if the AI layer is unavailable.</span><span class="surv">Survives AI/model failure</span></div>
+  <div class="layer-row"><span class="idx">05</span><span class="lbl">Cloud portal</span><span class="desc">Historical analytics and green-audit reporting, synced in batches whenever a link exists.</span><span class="surv">Fine offline for weeks</span></div>
+
+  <h3 class="h3">Two independent implementations of the same model</h3>
+  <p>The <b>frontend</b> (plain HTML/CSS/JavaScript, no framework, no build step) runs the entire simulation client-side &mdash; weather, dispatch, safety, forecasting, charts &mdash; so the dashboard works with zero backend at all, proving the "edge autonomy" story for real. The <b>backend</b> (Python, FastAPI) is a second, independently-runnable implementation of the same physical model, exposing it as a REST API with interactive docs, plus a terminal CLI client. Either can be demoed alone; an optional "Live Backend" panel on the site can also poll the real server to show the two agreeing.</p>
+</section>
+
+<section>
+  <h2 class="sh"><span class="idx">03</span> What happens every simulated tick</h2>
+  <p class="lede">The entire simulation is one function, <code class="inline">tick()</code>, that runs on a timer and does the following, in this exact order, entirely in the browser:</p>
+
+  <div class="pipe">
+    <div class="pipe-step"><span class="n">1</span><div class="body"><div class="t">Advance simulated time &amp; generate this tick's weather</div><div class="d"><code class="inline">stepWeather()</code> &mdash; a seasonal solar/wind model (polar day/night cycle, turbine power curve) plus autoregressive noise, so weather is physically plausible and continuous, not random per tick.</div></div></div>
+    <div class="pipe-step"><span class="n">2</span><div class="body"><div class="t">Compute renewable generation &amp; station load</div><div class="d"><code class="inline">computeRenewables()</code> applies the turbine power curve and solar irradiance model; <code class="inline">computeLoad()</code> sums four priority tiers (life support/heating, research, general, amenities) with realistic diurnal variation.</div></div></div>
+    <div class="pipe-step"><span class="n">3</span><div class="body"><div class="t">Run <i>both</i> dispatch controllers on identical inputs</div><div class="d"><code class="inline">dispatchBaseline()</code> (fixed rules) and <code class="inline">dispatchAI()</code> (forecast-aware optimizer) each decide the wind/solar/battery/diesel mix independently, from the exact same weather and load &mdash; this is what makes the fuel-savings comparison honest.</div></div></div>
+    <div class="pipe-step"><span class="n">4</span><div class="body"><div class="t">Check whether the AI is even allowed to run</div><div class="d">If a simulated AI-service failure or sensor fault is active, the tick silently substitutes <code class="inline">dispatchBaseline()</code> in place of <code class="inline">dispatchAI()</code> &mdash; a genuine controller swap, not just a relabeled badge.</div></div></div>
+    <div class="pipe-step"><span class="n">5</span><div class="body"><div class="t">Apply the hard safety override</div><div class="d"><code class="inline">applySafety()</code> sits outside and after the optimizer's decision. If battery state-of-charge would fall below the critical floor, it forces diesel on and sheds non-critical load &mdash; regardless of what the optimizer wanted. This function cannot be overridden by the AI.</div></div></div>
+    <div class="pipe-step"><span class="n">6</span><div class="body"><div class="t">Train the online ML forecaster, one step</div><div class="d"><code class="inline">mlTrainStep()</code> &mdash; a real gradient-descent update to an online linear regression, using this tick's actual load as the training signal. It never stops learning.</div></div></div>
+    <div class="pipe-step"><span class="n">7</span><div class="body"><div class="t">Generate &amp; resolve forecasts</div><div class="d"><code class="inline">generateForecasts()</code> produces 1/6/12/24-hour-ahead predictions from three independent models (statistical, online ML, deployed pretrained ML &mdash; see next section); <code class="inline">resolveForecasts()</code> scores each one's past predictions against what actually happened, updating live MAE/RMSE.</div></div></div>
+    <div class="pipe-step"><span class="n">8</span><div class="body"><div class="t">Check for anomalies</div><div class="d"><code class="inline">checkAnomalies()</code> compares each subsystem's actual reading against what the physical model says it <i>should</i> be, and only fires an alert when the gap crosses a statistical threshold &mdash; every alert states its expected-vs-detected values, never "the model said so."</div></div></div>
+    <div class="pipe-step"><span class="n">9</span><div class="body"><div class="t">Record history &amp; render</div><div class="d">This tick's full state is pushed into a rolling history buffer (fuel used, SOC, mode, decision reason, cumulative audit totals), and every visible chart, KPI and 3D readout re-renders from that same state.</div></div></div>
+  </div>
+
+  <div class="callout"><b>One tick, one source of truth:</b> every number on every tab, plus the cinematic 3D hero and the digital twin diagram, is read from this same tick's output through a single adapter (<code class="inline">window.PolarEMS</code>). There is no second, decorative data source anywhere on the page.</div>
+</section>
+
+<section>
+  <h2 class="sh"><span class="idx">04</span> Two controllers, one goal: measuring the value</h2>
+  <p class="lede">This is the mechanism that actually accomplishes the goal task &mdash; not a claim, a running comparison.</p>
+
+  <table>
+    <tr><th>Baseline controller</th><th>AI-optimized controller</th></tr>
+    <tr><td>Fixed rules: use renewables first, discharge battery on a fixed schedule, start diesel only once SOC crosses a fixed threshold.</td><td>Same physical constraints, but timing informed by the load/renewable forecast &mdash; e.g. pre-emptively holding more battery reserve ahead of a forecast low-wind spell, instead of reacting only once it arrives.</td></tr>
+    <tr><td>Sensible and safe on its own &mdash; not a strawman.</td><td>Wins only because it looks ahead, not because the baseline is broken.</td></tr>
+  </table>
+
+  <p>Both run every tick on identical conditions. The Green Audit tab reports the accumulated difference directly: <b>fuel saved</b> (litre delta between the two controllers' cumulative diesel burn), <b>CO&#8322; avoided</b> (that delta &times; 2.68 kg/L, the standard diesel emission factor), and <b>generator runtime reduction</b> (hours). That delta is what "AI-driven" is actually claiming credit for &mdash; a forecast-aware policy beating a fixed rule at the same job, under the same conditions, measured continuously.</p>
+</section>
+
+<section>
+  <h2 class="sh"><span class="idx">05</span> Where the AI actually is</h2>
+  <p class="lede">Specific and honest about which parts are learned and which are deliberately not, because in a safety-relevant system that distinction is the point.</p>
+
+  <div class="model-row"><span class="pill gb">Deployed pretrained</span><div class="body"><div class="t">Gradient-boosting regressor, running inference in the browser</div><div class="d">Scikit-learn <code class="inline">GradientBoostingRegressor</code> (150 trees), trained offline on a genuine held-out train/test split (5.4 kW mean error on unseen data). Its trees were exported to a JSON file and re-implemented as a small JavaScript tree-walking function &mdash; verified to reproduce scikit-learn's own predictions bit-for-bit before shipping. Runs entirely client-side; no server call at prediction time.</div></div></div>
+  <div class="model-row"><span class="pill gb">Deployed pretrained</span><div class="body"><div class="t">The same model, server-side</div><div class="d">Identical trained model also runs inside the FastAPI backend, exposed at <code class="inline">/api/forecast/ml</code>, so the same trained weights are reachable from a real HTTP API and a terminal CLI, not only the browser.</div></div></div>
+  <div class="model-row"><span class="pill ml">Learns live</span><div class="body"><div class="t">Online linear regression (Widrow-Hoff / LMS)</div><div class="d">Trains itself one gradient step per simulated tick, directly from this session's own telemetry &mdash; no offline dataset. Its weights and live MAE/RMSE are visible on the Forecast tab and genuinely change as the simulation runs.</div></div></div>
+  <div class="model-row"><span class="pill rule">Deliberately not AI</span><div class="body"><div class="t">Dispatch optimizer &amp; hard safety override</div><div class="d">A constrained, explainable decision policy and a hard-coded safety floor &mdash; not learned. In a system where a wrong decision can mean losing heat, "the model decided" is not an acceptable answer for why power was cut; a policy you can fully audit is more trustworthy than a black box here.</div></div></div>
+  <div class="model-row"><span class="pill rule">Deliberately not AI</span><div class="body"><div class="t">Anomaly detection</div><div class="d">Statistical control limits &mdash; actual reading vs. physically-expected value, threshold-triggered. Every alert names both numbers, so "how do you know it's anomalous" always has a specific answer.</div></div></div>
+</section>
+
+<section>
+  <h2 class="sh"><span class="idx">06</span> Safety &amp; offline autonomy</h2>
+  <p class="lede">The part of the architecture that exists specifically because failure here is a safety event, not an inconvenience.</p>
+  <ul>
+    <li><b>Hard safety floor:</b> if battery SOC drops toward the critical threshold, <code class="inline">applySafety()</code> forces diesel on and sheds only the lowest-priority loads &mdash; life support and heating sit in an unshed tier, enforced independently of any AI decision.</li>
+    <li><b>Graceful AI failure:</b> triggering the "AI service failure" scenario genuinely swaps the running controller to the deterministic baseline &mdash; visible live as the mode badge flips to SAFE FALLBACK &mdash; rather than just relabeling the same logic.</li>
+    <li><b>Offline autonomy:</b> toggling a simulated internet outage flips a real state flag; telemetry, forecasting, optimization and the safety layer all keep running unchanged. Only the cloud sync pauses, queueing records into a local outbox that drains with an animated batch upload once connectivity returns &mdash; mirroring real store-and-forward behavior on an intermittent satellite link.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sh"><span class="idx">07</span> The cinematic 3D layer &amp; digital twin</h2>
+  <p class="lede">A Three.js hero scene and a live digital-twin flow diagram sit on top of the dashboard &mdash; built specifically so they can never drift from the real simulation.</p>
+  <p>Both read the tick loop's output through one read-only adapter, <code class="inline">window.PolarEMS</code>, exposing a <code class="inline">snapshot()</code> of the current state and an <code class="inline">onTick()</code> subscription. If the Dashboard tab says battery is at 72%, the 3D hero's HUD and the digital twin's battery node show the same 72%, because they're reading the identical number, not a separate illustration. Clicking a subsystem in the digital twin (wind, solar, battery, diesel) both updates its live info panel and moves the 3D camera to focus on that subsystem's model &mdash; GPU-tiered (HIGH/MEDIUM/LOW geometry detail) so it degrades gracefully on lower-end hardware, and recomposed (not just resized) for narrow mobile viewports.</p>
+  <p>A looping background video of the station sits fixed behind the entire scroll as ambient atmosphere &mdash; purely decorative, contributing no data of its own, and removed outright under <code class="inline">prefers-reduced-motion</code>.</p>
+</section>
+
+<section>
+  <h2 class="sh"><span class="idx">08</span> Backend &amp; deployment</h2>
+  <table>
+    <tr><th>Piece</th><th>What it is</th><th>Where it runs</th></tr>
+    <tr><td class="b">Frontend</td><td>Single-file HTML/CSS/JS, no build step, no framework</td><td>Vercel (static CDN)</td></tr>
+    <tr><td class="b">Backend</td><td>Python + FastAPI, the same physical model reimplemented server-side</td><td>Render (containerized, HTTPS, auto-deploys on push)</td></tr>
+    <tr><td class="b">CLI client</td><td><code class="inline">cli.py</code> &mdash; a terminal menu that only ever makes plain HTTP calls to the API, no logic of its own</td><td>Runs locally against either backend</td></tr>
+    <tr><td class="b">Source control</td><td>Git</td><td>GitHub</td></tr>
+  </table>
+  <div class="callout warn"><b>A real constraint we hit and fixed, not hidden:</b> browsers refuse to let an HTTPS page call a plain HTTP address ("mixed content") &mdash; encountered directly when the frontend on Vercel (HTTPS) tried to reach a local backend (HTTP). Fixed by giving the backend real HTTPS on Render, not by bypassing browser security.</div>
+</section>
+
+<section>
+  <h2 class="sh"><span class="idx">09</span> How this accomplishes the goal task</h2>
+  <p class="lede">Tying it back to section 01.</p>
+  <ol>
+    <li><b>Minimizes diesel burned:</b> proven continuously by the baseline-vs-AI comparison, not asserted &mdash; the Green Audit tab is a running measurement, not a static claim.</li>
+    <li><b>Never loses critical power:</b> the hard safety layer is architecturally outside the optimizer's reach, and its behavior under AI failure is demonstrable live, on demand.</li>
+    <li><b>Keeps working with zero connectivity:</b> every layer that matters &mdash; sensing, forecasting, optimizing, safety &mdash; runs at the edge; only historical reporting needs the cloud, and it tolerates being offline for as long as necessary.</li>
+    <li><b>Is explainable, not a black box:</b> every dispatch decision carries a plain-English reason, every anomaly alert names its expected-vs-detected comparison, and every "trained" claim points at a specific model with a specific measured accuracy &mdash; visible on the Forecast tab, right now, while it runs.</li>
+  </ol>
+</section>
+
+<footer class="pf">POLAR-EMS &middot; technical explainer &middot; generated from the current running codebase, not a design spec written before implementation</footer>
+
+</div>
