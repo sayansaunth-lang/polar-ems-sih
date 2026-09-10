@@ -26,6 +26,7 @@
   --danger-soft:rgba(226,88,95,.14);
   --info:#5b9fe0;
   --ml:#a78bfa;
+  --gb:#ff9166;
   --p1:#e2585f;
   --p2:#e0a63e;
   --p3:#35c4c9;
@@ -654,7 +655,7 @@ footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center
 <!-- ============ FORECAST ============ -->
 <section class="page" id="page-forecast">
   <div class="section-head">
-    <div><h1 class="pt">Forecasting</h1><p class="lede">Two load forecasters run side by side, scored against realized actuals: a seasonal-naive statistical baseline, and a genuine trained model &mdash; an online linear regressor that learns from this session's own telemetry as it arrives.</p></div>
+    <div><h1 class="pt">Forecasting</h1><p class="lede">Three load forecasters run side by side, scored against realized actuals: a seasonal-naive statistical baseline (no learning), an online linear regressor that learns live from this session's own telemetry, and a <b style="color:var(--gb)">pretrained gradient-boosting model</b> &mdash; trained offline in Python and deployed to run genuine inference right here in your browser.</p></div>
   </div>
 
   <div class="grid kpi-row" style="grid-template-columns:repeat(4,1fr)" id="horizonTabs">
@@ -667,19 +668,35 @@ footer.pf{border-top:1px solid var(--border);padding:24px 20px;text-align:center
   <div class="grid kpi-row" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
     <div class="card kpi"><span class="l">Baseline MAE</span><span class="v" id="fMaeLoad">&mdash;<span class="unit">kW</span></span></div>
     <div class="card kpi"><span class="l">Baseline RMSE</span><span class="v" id="fRmseLoad">&mdash;<span class="unit">kW</span></span></div>
-    <div class="card kpi"><span class="l">ML model MAE</span><span class="v" id="fMlMae" style="color:var(--ml)">&mdash;<span class="unit">kW</span></span></div>
-    <div class="card kpi"><span class="l">ML model RMSE</span><span class="v" id="fMlRmse" style="color:var(--ml)">&mdash;<span class="unit">kW</span></span></div>
+    <div class="card kpi"><span class="l">Online ML MAE</span><span class="v" id="fMlMae" style="color:var(--ml)">&mdash;<span class="unit">kW</span></span></div>
+    <div class="card kpi"><span class="l">Online ML RMSE</span><span class="v" id="fMlRmse" style="color:var(--ml)">&mdash;<span class="unit">kW</span></span></div>
+    <div class="card kpi"><span class="l">Deployed model MAE</span><span class="v" id="fGbMae" style="color:var(--gb)">&mdash;<span class="unit">kW</span></span></div>
+    <div class="card kpi"><span class="l">Deployed model RMSE</span><span class="v" id="fGbRmse" style="color:var(--gb)">&mdash;<span class="unit">kW</span></span></div>
     <div class="card kpi"><span class="l">Samples scored</span><span class="v" id="fSamples">&mdash;</span></div>
   </div>
 
-  <div class="card" style="margin-bottom:14px">
-    <div class="section-head"><h2 class="st">ML forecaster</h2><span class="pill p3" id="mlUpdateCount">0 updates</span></div>
-    <p style="font-size:12.5px;color:var(--text-secondary);margin-bottom:10px">An online linear regression (Widrow-Hoff / LMS rule) predicting station load from hour-of-day, season, temperature, wind and cloud cover. It re-trains one step every simulated tick from real telemetry &mdash; no offline dataset, no cloud training. Its error should fall the longer the simulation runs. Note it may start out <i>less</i> accurate than the statistical baseline: that baseline is a formula hand-fitted to this simulation's own equations, while this model has to learn the relationship purely from noisy observed data, same as it would on a real station. These are its current learned weights:</p>
-    <div id="mlWeights" style="font-family:var(--font-mono);font-size:11.5px;line-height:1.7;color:var(--text-secondary)">&mdash;</div>
+  <div class="grid two-col" style="margin-bottom:14px">
+    <div class="card">
+      <div class="section-head"><h2 class="st">Online ML forecaster</h2><span class="pill p3" id="mlUpdateCount">0 updates</span></div>
+      <p style="font-size:12.5px;color:var(--text-secondary);margin-bottom:10px">An online linear regression (Widrow-Hoff / LMS rule) predicting station load from hour-of-day, season, temperature, wind and cloud cover. It re-trains one step every simulated tick from real telemetry &mdash; no offline dataset, no cloud training. Its error should fall the longer the simulation runs. Note it may start out <i>less</i> accurate than the statistical baseline: that baseline is a formula hand-fitted to this simulation's own equations, while this model has to learn the relationship purely from noisy observed data, same as it would on a real station. These are its current learned weights:</p>
+      <div id="mlWeights" style="font-family:var(--font-mono);font-size:11.5px;line-height:1.7;color:var(--text-secondary)">&mdash;</div>
+    </div>
+    <div class="card">
+      <div class="section-head"><h2 class="st">Deployed pretrained model</h2><span class="pill" id="gbStatusPill" style="color:var(--gb);border-color:rgba(255,145,102,.4);background:rgba(255,145,102,.08)">loading&hellip;</span></div>
+      <p style="font-size:12.5px;color:var(--text-secondary);margin-bottom:10px">A scikit-learn <code class="inline" id="gbModelType">GradientBoostingRegressor</code>, trained <b>offline in Python</b> on 3,000 synthetic samples drawn from this same simulation's own load model, with a real held-out train/test split. The 150 trained decision trees were exported as plain arrays and are re-walked right here in JavaScript &mdash; genuine inference on a genuine pretrained model, no server call, no training in the browser. See <code class="inline">backend/export_ml_model.py</code>.</p>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px;font-size:12px;margin-bottom:10px">
+        <div><div class="tt">Held-out test MAE</div><div class="num" id="gbTestMae" style="font-size:15px">&mdash;</div></div>
+        <div><div class="tt">Held-out test RMSE</div><div class="num" id="gbTestRmse" style="font-size:15px">&mdash;</div></div>
+        <div><div class="tt">Trees &times; depth</div><div class="num" id="gbTreeCount" style="font-size:15px">&mdash;</div></div>
+        <div><div class="tt">Trained / tested on</div><div class="num" id="gbSplitCount" style="font-size:15px">&mdash;</div></div>
+      </div>
+      <div class="tt" style="margin-bottom:5px">Feature importances (from training)</div>
+      <div id="gbImportances" style="font-family:var(--font-mono);font-size:11.5px;line-height:1.7;color:var(--text-secondary)">&mdash;</div>
+    </div>
   </div>
 
   <div class="card" style="margin-bottom:14px">
-    <div class="section-head"><h2 class="st">Load: forecast vs. actual</h2><div class="legend"><span><i class="ln" style="background:var(--text-primary)"></i>Actual</span><span><i class="ln dash" style="color:var(--accent)"></i>Statistical baseline</span><span><i class="ln dash" style="color:var(--ml)"></i>ML model</span></div></div>
+    <div class="section-head"><h2 class="st">Load: forecast vs. actual</h2><div class="legend"><span><i class="ln" style="background:var(--text-primary)"></i>Actual</span><span><i class="ln dash" style="color:var(--accent)"></i>Statistical baseline</span><span><i class="ln dash" style="color:var(--ml)"></i>Online ML</span><span><i class="ln dash" style="color:var(--gb)"></i>Deployed pretrained model</span></div></div>
     <svg id="fcLoadChart" class="chart-svg" viewBox="0 0 1000 220"></svg>
   </div>
   <div class="grid two-col" style="margin-bottom:14px">
@@ -965,6 +982,7 @@ const S = {
   forecastPoints:{1:[],6:[],12:[],24:[]}, // completed {t,actual,pred} for chart at chosen horizon (load)
   mlForecastErrors:{1:[],6:[],12:[],24:[]},
   ml:{weights:new Array(8).fill(0), updates:0},
+  gbForecastErrors:{1:[],6:[],12:[],24:[]},
   alerts:[], anomalyEvents:0,
   health:{battery:100,turbine:100,generator:100},
   mode:"AI OPTIMIZED",
@@ -1320,6 +1338,47 @@ function mlTrainStep(features, actualLoad){
 }
 
 /* ============================================================
+   DEPLOYED PRETRAINED MODEL (gradient boosting, runs in-browser)
+   Trained OFFLINE in Python with scikit-learn (see backend/app/
+   ml_forecast.py + backend/export_ml_model.py) on 3000 synthetic
+   samples from the same physical load model as the rest of this
+   simulation, with a real held-out train/test split. The trained
+   trees are exported as plain arrays in assets/ml/trained_forecaster.json
+   and re-walked here in JS -- this is genuine inference on a genuine
+   pretrained model, not a re-simulation of one. No training happens
+   in the browser; the browser only evaluates the already-learned trees.
+   export_ml_model.py verifies its export reproduces sklearn's own
+   predictions bit-for-bit before it's ever written to disk.
+============================================================ */
+const GB = { model:null, status:"loading", error:null };
+function gbFeatures(hour, doy, temp, wind, cloud){
+  return [
+    Math.sin(2*Math.PI*hour/24), Math.cos(2*Math.PI*hour/24),
+    Math.sin(2*Math.PI*doy/365), Math.cos(2*Math.PI*doy/365),
+    temp/50, wind/20, cloud
+  ];
+}
+function gbPredictTree(tree, x){
+  let node = 0;
+  while(tree.children_left[node] !== -1){
+    node = x[tree.feature[node]] <= tree.threshold[node] ? tree.children_left[node] : tree.children_right[node];
+  }
+  return tree.value[node];
+}
+function gbPredict(features){
+  if(!GB.model) return null;
+  let total = GB.model.init;
+  for(const tree of GB.model.trees) total += GB.model.learning_rate * gbPredictTree(tree, features);
+  return total;
+}
+(function loadDeployedModel(){
+  fetch("assets/ml/trained_forecaster.json")
+    .then(r => { if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(json => { GB.model = json; GB.status = "ready"; })
+    .catch(err => { GB.status = "error"; GB.error = String(err); console.error("[deployed model]", err); });
+})();
+
+/* ============================================================
    FORECAST MODULE
 ============================================================ */
 function generateForecasts(load){
@@ -1337,7 +1396,8 @@ function generateForecasts(load){
     const predWind = windPowerCurve(windDecay, S.turbineCount*CFG.turbineRatedKW);
     const seasonalTempT = seasonalTemp(doyT);
     const mlPredLoad = mlPredict(mlFeatures(hourT, doyT, seasonalTempT, 9.5, 0.32));
-    S.forecastPending.push({targetT, horizon:h, predLoad, predWind, predSolar, mlPredLoad});
+    const gbPredLoad = gbPredict(gbFeatures(hourT, doyT, seasonalTempT, 9.5, 0.32));
+    S.forecastPending.push({targetT, horizon:h, predLoad, predWind, predSolar, mlPredLoad, gbPredLoad});
   });
   if(S.forecastPending.length>400) S.forecastPending.splice(0, S.forecastPending.length-400);
 }
@@ -1354,8 +1414,14 @@ function resolveForecasts(actualLoad, actualWind, actualSolar){
       const mlArr = S.mlForecastErrors[f.horizon];
       mlArr.push({abs:mlErrL, sq:mlErrL*mlErrL});
       if(mlArr.length>200) mlArr.shift();
+      if(f.gbPredLoad != null){
+        const gbErrL = Math.abs(f.gbPredLoad-actualLoad);
+        const gbArr = S.gbForecastErrors[f.horizon];
+        gbArr.push({abs:gbErrL, sq:gbErrL*gbErrL});
+        if(gbArr.length>200) gbArr.shift();
+      }
       const pts = S.forecastPoints[f.horizon];
-      pts.push({t:f.targetT, actual:actualLoad, pred:f.predLoad, mlPred:f.mlPredLoad, predWind:f.predWind, actualWind, predSolar:f.predSolar, actualSolar});
+      pts.push({t:f.targetT, actual:actualLoad, pred:f.predLoad, mlPred:f.mlPredLoad, gbPred:f.gbPredLoad, predWind:f.predWind, actualWind, predSolar:f.predSolar, actualSolar});
       if(pts.length>60) pts.shift();
     } else still.push(f);
   });
@@ -1721,6 +1787,28 @@ function renderForecast(){
   const wLabels = ["bias","hour_sin","hour_cos","season_sin","season_cos","temp","wind","cloud"];
   document.getElementById("mlWeights").textContent = wLabels.map((l,i)=>l+"="+S.ml.weights[i].toFixed(3)).join("   ");
 
+  const gbErrs = S.gbForecastErrors[activeHorizon];
+  const gbMae = gbErrs.length ? gbErrs.reduce((a,b)=>a+b.abs,0)/gbErrs.length : null;
+  const gbRmse = gbErrs.length ? Math.sqrt(gbErrs.reduce((a,b)=>a+b.sq,0)/gbErrs.length) : null;
+  document.getElementById("fGbMae").innerHTML = (gbMae!=null?gbMae.toFixed(1):"—")+'<span class="unit">kW</span>';
+  document.getElementById("fGbRmse").innerHTML = (gbRmse!=null?gbRmse.toFixed(1):"—")+'<span class="unit">kW</span>';
+  const gbPill = document.getElementById("gbStatusPill");
+  if(GB.status==="ready"){
+    gbPill.textContent = "deployed · running in your browser";
+    const m = GB.model.metrics;
+    document.getElementById("gbModelType").textContent = GB.model.model_type;
+    document.getElementById("gbTestMae").textContent = m.test_mae_kw+" kW";
+    document.getElementById("gbTestRmse").textContent = m.test_rmse_kw+" kW";
+    document.getElementById("gbTreeCount").textContent = m.n_estimators+" × depth "+m.max_depth;
+    document.getElementById("gbSplitCount").textContent = m.n_train+" / "+m.n_test;
+    document.getElementById("gbImportances").textContent = Object.entries(m.feature_importances).map(([k,v])=>k+"="+v.toFixed(3)).join("   ");
+  } else if(GB.status==="error"){
+    gbPill.textContent = "failed to load";
+    gbPill.style.color = "var(--danger)";
+  } else {
+    gbPill.textContent = "loading…";
+  }
+
   const pts = S.forecastPoints[activeHorizon];
   const N = Math.min(48, pts.length);
   const recent = pts.slice(-N);
@@ -1728,10 +1816,12 @@ function renderForecast(){
   const accent = getComputedStyle(document.body).getPropertyValue("--accent");
   const info = getComputedStyle(document.body).getPropertyValue("--info");
   const mlColor = getComputedStyle(document.body).getPropertyValue("--ml");
+  const gbColor = getComputedStyle(document.body).getPropertyValue("--gb");
   drawLineChart(document.getElementById("fcLoadChart"), [
     {points:recent.map(r=>r.actual), color:primary},
     {points:recent.map(r=>r.pred), color:accent, dashed:true},
-    {points:recent.map(r=>r.mlPred), color:mlColor, dashed:true}
+    {points:recent.map(r=>r.mlPred), color:mlColor, dashed:true},
+    {points:recent.map(r=>r.gbPred), color:gbColor, dashed:true}
   ], {minZero:true, xLabels: recent.length?[fmtT(recent[0].t), fmtT(recent[recent.length-1].t)]:null});
   drawLineChart(document.getElementById("fcWindChart"), [
     {points:recent.map(r=>r.actualWind), color:primary},
@@ -2097,6 +2187,7 @@ function resetSimulation(){
   S.forecastPoints={1:[],6:[],12:[],24:[]};
   S.mlForecastErrors={1:[],6:[],12:[],24:[]};
   S.ml={weights:new Array(8).fill(0), updates:0};
+  S.gbForecastErrors={1:[],6:[],12:[],24:[]}; // GB.model itself is NOT reset -- it's a fixed pretrained model, not re-learned per run
   S.alerts=[]; S.anomalyEvents=0;
   S.health={battery:100,turbine:100,generator:100};
   S.mode="AI OPTIMIZED"; S.decisionLog=[]; S.syncLog=[];
