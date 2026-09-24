@@ -1,0 +1,188 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0d12; --surface:#131820; --surface-2:#171d27;
+  --border:#28323f; --border-strong:#3a4657;
+  --text-primary:#eef2f8; --text-secondary:#9aa7bc; --text-tertiary:#697488;
+  --accent:#35c4c9; --accent-strong:#6ce8ec; --accent-soft:#122c2e;
+  --ml:#b39bfa; --gb:#ffa06f; --warn:#f0b955;
+  --font-display:'Big Shoulders Display',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden}
+body{
+  background:
+    radial-gradient(60% 45% at 85% 6%, rgba(53,196,201,.10), transparent 60%),
+    radial-gradient(40% 30% at 6% 100%, rgba(179,155,250,.07), transparent 60%),
+    var(--bg);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  display:flex; flex-direction:column;
+  padding:52px 70px 40px;
+}
+
+/* ---- header ---- */
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:26px;border-bottom:2px solid var(--border);margin-bottom:40px}
+.brand{display:flex;align-items:center;gap:16px}
+.brand-mark{width:56px;height:56px;border-radius:14px;background:var(--surface-2);border:1.5px solid var(--border-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-mark svg{width:32px;height:32px}
+.brand-text .name{font-family:var(--font-display);font-weight:900;font-size:34px;letter-spacing:.01em;line-height:1;color:var(--text-primary)}
+.brand-text .sub{font-family:var(--font-mono);font-size:13.5px;color:var(--text-tertiary);letter-spacing:.05em;text-transform:uppercase;margin-top:6px}
+.hdr-right{text-align:right}
+.hdr-right .eyebrow{font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-strong);background:var(--accent-soft);border:1px solid rgba(53,196,201,.35);padding:7px 16px;border-radius:100px;display:inline-block}
+.hdr-right h1{font-family:var(--font-display);font-weight:900;font-size:44px;letter-spacing:.005em;margin-top:12px;color:var(--text-primary)}
+
+/* ---- main flow row ---- */
+.flow{display:flex;align-items:stretch;gap:0;flex:1;min-height:0}
+.node{background:var(--surface);border:1.5px solid var(--border-strong);border-radius:16px;padding:26px 24px;display:flex;flex-direction:column;justify-content:center;gap:24px}
+.node .k{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.node h3{font-family:var(--font-display);font-weight:800;font-size:23px;line-height:1.08;color:var(--text-primary)}
+.node .head-group{margin-bottom:4px}
+.node .items{display:flex;flex-direction:column;gap:14px}
+.node .item{font-size:14.5px;color:var(--text-secondary);line-height:1.4;padding-left:14px;position:relative}
+.node .item::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+
+.col-station{width:300px;flex-shrink:0}
+.col-station .k{color:var(--text-tertiary)}
+
+.arrow{width:56px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative}
+.arrow::after{content:"";width:100%;height:2px;background:linear-gradient(90deg,var(--border-strong),var(--accent))}
+.arrow .head{position:absolute;right:-2px;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid var(--accent)}
+
+.col-core{flex:1;min-width:0;background:var(--surface-2);border:1.5px solid var(--border-strong);border-radius:18px;padding:22px 26px;display:flex;flex-direction:column;justify-content:center;gap:22px}
+.col-core .k{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:2px}
+.sub{background:var(--surface);border:1px solid var(--border-strong);border-radius:12px;padding:22px 26px;display:flex;align-items:center;gap:22px}
+.sub .n{font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--accent-strong);width:28px;flex-shrink:0}
+.sub .body h4{font-family:var(--font-display);font-weight:700;font-size:21px;color:var(--text-primary);margin-bottom:6px}
+.sub .body p{font-size:14.5px;color:var(--text-secondary);line-height:1.45}
+.sub.hero{border-color:var(--accent);background:linear-gradient(135deg,rgba(53,196,201,.10),rgba(179,155,250,.06));padding:28px 26px}
+.sub.hero .body h4{color:var(--accent-strong);font-size:23px}
+.sub.hero .body p{font-size:15px}
+.sub.warn{border-color:rgba(240,185,85,.5)}
+.sub.warn .n{color:var(--warn)}
+.badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.badge{font-family:var(--font-mono);font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;border:1px solid;letter-spacing:.02em}
+.badge.gb{color:var(--gb);border-color:rgba(255,160,111,.45);background:rgba(255,160,111,.08)}
+.badge.ml{color:var(--ml);border-color:rgba(179,155,250,.45);background:rgba(179,155,250,.08)}
+.badge.rule{color:var(--text-tertiary);border-color:var(--border-strong);background:var(--surface-2)}
+
+.col-out{width:300px;flex-shrink:0}
+
+/* ---- side branch ---- */
+.branch-wrap{display:flex;flex-direction:column;align-items:center;width:340px;flex-shrink:0;margin-left:26px}
+.branch-line{width:2px;flex:1;background:repeating-linear-gradient(180deg,var(--border-strong) 0 8px,transparent 8px 16px);position:relative;min-height:30px}
+.branch-label{font-family:var(--font-mono);font-size:11.5px;color:var(--text-tertiary);text-align:center;padding:8px 4px;line-height:1.4}
+.branch-node{background:var(--surface);border:1.5px dashed var(--border-strong);border-radius:14px;padding:18px 20px;width:100%}
+.branch-node .k{font-family:var(--font-mono);font-size:11.5px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.branch-node h4{font-family:var(--font-display);font-weight:700;font-size:17px;margin-bottom:6px}
+.branch-node p{font-size:12.5px;color:var(--text-secondary);line-height:1.4}
+
+.lower{display:flex;gap:26px;margin-top:26px;flex-shrink:0}
+
+/* ---- footer strip ---- */
+.ftr{margin-top:26px;padding-top:20px;border-top:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.deploy{display:flex;align-items:center;gap:14px;font-family:var(--font-mono);font-size:13.5px;color:var(--text-secondary)}
+.deploy .step{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border-strong);border-radius:100px;padding:7px 16px}
+.deploy .sep{color:var(--text-tertiary)}
+.ftr .note{font-size:12.5px;color:var(--text-tertiary);max-width:520px;text-align:right;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#35c4c9" stroke-width="1.8"><path d="M12 2v20M2 12h20M4.5 4.5l15 15M19.5 4.5l-15 15" stroke-linecap="round"/><circle cx="12" cy="12" r="3.4" fill="#122c2e" stroke="#6ce8ec"/></svg>
+    </div>
+    <div class="brand-text">
+      <div class="name">POLAR-EMS</div>
+      <div class="sub">Vostok Ridge Station &middot; Smart Energy Management</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="eyebrow">Smart India Hackathon &middot; Final Round</span>
+    <h1>System Architecture</h1>
+  </div>
+</div>
+
+<div class="flow">
+  <div class="node col-station">
+    <div class="k">Input &middot; simulated</div>
+    <h3>Station Sensors</h3>
+    <div class="items">
+      <div class="item">Weather &mdash; wind, solar, temp</div>
+      <div class="item">Battery state of charge</div>
+      <div class="item">Diesel generator status</div>
+      <div class="item">Priority-tiered station load</div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="head"></div></div>
+
+  <div class="col-core">
+    <div class="k">Core Engine &mdash; runs identically in Browser (JS) &amp; Backend (Python)</div>
+    <div class="sub">
+      <span class="n">01</span>
+      <div class="body"><h4>Dual Dispatch Controllers</h4><p>Baseline (fixed rules) vs. AI (forecast-aware) &mdash; both run on identical conditions every tick, so fuel savings are measured, not asserted.</p></div>
+    </div>
+    <div class="sub warn">
+      <span class="n">02</span>
+      <div class="body"><h4>Hard Safety Override</h4><p>Independent of the AI and cannot be bypassed by it &mdash; guarantees critical loads never lose power.</p></div>
+    </div>
+    <div class="sub hero">
+      <span class="n">03</span>
+      <div class="body">
+        <h4>AI Forecasting &mdash; 3 real trained models</h4>
+        <p>Load &amp; renewable forecasting feeding the AI controller's decisions.</p>
+        <div class="badges">
+          <span class="badge ml">Online LMS &middot; learns live</span>
+          <span class="badge gb">Gradient Boosting &middot; deployed in-browser</span>
+          <span class="badge gb">Gradient Boosting &middot; backend</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="head"></div></div>
+
+  <div class="node col-out">
+    <div class="k">Output</div>
+    <h3>Dashboard + 3D Digital Twin</h3>
+    <div class="items">
+      <div class="item">7-tab live dashboard</div>
+      <div class="item">Cinematic 3D hero + twin</div>
+      <div class="item">One adapter, one data source</div>
+      <div class="item">Green audit &amp; decision log</div>
+    </div>
+  </div>
+
+  <div class="branch-wrap">
+    <div class="branch-line"></div>
+    <div class="branch-label">same engine, independent Python implementation &mdash; real REST API</div>
+    <div class="branch-node">
+      <div class="k">Parallel access path</div>
+      <h4>FastAPI Backend &larr; VS Code CLI / Live Backend panel</h4>
+      <p>Proves the logic also runs as a real, independently-deployed server &mdash; not only in the browser.</p>
+    </div>
+  </div>
+</div>
+
+<div class="ftr">
+  <div class="deploy">
+    <span class="step">GitHub</span>
+    <span class="sep">&rarr;</span>
+    <span class="step">Vercel &middot; frontend (static CDN)</span>
+    <span class="sep">+</span>
+    <span class="step">Render &middot; backend (HTTPS)</span>
+  </div>
+  <div class="note">Both halves deploy automatically from a single git push &mdash; live and testable end to end, not a local-only prototype.</div>
+</div>
+
+</body></html>
