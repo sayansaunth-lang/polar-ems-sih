@@ -1,0 +1,170 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0d12; --surface:#131820; --surface-2:#171d27;
+  --border:#28323f; --border-strong:#3a4657;
+  --text-primary:#eef2f8; --text-secondary:#9aa7bc; --text-tertiary:#697488;
+  --accent:#35c4c9; --accent-strong:#6ce8ec; --accent-soft:#122c2e;
+  --ml:#b39bfa; --ml-soft:#1d1830;
+  --gb:#ffa06f; --gb-soft:#2a1a10;
+  --font-display:'Big Shoulders Display',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden}
+body{
+  background:
+    radial-gradient(60% 45% at 85% 6%, rgba(53,196,201,.09), transparent 60%),
+    radial-gradient(40% 30% at 6% 100%, rgba(179,155,250,.06), transparent 60%),
+    var(--bg);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  display:flex; flex-direction:column;
+  padding:44px 64px 30px;
+}
+
+/* header */
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:20px;border-bottom:2px solid var(--border);margin-bottom:26px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-mark{width:46px;height:46px;border-radius:12px;background:var(--surface-2);border:1.5px solid var(--border-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-mark svg{width:26px;height:26px}
+.brand-text .name{font-family:var(--font-display);font-weight:900;font-size:27px;letter-spacing:.01em;line-height:1;color:var(--text-primary)}
+.brand-text .sub{font-family:var(--font-mono);font-size:11.5px;color:var(--text-tertiary);letter-spacing:.04em;text-transform:uppercase;margin-top:5px}
+.hdr-right{text-align:right}
+.hdr-right .eyebrow{font-family:var(--font-mono);font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-strong);background:var(--accent-soft);border:1px solid rgba(53,196,201,.35);padding:6px 14px;border-radius:100px;display:inline-block}
+.hdr-right h1{font-family:var(--font-display);font-weight:900;font-size:34px;letter-spacing:.005em;margin-top:9px;color:var(--text-primary)}
+
+/* zones */
+.zone{border-radius:16px;padding:18px 22px;display:flex;flex-direction:column}
+.zone-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.zone-hd .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.zone-hd .t{font-family:var(--font-mono);font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.zone-hd .d{font-size:11.5px;color:var(--text-tertiary);margin-left:auto}
+
+.zone.fe{background:var(--accent-soft);border:1.5px solid rgba(53,196,201,.4)}
+.zone.fe .dot{background:var(--accent)}
+.zone.fe .zone-hd .t{color:var(--accent-strong)}
+.zone.be{background:var(--gb-soft);border:1.5px solid rgba(255,160,111,.4)}
+.zone.be .dot{background:var(--gb)}
+.zone.be .zone-hd .t{color:var(--gb)}
+.zone.ml{background:var(--ml-soft);border:1.5px solid rgba(179,155,250,.4)}
+.zone.ml .dot{background:var(--ml)}
+.zone.ml .zone-hd .t{color:var(--ml)}
+
+.card{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;padding:13px 15px;display:flex;flex-direction:column;gap:5px}
+.card h4{font-family:var(--font-display);font-weight:700;font-size:15.5px;line-height:1.12;color:var(--text-primary)}
+.card p{font-size:11.5px;color:var(--text-secondary);line-height:1.38}
+
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid4b{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+.row-connector{display:flex;align-items:center;justify-content:center;height:20px;color:var(--text-tertiary);font-size:12px}
+.row-connector::before,.row-connector::after{content:"";flex:1;height:1px;background:var(--border-strong)}
+.row-connector span{padding:0 10px;font-family:var(--font-mono);font-size:10px;letter-spacing:.05em}
+
+.pipe-connector{display:flex;align-items:center;justify-content:center;width:22px;flex-shrink:0}
+.pipe-connector .arrow-i{color:var(--text-tertiary);font-size:16px}
+
+.lower{display:flex;gap:16px;margin-top:16px;flex:1;min-height:0}
+.zone.be{width:30%;flex-shrink:0}
+.zone.ml{flex:1}
+.ml-pipe{display:flex;align-items:stretch;gap:10px;flex:1}
+.ml-pipe .card{justify-content:center}
+
+/* footer */
+.ftr{margin-top:18px;padding-top:16px;border-top:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.deploy{display:flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:12.5px;color:var(--text-secondary)}
+.deploy .step{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border-strong);border-radius:100px;padding:6px 14px}
+.deploy .sep{color:var(--text-tertiary)}
+.ftr .note{font-size:11.5px;color:var(--text-tertiary);max-width:560px;text-align:right;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#35c4c9" stroke-width="1.8"><path d="M12 2v20M2 12h20M4.5 4.5l15 15M19.5 4.5l-15 15" stroke-linecap="round"/><circle cx="12" cy="12" r="3.4" fill="#122c2e" stroke="#6ce8ec"/></svg>
+    </div>
+    <div class="brand-text">
+      <div class="name">POLAR-EMS</div>
+      <div class="sub">Vostok Ridge Station &middot; Smart Energy Management</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="eyebrow">Smart India Hackathon &middot; Full Technical View</span>
+    <h1>System Architecture &mdash; Detailed</h1>
+  </div>
+</div>
+
+<div class="zone fe" style="flex:1;justify-content:space-evenly">
+  <div class="zone-hd"><span class="dot"></span><span class="t">Frontend &mdash; Browser (Vercel, static CDN)</span><span class="d">no framework, no build step</span></div>
+
+  <div class="grid4">
+    <div class="card"><h4>Simulation Engine</h4><p>Seasonal weather, turbine/PV power curves, priority-tiered load model</p></div>
+    <div class="card"><h4>Dual Dispatch Controllers</h4><p>Baseline (rules) vs. AI (forecast-aware) &mdash; identical conditions every tick</p></div>
+    <div class="card"><h4>Hard Safety Override</h4><p>Independent of AI, cannot be bypassed &mdash; protects critical loads</p></div>
+    <div class="card"><h4>Anomaly Detection</h4><p>Statistical control limits &mdash; actual vs. physically-expected</p></div>
+  </div>
+
+  <div class="row-connector"><span>feeds</span></div>
+
+  <div class="grid2">
+    <div class="card"><h4>3 Forecasters</h4><p>Statistical baseline &middot; Online LMS (learns live) &middot; Deployed Gradient-Boosting model (runs in-browser)</p></div>
+    <div class="card"><h4>window.PolarEMS Adapter</h4><p>Single read-only source of truth &mdash; every tab and the 3D layer read the exact same tick output</p></div>
+  </div>
+
+  <div class="row-connector"><span>renders</span></div>
+
+  <div class="grid3">
+    <div class="card"><h4>7-Tab Dashboard</h4><p>KPIs, charts, decision log, green audit</p></div>
+    <div class="card"><h4>Three.js Hero + Digital Twin</h4><p>Click-to-focus camera, GPU-tiered detail</p></div>
+    <div class="card"><h4>Live Backend Panel</h4><p>Optional HTTPS polling of the real API</p></div>
+  </div>
+</div>
+
+<div class="lower">
+  <div class="zone be">
+    <div class="zone-hd"><span class="dot"></span><span class="t">Backend</span></div>
+    <div class="d" style="margin:-10px 0 12px;font-size:11px;color:var(--text-tertiary)">Python + FastAPI &middot; Render &middot; HTTPS</div>
+    <div style="display:flex;flex-direction:column;gap:10px;flex:1;justify-content:space-evenly">
+      <div class="card"><h4>SimulationEngine</h4><p>Python port of the identical model</p></div>
+      <div class="card"><h4>GradientBoostingRegressor</h4><p>scikit-learn, trained at startup</p></div>
+      <div class="card"><h4>REST API</h4><p>/api/telemetry &middot; /api/forecast &middot; /api/green-audit</p></div>
+    </div>
+  </div>
+
+  <div class="zone ml">
+    <div class="zone-hd"><span class="dot"></span><span class="t">ML Training &amp; Export</span><span class="d">offline, one-time</span></div>
+    <div class="ml-pipe">
+      <div class="card" style="flex:1"><h4>Synthetic Training Data</h4><p>3,000 samples generated from the simulation's own physics model</p></div>
+      <div class="pipe-connector"><span class="arrow-i">&rarr;</span></div>
+      <div class="card" style="flex:1"><h4>Train + Held-Out Split</h4><p>150 trees, real measured test MAE/RMSE</p></div>
+      <div class="pipe-connector"><span class="arrow-i">&rarr;</span></div>
+      <div class="card" style="flex:1"><h4>Verify Export</h4><p>JS re-implementation == sklearn, bit-for-bit</p></div>
+      <div class="pipe-connector"><span class="arrow-i">&rarr;</span></div>
+      <div class="card" style="flex:1;border-color:var(--ml)"><h4 style="color:var(--ml)">trained_forecaster.json</h4><p>Fetched once by the frontend at load</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="ftr">
+  <div class="deploy">
+    <span class="step">GitHub</span>
+    <span class="sep">&rarr;</span>
+    <span class="step">Vercel &middot; hosts Frontend</span>
+    <span class="sep">+</span>
+    <span class="step">Render &middot; hosts Backend</span>
+  </div>
+  <div class="note">Frontend fetches the trained model JSON once at load; the Live Backend panel independently polls the API over HTTPS &mdash; two separate, optional connections, neither required for the other to work.</div>
+</div>
+
+</body></html>
