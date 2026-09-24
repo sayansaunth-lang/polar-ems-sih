@@ -1,0 +1,297 @@
+<title>POLAR-EMS Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<style>
+:root{
+  --bg:#faf9f6; --surface:#ffffff; --surface-2:#f3f1ec;
+  --border:#e4e0d6; --border-strong:#cfc9b8;
+  --text-primary:#181611; --text-secondary:#5c584c; --text-tertiary:#8b8672;
+  --accent:#0f9aa3; --accent-strong:#0c7d85; --accent-soft:#e3f4f4;
+  --ml:#7c5cc4; --gb:#c4632c;
+  --font-display:'Big Shoulders Display',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a0d12; --surface:#131820; --surface-2:#171d27;
+    --border:#232b37; --border-strong:#323d4d;
+    --text-primary:#e8edf5; --text-secondary:#9aa7bc; --text-tertiary:#6b7789;
+    --accent:#35c4c9; --accent-strong:#5fe0e4; --accent-soft:#132b2c;
+    --ml:#a78bfa; --gb:#ff9166;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a0d12; --surface:#131820; --surface-2:#171d27;
+  --border:#232b37; --border-strong:#323d4d;
+  --text-primary:#e8edf5; --text-secondary:#9aa7bc; --text-tertiary:#6b7789;
+  --accent:#35c4c9; --accent-strong:#5fe0e4; --accent-soft:#132b2c;
+  --ml:#a78bfa; --gb:#ff9166;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text-primary);font-family:var(--font-body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding-inline:20px;padding-block:44px 90px}
+a{color:var(--accent-strong)}
+code{font-family:var(--font-mono)}
+
+header.top{margin-bottom:38px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+header.top .eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-strong);font-weight:600;margin-bottom:10px}
+header.top h1{font-family:var(--font-display);font-weight:900;font-size:clamp(28px,4.6vw,42px);letter-spacing:.005em;line-height:1.03;text-wrap:balance;margin:0}
+header.top p{margin:14px 0 0;color:var(--text-secondary);max-width:62ch;font-size:15px}
+
+section.block{margin-bottom:46px}
+h2.sh{display:flex;align-items:baseline;gap:10px;font-family:var(--font-display);font-weight:800;font-size:23px;margin:0 0 4px}
+h2.sh .tag{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--surface);background:var(--accent-strong);padding:3px 8px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
+p.lede{color:var(--text-secondary);margin:0 0 18px;max-width:66ch;font-size:13.5px}
+
+.diagram-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;overflow-x:auto}
+.diagram-card pre.mermaid{margin:0;min-width:560px}
+
+.code-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.code-panel .bar{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-panel .bar .lbl{font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em}
+.code-panel button.copy{font-family:var(--font-mono);font-size:11.5px;font-weight:600;background:var(--accent-soft);color:var(--accent-strong);border:1px solid var(--border-strong);border-radius:6px;padding:5px 11px;cursor:pointer}
+.code-panel button.copy:hover{filter:brightness(0.97)}
+.code-panel button.copy:focus-visible{outline:2px solid var(--accent-strong);outline-offset:1px}
+.code-panel button.copy.done{background:var(--accent-strong);color:var(--surface);border-color:var(--accent-strong)}
+.code-panel pre.code-block{margin:0;padding:16px 18px;overflow-x:auto;font-family:var(--font-mono);font-size:12px;line-height:1.65;color:var(--text-secondary);white-space:pre}
+
+.howto{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:20px 22px}
+.howto h2.sh{margin-bottom:10px}
+.howto ol{margin:0;padding-left:20px}
+.howto li{margin-bottom:9px;color:var(--text-secondary);font-size:13.5px}
+.howto li b{color:var(--text-primary)}
+.howto code{background:var(--surface);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:11.5px;color:var(--accent-strong)}
+
+footer.pf{margin-top:44px;padding-top:18px;border-top:1px solid var(--border);color:var(--text-tertiary);font-size:11.5px;text-align:center}
+
+@media(max-width:640px){
+  .diagram-card{padding:12px}
+  header.top h1{font-size:26px}
+}
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">System architecture · for SIH final PPT</div>
+  <h1>How POLAR-EMS is put together</h1>
+  <p>Two diagrams: a simplified one sized for a single presentation slide, and a detailed one covering every real component. Both are live Mermaid diagrams — copy the source below straight into <a href="https://mermaid.live" target="_blank" rel="noopener">mermaid.live</a> to export a PNG/SVG for PowerPoint.</p>
+</header>
+
+<section class="block">
+  <h2 class="sh">Simplified <span class="tag">for the slide</span></h2>
+  <p class="lede">High-level flow: simulated station data in, dual-controller dispatch and safety in the middle, dashboard and 3D twin out — with the backend/CLI as a parallel access path. Sized to stay legible at slide scale.</p>
+
+  <div class="diagram-card">
+<pre class="mermaid">
+%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#e3f4f4','primaryTextColor':'#181611','primaryBorderColor':'#0c7d85','lineColor':'#0c7d85','secondaryColor':'#fdece1','tertiaryColor':'#f1edfa','fontFamily':'IBM Plex Sans, sans-serif'}}}%%
+flowchart LR
+    subgraph Sim["SIMULATED STATION"]
+        Sensors["Field Sensors&lt;br/&gt;weather · battery · diesel · load"]
+    end
+    subgraph Core["CORE ENGINE — runs in Browser AND Backend"]
+        Dispatch["Dual Dispatch&lt;br/&gt;Baseline vs AI"]
+        Safety["Hard Safety Override"]
+        Forecast["AI Forecasting&lt;br/&gt;3 trained models"]
+    end
+    subgraph Output["PRESENTATION LAYER"]
+        UI["Dashboard +&lt;br/&gt;3D Digital Twin"]
+    end
+    subgraph Access["ACCESS POINTS"]
+        Judge["Judge / Browser"]
+        CLI["VS Code CLI"]
+        API["FastAPI Backend"]
+    end
+    Sensors --> Dispatch
+    Dispatch --> Safety
+    Dispatch --> Forecast
+    Safety --> UI
+    Forecast --> UI
+    Judge --> UI
+    CLI -. HTTP .-> API
+    UI -. optional live poll .-> API
+</pre>
+  </div>
+
+  <div class="code-panel">
+    <div class="bar"><span class="lbl">mermaid source</span><button class="copy" data-target="code-simple">Copy code</button></div>
+    <pre class="code-block" id="code-simple">%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#e3f4f4','primaryTextColor':'#181611','primaryBorderColor':'#0c7d85','lineColor':'#0c7d85','secondaryColor':'#fdece1','tertiaryColor':'#f1edfa','fontFamily':'IBM Plex Sans, sans-serif'}}}%%
+flowchart LR
+    subgraph Sim["SIMULATED STATION"]
+        Sensors["Field Sensors&lt;br/&gt;weather · battery · diesel · load"]
+    end
+    subgraph Core["CORE ENGINE — runs in Browser AND Backend"]
+        Dispatch["Dual Dispatch&lt;br/&gt;Baseline vs AI"]
+        Safety["Hard Safety Override"]
+        Forecast["AI Forecasting&lt;br/&gt;3 trained models"]
+    end
+    subgraph Output["PRESENTATION LAYER"]
+        UI["Dashboard +&lt;br/&gt;3D Digital Twin"]
+    end
+    subgraph Access["ACCESS POINTS"]
+        Judge["Judge / Browser"]
+        CLI["VS Code CLI"]
+        API["FastAPI Backend"]
+    end
+    Sensors --> Dispatch
+    Dispatch --> Safety
+    Dispatch --> Forecast
+    Safety --> UI
+    Forecast --> UI
+    Judge --> UI
+    CLI -. HTTP .-> API
+    UI -. optional live poll .-> API</pre>
+  </div>
+</section>
+
+<section class="block">
+  <h2 class="sh">Detailed <span class="tag">full technical view</span></h2>
+  <p class="lede">Every real subsystem: the frontend's tick pipeline, the Python backend, the offline ML training/export pipeline that produces the in-browser model, and how GitHub deploys both halves. Better suited to an appendix slide or the demo screen than the main deck.</p>
+
+  <div class="diagram-card">
+<pre class="mermaid">
+%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#e3f4f4','primaryTextColor':'#181611','primaryBorderColor':'#0c7d85','lineColor':'#0c7d85','secondaryColor':'#fdece1','tertiaryColor':'#f1edfa','fontFamily':'IBM Plex Sans, sans-serif'}}}%%
+flowchart TB
+    subgraph FE["FRONTEND — Browser (Vercel, static CDN)"]
+        direction TB
+        SimEngine["Simulation Engine&lt;br/&gt;seasonal weather · turbine/PV curves · priority load"]
+        Dispatch["Dual Dispatch Controllers&lt;br/&gt;Baseline (rules) vs AI (forecast-aware)"]
+        Safety["Hard Safety Override&lt;br/&gt;independent of AI, cannot be bypassed"]
+        Anomaly["Anomaly Detection&lt;br/&gt;expected vs. actual thresholds"]
+        Forecast["3 Forecasters&lt;br/&gt;Statistical · Online LMS (learns live) · Deployed GB model"]
+        Adapter["window.PolarEMS Adapter&lt;br/&gt;single source of truth"]
+        Dashboard["7-Tab Dashboard&lt;br/&gt;KPIs, charts, decision log"]
+        Hero3D["Three.js Hero + Digital Twin&lt;br/&gt;click-to-focus camera"]
+        LiveBE["Live Backend Panel&lt;br/&gt;optional REST polling"]
+    end
+    subgraph BE["BACKEND — Python + FastAPI (Render, HTTPS)"]
+        direction TB
+        PySim["SimulationEngine — Python port"]
+        PyML["GradientBoostingRegressor&lt;br/&gt;scikit-learn, trained at startup"]
+        API["REST API&lt;br/&gt;/api/telemetry · /api/forecast · /api/green-audit"]
+    end
+    subgraph MLPipe["ML TRAINING &amp; EXPORT — offline, one-time"]
+        direction TB
+        SynthGen["Synthetic Training Data&lt;br/&gt;3000 samples from the physics model"]
+        TrainStep["Train + held-out test split"]
+        VerifyStep["Verify JS export == sklearn, bit-for-bit"]
+        JSONModel["trained_forecaster.json&lt;br/&gt;150 trees"]
+    end
+    subgraph Infra["DEPLOYMENT"]
+        direction LR
+        GitHub["GitHub"]
+        Vercel["Vercel"]
+        RenderHost["Render"]
+    end
+    SimEngine --> Dispatch --> Safety --> Anomaly
+    Dispatch --> Forecast
+    Safety --> Adapter
+    Forecast --> Adapter
+    Adapter --> Dashboard
+    Adapter --> Hero3D
+    SynthGen --> TrainStep --> VerifyStep --> JSONModel
+    JSONModel -. fetched once at load .-> Forecast
+    LiveBE -. HTTPS polling .-> API
+    API --> PySim
+    API --> PyML
+    GitHub --> Vercel
+    GitHub --> RenderHost
+    Vercel -. hosts .-> FE
+    RenderHost -. hosts .-> BE
+</pre>
+  </div>
+
+  <div class="code-panel">
+    <div class="bar"><span class="lbl">mermaid source</span><button class="copy" data-target="code-detailed">Copy code</button></div>
+    <pre class="code-block" id="code-detailed">%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#e3f4f4','primaryTextColor':'#181611','primaryBorderColor':'#0c7d85','lineColor':'#0c7d85','secondaryColor':'#fdece1','tertiaryColor':'#f1edfa','fontFamily':'IBM Plex Sans, sans-serif'}}}%%
+flowchart TB
+    subgraph FE["FRONTEND — Browser (Vercel, static CDN)"]
+        direction TB
+        SimEngine["Simulation Engine&lt;br/&gt;seasonal weather · turbine/PV curves · priority load"]
+        Dispatch["Dual Dispatch Controllers&lt;br/&gt;Baseline (rules) vs AI (forecast-aware)"]
+        Safety["Hard Safety Override&lt;br/&gt;independent of AI, cannot be bypassed"]
+        Anomaly["Anomaly Detection&lt;br/&gt;expected vs. actual thresholds"]
+        Forecast["3 Forecasters&lt;br/&gt;Statistical · Online LMS (learns live) · Deployed GB model"]
+        Adapter["window.PolarEMS Adapter&lt;br/&gt;single source of truth"]
+        Dashboard["7-Tab Dashboard&lt;br/&gt;KPIs, charts, decision log"]
+        Hero3D["Three.js Hero + Digital Twin&lt;br/&gt;click-to-focus camera"]
+        LiveBE["Live Backend Panel&lt;br/&gt;optional REST polling"]
+    end
+    subgraph BE["BACKEND — Python + FastAPI (Render, HTTPS)"]
+        direction TB
+        PySim["SimulationEngine — Python port"]
+        PyML["GradientBoostingRegressor&lt;br/&gt;scikit-learn, trained at startup"]
+        API["REST API&lt;br/&gt;/api/telemetry · /api/forecast · /api/green-audit"]
+    end
+    subgraph MLPipe["ML TRAINING &amp; EXPORT — offline, one-time"]
+        direction TB
+        SynthGen["Synthetic Training Data&lt;br/&gt;3000 samples from the physics model"]
+        TrainStep["Train + held-out test split"]
+        VerifyStep["Verify JS export == sklearn, bit-for-bit"]
+        JSONModel["trained_forecaster.json&lt;br/&gt;150 trees"]
+    end
+    subgraph Infra["DEPLOYMENT"]
+        direction LR
+        GitHub["GitHub"]
+        Vercel["Vercel"]
+        RenderHost["Render"]
+    end
+    SimEngine --> Dispatch --> Safety --> Anomaly
+    Dispatch --> Forecast
+    Safety --> Adapter
+    Forecast --> Adapter
+    Adapter --> Dashboard
+    Adapter --> Hero3D
+    SynthGen --> TrainStep --> VerifyStep --> JSONModel
+    JSONModel -. fetched once at load .-> Forecast
+    LiveBE -. HTTPS polling .-> API
+    API --> PySim
+    API --> PyML
+    GitHub --> Vercel
+    GitHub --> RenderHost
+    Vercel -. hosts .-> FE
+    RenderHost -. hosts .-> BE</pre>
+  </div>
+</section>
+
+<div class="howto">
+  <h2 class="sh">Getting this into PowerPoint</h2>
+  <ol>
+    <li><b>Copy</b> the source block for whichever diagram you want (button above each).</li>
+    <li>Open <a href="https://mermaid.live" target="_blank" rel="noopener">mermaid.live</a>, paste it into the left-hand editor pane — the diagram renders instantly on the right.</li>
+    <li>Use its <b>Actions → PNG</b> (or SVG, for a version that stays sharp if you resize it on the slide) to download the image.</li>
+    <li>Insert that image into your slide like any picture — <b>Insert → Pictures</b> in PowerPoint.</li>
+  </ol>
+</div>
+
+<footer class="pf">POLAR-EMS &middot; architecture reference &middot; generated from the current running codebase</footer>
+
+</div>
+
+<script>
+document.querySelectorAll("button.copy").forEach(btn=>{
+  btn.addEventListener("click", async ()=>{
+    const target = document.getElementById(btn.dataset.target);
+    const text = target.textContent;
+    try{
+      await navigator.clipboard.writeText(text);
+    }catch(e){
+      const range = document.createRange();
+      range.selectNodeContents(target);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    const original = btn.textContent;
+    btn.textContent = "Copied ✓";
+    btn.classList.add("done");
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove("done"); }, 1600);
+  });
+});
+</script>
