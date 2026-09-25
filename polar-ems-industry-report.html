@@ -1,0 +1,206 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#161c26; --ink-soft:#4c5768; --ink-faint:#8994a3;
+  --paper:#ffffff; --band:#f4f6f9; --line:#dfe4ea;
+  --navy:#14324f; --navy-soft:#e7edf3;
+  --teal:#0f9aa3; --teal-soft:#e2f4f4; --teal-strong:#0c7d85;
+  --good:#2f8f5b; --good-soft:#e6f5ec;
+  --amber:#b9791a; --amber-soft:#fbf0dd;
+  --font-display:'Big Shoulders Display',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:14.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:0 40px}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+code{font-family:var(--font-mono);font-size:12.5px;background:var(--navy-soft);padding:1px 6px;border-radius:4px;color:var(--navy)}
+
+/* cover */
+.cover{padding:56px 0 34px;border-bottom:3px solid var(--navy)}
+.cover .kicker{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--teal-strong);margin-bottom:14px}
+.cover h1{font-family:var(--font-display);font-weight:900;font-size:44px;letter-spacing:.005em;line-height:1.04;color:var(--navy);max-width:20ch}
+.cover p.dek{margin-top:14px;font-size:16px;color:var(--ink-soft);max-width:62ch;line-height:1.55}
+.cover .meta{margin-top:26px;display:flex;gap:26px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-faint);font-family:var(--font-mono)}
+
+/* sections */
+section{padding:34px 0;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+h2.sh{font-family:var(--font-display);font-weight:800;font-size:24px;color:var(--navy);letter-spacing:.005em;margin-bottom:4px}
+h2.sh .no{font-family:var(--font-mono);font-size:13px;color:var(--teal-strong);font-weight:600;margin-right:10px}
+p.lede{color:var(--ink-soft);max-width:68ch;margin-bottom:16px;font-size:14px}
+p{margin-bottom:12px;max-width:70ch}
+ul{margin:0 0 14px 20px}
+li{margin-bottom:7px;color:var(--ink-soft)}
+li b{color:var(--ink)}
+strong{color:var(--ink)}
+
+.callout{background:var(--navy-soft);border-left:3px solid var(--navy);border-radius:6px;padding:14px 18px;margin:16px 0;font-size:13.5px;color:var(--ink-soft)}
+.callout b{color:var(--navy)}
+.callout.amber{background:var(--amber-soft);border-left-color:var(--amber)}
+.callout.amber b{color:var(--amber)}
+
+/* stat row */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0}
+.stat{background:var(--band);border:1px solid var(--line);border-radius:10px;padding:16px 14px}
+.stat .v{font-family:var(--font-display);font-weight:800;font-size:26px;color:var(--navy);line-height:1}
+.stat .v .u{font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--ink-faint);margin-left:2px}
+.stat .l{font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em;margin-top:6px}
+
+/* chart */
+.chart-card{background:var(--band);border:1px solid var(--line);border-radius:12px;padding:22px 26px;margin:18px 0}
+.chart-card .chart-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.chart-card h4{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--navy)}
+.chart-card .method{font-size:11px;color:var(--ink-faint)}
+.chart-foot{font-size:11px;color:var(--ink-faint);margin-top:8px;line-height:1.5}
+
+/* table */
+table{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);padding:8px 10px;border-bottom:2px solid var(--line);font-weight:600}
+td{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--ink-soft)}
+td.b{color:var(--ink);font-weight:600}
+tr:last-child td{border-bottom:none}
+
+.applist{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 22px;margin:16px 0}
+.applist .a{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink-soft)}
+.applist .a .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);margin-top:7px;flex-shrink:0}
+.applist .a b{color:var(--ink);display:block}
+
+footer.pf{padding:26px 0 60px;text-align:center;color:var(--ink-faint);font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="cover">
+  <div class="kicker">Industry impact report &middot; POLAR-EMS</div>
+  <h1>Forecast-aware dispatch for isolated, diesel-dependent microgrids</h1>
+  <p class="dek">A working prototype, built for an Antarctic research station, that measurably cuts diesel consumption and generator wear on any remote power system where fuel is expensive to deliver and downtime is not an option.</p>
+  <div class="meta">
+    <span>Prototype stage &middot; software-validated</span>
+    <span>github.com/sayansaunth-lang/polar-ems-sih</span>
+    <span>polar-ems-web.vercel.app</span>
+  </div>
+</div>
+
+<section>
+  <h2 class="sh"><span class="no">01</span>Executive Summary</h2>
+  <p class="lede">POLAR-EMS is a dispatch and safety layer for isolated microgrids — systems that generate their own power from wind, solar, battery and diesel with no utility grid to fall back on. It replaces fixed-rule generator scheduling with a forecast-aware controller that decides, continuously, how to blend available power sources to minimize diesel burned and generator runtime, without ever compromising a hard-guaranteed power floor for critical loads.</p>
+  <p>Over an extended validation run of the working prototype, the AI-optimized controller reduced diesel consumption and generator operating hours relative to an equally realistic fixed-rule baseline, while a safety layer architecturally independent of the optimizer guaranteed critical-load power throughout — including under simulated AI failure and simulated connectivity loss.</p>
+</section>
+
+<section>
+  <h2 class="sh"><span class="no">02</span>The Industry Problem</h2>
+  <p class="lede">This is not a problem unique to polar research. Any facility that generates its own power in a location fuel cannot easily reach shares the same two constraints:</p>
+  <ul>
+    <li><b>Diesel is the most expensive input, and it's fixed-schedule delivered.</b> Fuel is shipped, flown, or trucked in on a schedule that cannot flex with demand — every litre burned inefficiently is a cost that compounds over the life of the site.</li>
+    <li><b>Downtime is not cosmetic.</b> For remote telecom, defense, mining, medical, or life-support infrastructure, a power failure is an operational or safety incident, not an inconvenience — so any optimization layer has to prove it cannot cause one.</li>
+  </ul>
+  <p>Most existing remote-site generator controllers are fixed-threshold rule systems: run diesel when battery crosses X%, regardless of what the weather forecast says is coming. That leaves real, measurable efficiency on the table.</p>
+</section>
+
+<section>
+  <h2 class="sh"><span class="no">03</span>How It Works</h2>
+  <p class="lede">Three layers, each doing one job:</p>
+  <ul>
+    <li><b>Forecast-aware dispatch.</b> Instead of reacting only to the current battery level, the controller looks ahead at the renewable forecast and times diesel starts and battery reserve to avoid unnecessary generator cycling.</li>
+    <li><b>A hard safety floor, independent of the optimizer.</b> A separate override guarantees critical-load power regardless of what the optimizer decides, or whether it's running at all — demonstrated by disabling the AI controller entirely and confirming the site stays powered on deterministic fallback rules.</li>
+    <li><b>Machine learning that's real, not asserted.</b> Load forecasting is backed by a gradient-boosting model trained on a genuine held-out test split, exported and verified to reproduce its training-time predictions exactly, then deployed to run inference directly in the field-facing application with no cloud dependency.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sh"><span class="no">04</span>Measured Results</h2>
+  <p class="lede">Figures below are from an extended validation run of the actual working prototype &mdash; roughly eight simulated months, comparing the AI-optimized controller against a fixed-rule baseline operating under <em>identical</em> weather and load conditions throughout, so the delta is a measured result, not a projection.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="v">1,251<span class="u">L</span></div><div class="l">Diesel saved</div></div>
+    <div class="stat"><div class="v">3.35<span class="u">t</span></div><div class="l">CO&#8322; avoided</div></div>
+    <div class="stat"><div class="v">233<span class="u">h</span></div><div class="l">Fewer generator-hours</div></div>
+    <div class="stat"><div class="v">65.6<span class="u">%</span></div><div class="l">Load served by renewables</div></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-hd"><h4>AI-optimized vs. fixed-rule baseline (indexed, baseline = 100%)</h4><span class="method">~8-month run &middot; identical conditions</span></div>
+    <svg viewBox="0 0 760 230" style="width:100%;height:auto" role="img" aria-label="Bar chart comparing AI-optimized to baseline: diesel consumed at 99.1 percent, generator runtime at 94.8 percent">
+      <!-- gridlines -->
+      <line x1="60" y1="20" x2="60" y2="180" stroke="#dfe4ea" stroke-width="1"/>
+      <line x1="60" y1="180" x2="740" y2="180" stroke="#8994a3" stroke-width="1.2"/>
+      <text x="52" y="24" text-anchor="end" font-family="IBM Plex Mono" font-size="10.5" fill="#8994a3">100%</text>
+      <text x="52" y="102" text-anchor="end" font-family="IBM Plex Mono" font-size="10.5" fill="#8994a3">50%</text>
+      <text x="52" y="184" text-anchor="end" font-family="IBM Plex Mono" font-size="10.5" fill="#8994a3">0%</text>
+      <line x1="60" y1="100" x2="740" y2="100" stroke="#dfe4ea" stroke-width="1"/>
+
+      <!-- group 1: diesel consumed -->
+      <g>
+        <rect x="140" y="20" width="54" height="160" fill="#c7cfda"/>
+        <text x="167" y="14" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#4c5768">100%</text>
+        <rect x="204" y="21.4" width="54" height="158.6" fill="#0f9aa3"/>
+        <text x="231" y="15.4" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#0c7d85">99.1%</text>
+        <text x="199" y="204" text-anchor="middle" font-family="IBM Plex Sans" font-weight="600" font-size="13" fill="#161c26">Diesel Consumed</text>
+        <text x="199" y="220" text-anchor="middle" font-family="IBM Plex Mono" font-size="10.5" fill="#8994a3">139,959 L &rarr; 138,708 L</text>
+      </g>
+
+      <!-- group 2: generator runtime -->
+      <g>
+        <rect x="420" y="20" width="54" height="160" fill="#c7cfda"/>
+        <text x="447" y="14" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#4c5768">100%</text>
+        <rect x="484" y="28.5" width="54" height="151.5" fill="#0f9aa3"/>
+        <text x="511" y="22.5" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#0c7d85">94.8%</text>
+        <text x="479" y="204" text-anchor="middle" font-family="IBM Plex Sans" font-weight="600" font-size="13" fill="#161c26">Generator Runtime</text>
+        <text x="479" y="220" text-anchor="middle" font-family="IBM Plex Mono" font-size="10.5" fill="#8994a3">4,486 h &rarr; 4,253 h</text>
+      </g>
+
+      <!-- legend -->
+      <rect x="600" y="196" width="11" height="11" fill="#c7cfda"/>
+      <text x="616" y="205" font-family="IBM Plex Sans" font-size="11.5" fill="#4c5768">Baseline (fixed-rule)</text>
+      <rect x="600" y="212" width="11" height="11" fill="#0f9aa3"/>
+      <text x="616" y="221" font-family="IBM Plex Sans" font-size="11.5" fill="#4c5768">AI-optimized</text>
+    </svg>
+    <div class="chart-foot">Bars are indexed to the baseline for readability at this scale &mdash; a sub-1% fuel delta on ~140,000 L is not visible as two full-height bars, so this shows the relative reduction directly, with absolute figures labeled on each bar.</div>
+  </div>
+
+  <div class="callout amber"><b>Read this number honestly:</b> a 0.9% fuel reduction is modest on its own, and we're not presenting it as more than it is. What it compounds into is the more economically relevant number for a real operator: 233 fewer generator-operating-hours over eight months &mdash; a 5.2% cut in the hours that drive service intervals, oil changes, and mechanical wear, independent of fuel price. At fleet scale, hours saved is usually the bigger line item than litres saved.</div>
+</section>
+
+<section>
+  <h2 class="sh"><span class="no">05</span>Why It Matters for an Operator</h2>
+  <table>
+    <tr><th>Result</th><th>Operational translation</th></tr>
+    <tr><td class="b">233 fewer generator-hours</td><td>Fewer service intervals, less mechanical wear, longer time between costly remote maintenance callouts</td></tr>
+    <tr><td class="b">1,251 L diesel saved</td><td>Direct fuel-logistics cost avoidance &mdash; compounds with delivery cost, not just unit price</td></tr>
+    <tr><td class="b">3.35 t CO&#8322; avoided</td><td>A concrete, auditable figure for ESG and emissions reporting</td></tr>
+    <tr><td class="b">Hard safety floor, independent of AI</td><td>The optimization layer can fail, be disabled, or be wrong, and the site still keeps critical power &mdash; a real operator's actual risk tolerance</td></tr>
+    <tr><td class="b">Fully edge-capable</td><td>Forecasting, dispatch and safety all run without cloud connectivity &mdash; relevant anywhere satellite or cellular backhaul is not guaranteed</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2 class="sh"><span class="no">06</span>Where Else This Applies</h2>
+  <p class="lede">The same constraint &mdash; islanded power, expensive fuel logistics, low tolerance for downtime &mdash; appears well beyond polar research:</p>
+  <div class="applist">
+    <div class="a"><span class="dot"></span><div><b>Mining &amp; remote extraction sites</b>Off-grid camps running diesel gensets as primary power for months at a time</div></div>
+    <div class="a"><span class="dot"></span><div><b>Telecom &amp; broadcast towers</b>Unmanned remote sites where a generator visit is a helicopter trip</div></div>
+    <div class="a"><span class="dot"></span><div><b>Defense &amp; forward operating bases</b>Fuel convoys are a direct logistics and safety liability</div></div>
+    <div class="a"><span class="dot"></span><div><b>Disaster-relief &amp; field hospitals</b>Temporary power where reliability requirements are highest and infrastructure is lowest</div></div>
+    <div class="a"><span class="dot"></span><div><b>Island &amp; maritime microgrids</b>Diesel shipped by boat, identical logistics profile to polar resupply</div></div>
+    <div class="a"><span class="dot"></span><div><b>Remote oil &amp; gas facilities</b>Islanded power at the well site or platform, safety-critical loads throughout</div></div>
+  </div>
+</section>
+
+<section>
+  <h2 class="sh"><span class="no">07</span>Maturity &amp; Path to Deployment</h2>
+  <p class="lede">Presented at the stage it actually is: a validated software prototype, not yet integrated with physical hardware.</p>
+  <p>The simulation, dispatch, forecasting and safety logic are built against the same data shape real sensors and a real battery-management system would provide (weather, state-of-charge, generator status, per-zone load), and both the client and server implementations already expose that logic as a real, callable API. Moving to a physical deployment means replacing the synthetic telemetry generator with live sensor/BMS/genset feeds into the same pipeline &mdash; not a redesign of the decision logic itself.</p>
+  <div class="callout"><b>What's already real today:</b> the dispatch algorithm, the safety override, the trained forecasting models, and a live, publicly deployed frontend and backend that anyone can query over HTTPS right now.</div>
+</section>
+
+<footer class="pf">POLAR-EMS &middot; Industry Impact Report &middot; figures drawn directly from a live validation run of the working prototype, not modeled or assumed</footer>
+
+</div>
+</body></html>
