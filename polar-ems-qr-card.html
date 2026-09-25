@@ -1,0 +1,47 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:900px;height:1200px;overflow:hidden}
+body{
+  background:
+    radial-gradient(60% 40% at 82% 8%, rgba(53,196,201,.14), transparent 60%),
+    radial-gradient(40% 30% at 10% 100%, rgba(179,155,250,.08), transparent 60%),
+    #0a0d12;
+  color:#e8edf5;
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px;
+}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:40px}
+.brand-mark{width:52px;height:52px;border-radius:13px;background:#171d27;border:1.5px solid #323d4d;display:flex;align-items:center;justify-content:center}
+.brand-mark svg{width:29px;height:29px}
+.brand-name{font-family:'Big Shoulders Display',system-ui,sans-serif;font-weight:900;font-size:32px;letter-spacing:.01em}
+.qr-panel{background:#ffffff;border-radius:24px;padding:36px;box-shadow:0 30px 70px -20px rgba(0,0,0,.5)}
+.qr-panel img{display:block;width:520px;height:520px;image-rendering:pixelated}
+.cta{font-family:'Big Shoulders Display',system-ui,sans-serif;font-weight:900;font-size:40px;margin-top:44px;text-align:center;color:#e8edf5}
+.cta .accent{color:#5fe0e4}
+.url{font-family:'IBM Plex Mono',ui-monospace,Consolas,monospace;font-size:19px;color:#8fa0b8;margin-top:14px;letter-spacing:.01em}
+.sub{font-size:14.5px;color:#57667c;margin-top:22px;text-align:center;max-width:44ch;line-height:1.5}
+</style>
+</head>
+<body>
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#35c4c9" stroke-width="1.8"><path d="M12 2v20M2 12h20M4.5 4.5l15 15M19.5 4.5l-15 15" stroke-linecap="round"/><circle cx="12" cy="12" r="3.4" fill="#122c2e" stroke="#6ce8ec"/></svg>
+    </div>
+    <div class="brand-name">POLAR-EMS</div>
+  </div>
+
+  <div class="qr-panel">
+    <img src="data:image/png;base64,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98lzp973xHU+ca1u42YFAEgTKwBAmlgBANLECgCQJlYAgDSxAgCkiRUAIE2sAABpYgUASBMrAECaWAEA0sQKAJAmVgCANLECAKSJFQAgTawAAGliBQBIEysAQJpYAQDS3tMDnGStNT0C0T3ae4/89kS3ve+J38KTPTrxufS5WQEA0sQKAJAmVgCANLECAKSJFQAgTawAAGliBQBIEysAQJpYAQDSxAoAkCZWAIA0sQIApIkVACBNrAAAaWIFAEgTKwBAmlgBANLECgCQJlYAgLS1956eAQDgj9ysAABpYgUASBMrAECaWAEA0sQKAJAmVgCANLECAKSJFQAgTawAAGliBQBIEysAQJpYAQDSxAoAkCZWAIA0sQIApIkVACBNrAAAaWIFAEgTKwBAmlgBANLECgCQJlYAgDSxAgCkiRUAIE2sAABpYgUASBMrAECaWAEA0sQKAJAmVgCANLECAKSJFQAgTawAAGliBQBIEysAQJpYAQDSxAoAkCZWAIA0sQIApIkVACBNrAAAaWIFAEgTKwBAmlgBANLECgCQJlYAgDSxAgCkiRUAIE2sAABpYgUASBMrAECaWAEA0sQKAJAmVgCANLECAKSJFQAgTawAAGliBQBIEysAQJpYAQDSxAoAkCZWAIA0sQIApIkVACBNrAAAaWIFAEgTKwBAmlgBANLECgCQJlYAgDSxAgCkiRUAIE2sAABpYgUASBMrAECaWAEA0sQKAJAmVgCANLECALzK/g8Eakjaiv3clwAAAABJRU5ErkJggg==" alt="QR code linking to the POLAR-EMS live demo">
+  </div>
+
+  <div class="cta">Scan to try it <span class="accent">live</span></div>
+  <div class="url">polar-ems-web.vercel.app</div>
+  <div class="sub">AI-driven smart energy management for isolated polar research stations &mdash; live simulation, live 3D twin, live dashboard.</div>
+</body></html>
