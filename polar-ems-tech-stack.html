@@ -1,0 +1,93 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0d12; --surface:#131820; --surface-2:#171d27;
+  --border:#232b37; --border-strong:#323d4d;
+  --text-primary:#e8edf5; --text-secondary:#8fa0b8; --text-tertiary:#57667c;
+  --accent:#35c4c9; --accent-strong:#5fe0e4; --accent-soft:rgba(53,196,201,.12);
+  --ml:#a78bfa; --gb:#ff9166;
+  --font-display:'Big Shoulders Display',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text-primary);font-family:var(--font-body);font-size:14.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 40px}
+code{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:var(--accent-strong)}
+
+.cover{padding:50px 0 28px;border-bottom:2px solid var(--border)}
+.cover .kicker{font-family:var(--font-mono);font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:12px}
+.cover h1{font-family:var(--font-display);font-weight:900;font-size:36px;letter-spacing:.005em;color:var(--text-primary)}
+.cover p{margin-top:12px;color:var(--text-secondary);max-width:64ch;font-size:14.5px}
+
+section{padding:26px 0;border-bottom:1px solid var(--border)}
+section:last-of-type{border-bottom:none}
+h2.sh{font-family:var(--font-display);font-weight:800;font-size:19px;color:var(--accent-strong);margin-bottom:12px;display:flex;align-items:center;gap:9px}
+h2.sh .tag{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--text-tertiary);background:var(--surface-2);border:1px solid var(--border-strong);padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:.04em}
+
+.comp{display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--border)}
+.comp:first-of-type{border-top:none}
+.comp .name{font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--text-primary);width:220px;flex-shrink:0}
+.comp .desc{font-size:13px;color:var(--text-secondary);line-height:1.5}
+
+footer.pf{padding:24px 0 50px;text-align:center;color:var(--text-tertiary);font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="cover">
+  <div class="kicker">POLAR-EMS &middot; Reference</div>
+  <h1>Components &amp; Technology Stack</h1>
+  <p>Every real component used to build POLAR-EMS, grouped by where it runs. Nothing in the running product depends on a JS framework, a charting library, or a cloud ML API &mdash; the only non-trivial dependency anywhere is scikit-learn, used strictly offline for training.</p>
+</div>
+
+<section>
+  <h2 class="sh">Frontend <span class="tag">runs in the browser</span></h2>
+  <div class="comp"><div class="name">HTML / CSS / JavaScript</div><div class="desc">No framework (no React/Vue), no build step. One self-contained <code>index.html</code> runs the entire simulation client-side.</div></div>
+  <div class="comp"><div class="name">Three.js</div><div class="desc"><code>three@0.160.0</code>, loaded via CDN import map &mdash; the cinematic hero scene and 3D digital twin.</div></div>
+  <div class="comp"><div class="name">Native <code>&lt;video&gt;</code></div><div class="desc">The looping Antarctic station background, no player library.</div></div>
+  <div class="comp"><div class="name">Hand-drawn inline SVG</div><div class="desc">Every chart &mdash; line/bar charts, the power-flow diagram, the digital twin &mdash; drawn directly, no charting library.</div></div>
+  <div class="comp"><div class="name">Google Fonts</div><div class="desc">Big Shoulders Display (headings), IBM Plex Sans (body), IBM Plex Mono (data/labels).</div></div>
+</section>
+
+<section>
+  <h2 class="sh">Backend <span class="tag">Python service</span></h2>
+  <div class="comp"><div class="name">Python 3.11</div><div class="desc">Runtime for the entire backend.</div></div>
+  <div class="comp"><div class="name">FastAPI</div><div class="desc">The REST API framework &mdash; <code>/api/telemetry</code>, <code>/api/forecast</code>, <code>/api/green-audit</code>, and more.</div></div>
+  <div class="comp"><div class="name">Uvicorn</div><div class="desc">The ASGI server running the FastAPI app.</div></div>
+  <div class="comp"><div class="name">Pydantic</div><div class="desc">Request/response validation for the API.</div></div>
+  <div class="comp"><div class="name"><code>requests</code> + <code>rich</code></div><div class="desc">Power <code>cli.py</code>, the terminal client &mdash; <code>rich</code> renders its menu, tables and panels.</div></div>
+</section>
+
+<section>
+  <h2 class="sh">Machine Learning</h2>
+  <div class="comp"><div class="name">scikit-learn</div><div class="desc"><code>GradientBoostingRegressor</code> (150 trees), trained offline with a genuine held-out train/test split.</div></div>
+  <div class="comp"><div class="name">NumPy</div><div class="desc">Numerical operations for training and export.</div></div>
+  <div class="comp"><div class="name">Custom JS tree-traversal engine</div><div class="desc">Reimplements the trained model's inference in the browser &mdash; the trained model is exported to JSON and walked in plain JS, verified bit-for-bit against scikit-learn's own output before shipping. No ML library needed client-side.</div></div>
+  <div class="comp"><div class="name">Custom online linear regression</div><div class="desc">Widrow-Hoff / LMS rule, hand-implemented in JS &mdash; trains live from the running simulation, one gradient step per tick.</div></div>
+</section>
+
+<section>
+  <h2 class="sh">Deployment &amp; Infrastructure</h2>
+  <div class="comp"><div class="name">Git / GitHub</div><div class="desc">Single source of truth &mdash; <code>sayansaunth-lang/polar-ems-sih</code>.</div></div>
+  <div class="comp"><div class="name">Vercel</div><div class="desc">Hosts the frontend as a static CDN deployment.</div></div>
+  <div class="comp"><div class="name">Render</div><div class="desc">Hosts the backend &mdash; containerized, HTTPS, auto-deploys on push (<code>render.yaml</code>).</div></div>
+</section>
+
+<section>
+  <h2 class="sh">Dev Tooling <span class="tag">used to build &amp; verify, not part of the running app</span></h2>
+  <div class="comp"><div class="name">VS Code</div><div class="desc"><code>.vscode/launch.json</code> run configs for the backend and CLI client.</div></div>
+  <div class="comp"><div class="name">Python venv + pip</div><div class="desc">Dependency isolation, pinned in <code>requirements.txt</code>.</div></div>
+  <div class="comp"><div class="name">Headless Chrome</div><div class="desc">Renders the documentation, reports and slide graphics from HTML to PDF/PNG.</div></div>
+  <div class="comp"><div class="name"><code>pypdf</code></div><div class="desc">Verifies generated PDFs actually contain the right content before they're shipped.</div></div>
+</section>
+
+<footer class="pf">POLAR-EMS &middot; Components &amp; Technology Stack &middot; reflects the current running codebase</footer>
+
+</div>
+</body></html>
